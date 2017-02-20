@@ -4,7 +4,7 @@
 #ifndef PENUMBRA_H_
 #define PENUMBRA_H_
 
-#include "penumbra/context.h"
-#include "penumbra/sun.h"
+#include <penumbra/context.h>
+#include <penumbra/sun.h>
 
 #endif /* PENUMBRA_H_ */

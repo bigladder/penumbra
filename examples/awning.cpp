@@ -1,7 +1,7 @@
 /* Copyright (c) 2017 Big Ladder Software and Chip Barnaby. All rights reserved.
 * See the LICENSE file for additional terms and conditions. */
 
-#include "penumbra/penumbra.h"
+#include <penumbra/penumbra.h>
 #include <iostream>
 
 int main(void)
@@ -40,7 +40,7 @@ int main(void)
     context.showRendering();
     std::size_t pixels = context.countPixels();
 
-    std::cout << pixels;
+    std::cout << pixels << std::endl;
 
     return 0;
 }

@@ -5,7 +5,7 @@
 #define SUN_H_
 
 #include <cmath>
-#include "linmath.h"
+#include <linmath.h>
 
 namespace Pumbra {
 

@@ -1,7 +1,7 @@
 /* Copyright (c) 2017 Big Ladder Software and Charles S. Barnaby. All rights reserved.
 * See the LICENSE file for additional terms and conditions. */
 
-#include "penumbra/sun.h"
+#include <penumbra/sun.h>
 
 namespace Pumbra {
 

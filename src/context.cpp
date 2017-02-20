@@ -1,7 +1,7 @@
 /* Copyright (c) 2017 Big Ladder Software and Charles S. Barnaby. All rights reserved.
 * See the LICENSE file for additional terms and conditions. */
 
-#include "penumbra/context.h"
+#include <penumbra/context.h>
 
 namespace Pumbra {
 
@@ -16,10 +16,11 @@ namespace Pumbra {
 
 const char* Context::vertexShaderSource =
 R"src(
+  #version 150
   uniform mat4 MVP;
-  attribute vec3 vCol;
-  attribute vec3 vPos;
-  varying vec3 color;
+  in vec3 vCol;
+  in vec3 vPos;
+  out vec3 color;
   void main()
   {
     gl_Position = MVP * vec4(vPos, 1.0);
@@ -29,10 +30,12 @@ R"src(
 
 const char* Context::fragmentShaderSource =
 R"src(
-  varying vec3 color;
+  #version 150
+  in vec3 color;
+  out vec4 outColor;
   void main()
   {
-    gl_FragColor = vec4(color, 1.0);
+    outColor = vec4(color, 1.0);
   }
 )src";
 
@@ -82,10 +85,14 @@ void GLModel::draw() {
 Context::Context(std::size_t size) :
   size(size)
 {
+  glfwSetErrorCallback([](int error, const char* description){fprintf(stderr, "Error (%d): %s\n", error, description);});
+
   if (!glfwInit()) {throw;}
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
   glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
   window = glfwCreateWindow(1, 1, "Penumbra", NULL, NULL);
   glfwMakeContextCurrent(window);
@@ -100,15 +107,40 @@ Context::Context(std::size_t size) :
 
   glEnable(GL_DEPTH_TEST);
 
+  GLint shader_ok;
+  GLsizei log_length;
+  char info_log[8192];
+
+
   // Vertex shader
   vertexShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
   glCompileShader(vertexShader);
+  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &shader_ok);
+
+  if (shader_ok != GL_TRUE)
+  {
+      fprintf(stderr, "ERROR: Failed to compile vertex_shader shader.\n");
+      glGetShaderInfoLog(vertexShader, 8192, &log_length,info_log);
+      fprintf(stderr, "ERROR: \n%s\n\n", info_log);
+      glDeleteShader(vertexShader);
+  }
+
 
   // Fragment shader
   fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
   glCompileShader(fragmentShader);
+  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &shader_ok);
+
+  if (shader_ok != GL_TRUE)
+  {
+      fprintf(stderr, "ERROR: Failed to compile vertex_shader shader.\n");
+      glGetShaderInfoLog(fragmentShader, 8192, &log_length,info_log);
+      fprintf(stderr, "ERROR: \n%s\n\n", info_log);
+      glDeleteShader(fragmentShader);
+  }
+
 
   // Shader program
   program = glCreateProgram();
@@ -133,7 +165,7 @@ Context::~Context(){
 void Context::setModel(const std::vector<std::array<float, 3>>& vertices) {
 
   // set model vertices
-  model.setVertices(vertices, { 0.5f, 0.5f, 0.5f });
+  model.setVertices(vertices, {{ 0.5f, 0.5f, 0.5f }});
 
   float bLeft = FLT_MAX, bBottom = FLT_MAX, bFront = FLT_MAX;
   float bRight = -FLT_MAX, bTop = -FLT_MAX, bBack = -FLT_MAX;
@@ -141,15 +173,15 @@ void Context::setModel(const std::vector<std::array<float, 3>>& vertices) {
 
   // calculate bounding box
   for (auto a : vertices) {
-    bLeft = min(a[0], bLeft);
-    bRight = max(a[0], bRight);
-    bFront = min(a[1], bFront);
-    bBack = max(a[1], bBack);
-    bBottom = min(a[2], bBottom);
-    bTop = max(a[2], bTop);
+    bLeft = std::min(a[0], bLeft);
+    bRight = std::max(a[0], bRight);
+    bFront = std::min(a[1], bFront);
+    bBack = std::max(a[1], bBack);
+    bBottom = std::min(a[2], bBottom);
+    bTop = std::max(a[2], bTop);
   }
 
-  float tempBox[8][4] = 
+  float tempBox[8][4] =
   {
     { bLeft, bFront, bBottom, 0.0 },
     { bLeft, bFront, bTop, 0.0 },
@@ -178,7 +210,7 @@ void Context::setScene(const std::vector<std::array<float, 3>>& vertices, mat4x4
   }
 
   // set surface vertices
-  surface.setVertices(vertices, { 1.f, 1.f, 1.f });
+  surface.setVertices(vertices, {{ 1.f, 1.f, 1.f }});
 
   // calculate clipping planes in rendered coorinates
   float left(FLT_MAX);
@@ -192,19 +224,19 @@ void Context::setScene(const std::vector<std::array<float, 3>>& vertices, mat4x4
     vec4 point = { a[0], a[1], a[2], 0 };
     vec4 trans;
     mat4x4_mul_vec4(trans, view, point);
-    left = min(trans[0], left);
-    right = max(trans[0], right);
-    bottom = min(trans[1], bottom);
-    top = max(trans[1], top);
+    left = std::min(trans[0], left);
+    right = std::max(trans[0], right);
+    bottom = std::min(trans[1], bottom);
+    top = std::max(trans[1], top);
     //near_ = min(trans[2], near_);
-    far_ = min(trans[2], far_);
+    far_ = std::min(trans[2], far_);
   }
 
   // Use model box to determine near clipping plane
   for (std::size_t i = 0; i < 8; i++) {
     vec4 trans;
     mat4x4_mul_vec4(trans, view, modelBox[i]);
-    near_ = max(trans[2], near_);
+    near_ = std::max(trans[2], near_);
   }
 
   // account for camera position

@@ -6,10 +6,12 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "penumbra/sun.h"
+#include <penumbra/sun.h>
 #include <vector>
 #include <array>
 #include <limits>
+
+#define FLT_MAX std::numeric_limits<float>::max()
 
 namespace Pumbra {
 
@@ -30,7 +32,6 @@ public:
   ~Context();
   void showRendering();
   void drawSurfaces();
-  //countPixels();
   void setModel(const std::vector<std::array<float, 3>>& vertices);
   void setScene(const std::vector<std::array<float, 3>>& vertices, mat4x4 sunView);
   std::size_t countPixels();
