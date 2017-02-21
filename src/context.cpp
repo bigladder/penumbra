@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 Big Ladder Software and Charles S. Barnaby. All rights reserved.
+/* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
 * See the LICENSE file for additional terms and conditions. */
 
 #include <penumbra/context.h>
@@ -10,7 +10,6 @@ namespace Pumbra {
 // May require regeneration of GLAD
 
 // TODO: Separate into more objects:
-// - Shader program
 // - Camera
 // - Results? (a container for the surface and its properties)
 
@@ -82,6 +81,50 @@ void GLModel::draw() {
   glDrawArrays(GL_TRIANGLES, 0, numVerts);
 }
 
+GLShader::GLShader(GLenum type, const char* source) {
+  GLint shader_ok;
+  GLsizei log_length;
+  char info_log[8192];
+
+  shader = glCreateShader(type);
+  if (shader != 0)
+  {
+      glShaderSource(shader, 1, (const GLchar**)&source, NULL);
+      glCompileShader(shader);
+      glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
+      if (shader_ok != GL_TRUE)
+      {
+          fprintf(stderr, "ERROR: Failed to compile %s shader\n", (type == GL_FRAGMENT_SHADER) ? "fragment" : "vertex" );
+          glGetShaderInfoLog(shader, 8192, &log_length,info_log);
+          fprintf(stderr, "ERROR: \n%s\n\n", info_log);
+          glDeleteShader(shader);
+          shader = 0;
+      }
+  }
+}
+
+GLShader::~GLShader() {}
+
+GLuint GLShader::getInt() {
+  return shader;
+}
+
+GLProgram::GLProgram(const char* vertexSource, const char* fragmentSource) {
+  program = glCreateProgram();
+  GLShader vertex(GL_VERTEX_SHADER,vertexSource);
+  GLShader fragment(GL_FRAGMENT_SHADER,fragmentSource);
+  glAttachShader(program, vertex.getInt());
+  glAttachShader(program, fragment.getInt());
+  glLinkProgram(program);
+  glUseProgram(program);
+}
+
+GLProgram::~GLProgram() {}
+
+GLuint GLProgram::getInt() {
+  return program;
+}
+
 Context::Context(std::size_t size) :
   size(size)
 {
@@ -107,53 +150,13 @@ Context::Context(std::size_t size) :
 
   glEnable(GL_DEPTH_TEST);
 
-  GLint shader_ok;
-  GLsizei log_length;
-  char info_log[8192];
-
-
-  // Vertex shader
-  vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &shader_ok);
-
-  if (shader_ok != GL_TRUE)
-  {
-      fprintf(stderr, "ERROR: Failed to compile vertex_shader shader.\n");
-      glGetShaderInfoLog(vertexShader, 8192, &log_length,info_log);
-      fprintf(stderr, "ERROR: \n%s\n\n", info_log);
-      glDeleteShader(vertexShader);
-  }
-
-
-  // Fragment shader
-  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &shader_ok);
-
-  if (shader_ok != GL_TRUE)
-  {
-      fprintf(stderr, "ERROR: Failed to compile vertex_shader shader.\n");
-      glGetShaderInfoLog(fragmentShader, 8192, &log_length,info_log);
-      fprintf(stderr, "ERROR: \n%s\n\n", info_log);
-      glDeleteShader(fragmentShader);
-  }
-
-
   // Shader program
-  program = glCreateProgram();
-  glAttachShader(program, vertexShader);
-  glAttachShader(program, fragmentShader);
-  glLinkProgram(program);
-  glUseProgram(program);
+  GLProgram program(vertexShaderSource, fragmentShaderSource);
 
+  mvpLocation = glGetUniformLocation(program.getInt(), "MVP");
 
-  mvpLocation = glGetUniformLocation(program, "MVP");
-
-  glBindAttribLocation(program, 0, "vPos");
-  glBindAttribLocation(program, 1, "vCol");
+  glBindAttribLocation(program.getInt(), 0, "vPos");
+  glBindAttribLocation(program.getInt(), 1, "vCol");
 }
 
 Context::~Context(){

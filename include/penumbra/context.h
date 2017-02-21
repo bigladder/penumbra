@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 Big Ladder Software and Charles S. Barnaby. All rights reserved.
+/* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
 * See the LICENSE file for additional terms and conditions. */
 
 #ifndef CONTEXT_H_
@@ -25,6 +25,24 @@ private:
   std::size_t numVerts;
 };
 
+class GLShader {
+public:
+  GLShader(GLenum type, const char* source);
+  ~GLShader();
+  GLuint getInt();
+private:
+  GLuint shader;
+};
+
+class GLProgram {
+public:
+  GLProgram(const char* vertexSource, const char* fragmentSource);
+  ~GLProgram();
+  GLuint getInt();
+private:
+  GLuint program;
+};
+
 class Context {
 
 public:
@@ -41,7 +59,6 @@ private:
   GLuint query, fbo, rbo;
   static const char* vertexShaderSource;
   static const char* fragmentShaderSource;
-  GLuint vertexShader, fragmentShader, program;
   GLint mvpLocation;
   std::size_t size;
   GLModel model, surface;

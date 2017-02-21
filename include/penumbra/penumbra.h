@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 Big Ladder Software and Charles S. Barnaby. All rights reserved.
+/* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
 * See the LICENSE file for additional terms and conditions. */
 
 #ifndef PENUMBRA_H_
