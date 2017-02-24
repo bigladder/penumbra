@@ -1,7 +1,10 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
 * See the LICENSE file for additional terms and conditions. */
 
-#include <penumbra/context.h>
+#include <iostream>
+
+// Penumbra
+#include <gl/context.h>
 
 namespace Pumbra {
 
@@ -15,9 +18,10 @@ namespace Pumbra {
 
 const char* Context::vertexShaderSource =
 R"src(
-  #version 150
-  uniform mat4 MVP;
-  in vec3 vCol;
+  #version 330
+  #extension GL_ARB_explicit_uniform_location : require
+  layout(location = 0) uniform mat4 MVP;
+  layout(location = 16) uniform vec3 vCol;
   in vec3 vPos;
   out vec3 color;
   void main()
@@ -29,7 +33,7 @@ R"src(
 
 const char* Context::fragmentShaderSource =
 R"src(
-  #version 150
+  #version 330
   in vec3 color;
   out vec4 outColor;
   void main()
@@ -38,92 +42,6 @@ R"src(
   }
 )src";
 
-GLModel::~GLModel() {
-  glDeleteVertexArrays(1, &vao);
-  glDeleteBuffers(1, &vbo);
-}
-
-void GLModel::setVertices(const std::vector<std::array<float, 3>>& vertices, const std::array<float, 3>& color) {
-
-  numVerts = vertices.size();
-  std::vector<float> cVertices;
-  cVertices.reserve(numVerts * 6);
-
-  for (std::size_t i = 0; i < numVerts; i++) {
-    cVertices.push_back(vertices[i][0]);
-    cVertices.push_back(vertices[i][1]);
-    cVertices.push_back(vertices[i][2]);
-    cVertices.push_back(color[0]);
-    cVertices.push_back(color[1]);
-    cVertices.push_back(color[2]);
-  }
-
-  // Set up vertex array object
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  // Set up array buffer to store vertex information
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float)*cVertices.size(), &cVertices[0], GL_STATIC_DRAW);
-
-  // Set drawing pointers for current vertex buffer
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-    sizeof(float) * 6, (void*)0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-    sizeof(float) * 6, (void*)(sizeof(float) * 3));
-}
-
-void GLModel::draw() {
-  glBindVertexArray(vao);
-  glDrawArrays(GL_TRIANGLES, 0, numVerts);
-}
-
-GLShader::GLShader(GLenum type, const char* source) {
-  GLint shader_ok;
-  GLsizei log_length;
-  char info_log[8192];
-
-  shader = glCreateShader(type);
-  if (shader != 0)
-  {
-      glShaderSource(shader, 1, (const GLchar**)&source, NULL);
-      glCompileShader(shader);
-      glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
-      if (shader_ok != GL_TRUE)
-      {
-          fprintf(stderr, "ERROR: Failed to compile %s shader\n", (type == GL_FRAGMENT_SHADER) ? "fragment" : "vertex" );
-          glGetShaderInfoLog(shader, 8192, &log_length,info_log);
-          fprintf(stderr, "ERROR: \n%s\n\n", info_log);
-          glDeleteShader(shader);
-          shader = 0;
-      }
-  }
-}
-
-GLShader::~GLShader() {}
-
-GLuint GLShader::getInt() {
-  return shader;
-}
-
-GLProgram::GLProgram(const char* vertexSource, const char* fragmentSource) {
-  program = glCreateProgram();
-  GLShader vertex(GL_VERTEX_SHADER,vertexSource);
-  GLShader fragment(GL_FRAGMENT_SHADER,fragmentSource);
-  glAttachShader(program, vertex.getInt());
-  glAttachShader(program, fragment.getInt());
-  glLinkProgram(program);
-  glUseProgram(program);
-}
-
-GLProgram::~GLProgram() {}
-
-GLuint GLProgram::getInt() {
-  return program;
-}
 
 Context::Context(std::size_t size) :
   size(size)
@@ -133,7 +51,7 @@ Context::Context(std::size_t size) :
   if (!glfwInit()) {throw;}
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
   glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -153,10 +71,11 @@ Context::Context(std::size_t size) :
   // Shader program
   GLProgram program(vertexShaderSource, fragmentShaderSource);
 
-  mvpLocation = glGetUniformLocation(program.getInt(), "MVP");
-
   glBindAttribLocation(program.getInt(), 0, "vPos");
-  glBindAttribLocation(program.getInt(), 1, "vCol");
+
+  glGenFramebuffers(1, &fbo);
+  glGenRenderbuffers(1, &rbo);
+
 }
 
 Context::~Context(){
@@ -165,23 +84,26 @@ Context::~Context(){
   glfwTerminate();
 }
 
-void Context::setModel(const std::vector<std::array<float, 3>>& vertices) {
+void Context::setModel(const std::vector<float>& vertices) {
 
   // set model vertices
-  model.setVertices(vertices, {{ 0.5f, 0.5f, 0.5f }});
+  model.setVertices(vertices);
 
-  float bLeft = FLT_MAX, bBottom = FLT_MAX, bFront = FLT_MAX;
-  float bRight = -FLT_MAX, bTop = -FLT_MAX, bBack = -FLT_MAX;
+  float bLeft = MAX_FLOAT, bBottom = MAX_FLOAT, bFront = MAX_FLOAT;
+  float bRight = -MAX_FLOAT, bTop = -MAX_FLOAT, bBack = -MAX_FLOAT;
 
 
   // calculate bounding box
-  for (auto a : vertices) {
-    bLeft = std::min(a[0], bLeft);
-    bRight = std::max(a[0], bRight);
-    bFront = std::min(a[1], bFront);
-    bBack = std::max(a[1], bBack);
-    bBottom = std::min(a[2], bBottom);
-    bTop = std::max(a[2], bTop);
+  for(int i = 0; i < vertices.size(); i += 3) {
+    float x = vertices[i];
+    float y = vertices[i+1];
+    float z = vertices[i+2];
+    bLeft = std::min(x, bLeft);
+    bRight = std::max(x, bRight);
+    bFront = std::min(y, bFront);
+    bBack = std::max(y, bBack);
+    bBottom = std::min(z, bBottom);
+    bTop = std::max(z, bTop);
   }
 
   float tempBox[8][4] =
@@ -204,7 +126,7 @@ void Context::setModel(const std::vector<std::array<float, 3>>& vertices) {
 
 }
 
-void Context::setScene(const std::vector<std::array<float, 3>>& vertices, mat4x4 sunView) {
+void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
 
   for (std::size_t i = 0; i < 4; i++) {
     for (std::size_t j = 0; j < 4; j++) {
@@ -212,19 +134,20 @@ void Context::setScene(const std::vector<std::array<float, 3>>& vertices, mat4x4
     }
   }
 
-  // set surface vertices
-  surface.setVertices(vertices, {{ 1.f, 1.f, 1.f }});
-
   // calculate clipping planes in rendered coorinates
-  float left(FLT_MAX);
-  float right(-FLT_MAX);
-  float bottom(FLT_MAX);
-  float top(-FLT_MAX);
-  float near_(-FLT_MAX);
-  float far_(FLT_MAX);
+  float left(MAX_FLOAT);
+  float right(-MAX_FLOAT);
+  float bottom(MAX_FLOAT);
+  float top(-MAX_FLOAT);
+  float near_(-MAX_FLOAT);
+  float far_(MAX_FLOAT);
 
-  for (auto a : vertices) {
-    vec4 point = { a[0], a[1], a[2], 0 };
+  for (int i = first; i < first + count; i += 3) {
+    vec4 point = {
+      model.vertexArray[i],
+      model.vertexArray[i + 1],
+      model.vertexArray[i + 2],
+      0 };
     vec4 trans;
     mat4x4_mul_vec4(trans, view, point);
     left = std::min(trans[0], left);
@@ -266,14 +189,14 @@ void Context::setScene(const std::vector<std::array<float, 3>>& vertices, mat4x4
 }
 
 
-void Context::showRendering()
+void Context::showRendering(GLint first, GLsizei count)
 {
   glfwSetWindowSize(window, size, size);
   glfwShowWindow(window);
 
   while (!glfwWindowShouldClose(window))
   {
-    drawSurfaces();
+    drawScene(first, count);
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -282,26 +205,26 @@ void Context::showRendering()
   glfwHideWindow(window);
 }
 
-void Context::drawSurfaces()
+void Context::drawScene(GLint first, GLsizei count)
 {
   glViewport(0, 0, size, size);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
-  model.draw();
+  glUniform3f(16, 0.5f, 0.5f, 0.5f);
+  model.draw(0, model.numVerts);
   glDepthFunc(GL_EQUAL);
-  surface.draw();
+  glUniform3f(16, 1.f, 1.f, 1.f);
+  model.draw(first, count);
 }
 
 void Context::setMVP()
 {
   mat4x4_mul(mvp, projection, view);
-  glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat*)mvp);
+  glUniformMatrix4fv(0, 1, GL_FALSE, (const GLfloat*)mvp);
 }
 
-std::size_t Context::countPixels() {
-  glGenFramebuffers(1, &fbo);
-  glGenRenderbuffers(1, &rbo);
+float Context::calculatePSSF(GLint first, GLsizei count) {
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
   glBindRenderbuffer(GL_RENDERBUFFER, rbo);
@@ -316,14 +239,15 @@ std::size_t Context::countPixels() {
   glGenQueries(1, &query);
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
+  glUniform3f(16, 0.5f, 0.5f, 0.5f); // TODO: Change shader to ignore color in this case
   glViewport(0, 0, size, size);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
-  model.draw();
+  model.draw(0, model.numVerts);
   glDepthFunc(GL_EQUAL);
   glBeginQuery(GL_SAMPLES_PASSED, query);
-  surface.draw();
+  model.draw(first, count);
   glEndQuery(GL_SAMPLES_PASSED);
 
   // reset to default framebuffer
@@ -339,7 +263,7 @@ std::size_t Context::countPixels() {
   GLint pixelCount;
   glGetQueryObjectiv(query, GL_QUERY_RESULT, &pixelCount);
 
-  return pixelCount;
+  return pixelCount*pixelArea;
 
 }
 

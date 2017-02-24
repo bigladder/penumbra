@@ -1,46 +1,62 @@
 /* Copyright (c) 2017 Big Ladder Software and Chip Barnaby. All rights reserved.
 * See the LICENSE file for additional terms and conditions. */
 
-#include <penumbra/penumbra.h>
+// Standard
 #include <iostream>
+
+// Penumbra
+#include <penumbra/penumbra.h>
 
 int main(void)
 {
-    std::vector<std::array<float,3>> model =
+    Pumbra::Polygon wallVerts =
     {
-      {{ 0.f, 0.f, 0.f}},
-      {{ 1.f, 0.f, 0.f}},
-      {{ 0.f, 0.f, 1.f}},
-      {{ 0.f, 0.f, 1.f}},
-      {{ 1.f, 0.f, 0.f}},
-      {{ 1.f, 0.f, 1.f}},
-      {{ 0.25f, 0.f, 0.5f}},
-      {{ 0.75f, 0.f, 0.5f}},
-      {{ 0.25f, -0.5f, 0.5f}},
-      {{ 0.75f, 0.f, 0.5f}},
-      {{ 0.25f, -0.5f, 0.5f}},
-      {{ 0.75f, -0.5f, 0.5f}}
-    };
-    std::vector<std::array<float, 3>> surface =
-    {
-      { { 0.f, 0.f, 0.f } },
-      { { 1.f, 0.f, 0.f } },
-      { { 0.f, 0.f, 1.f } },
-      { { 0.f, 0.f, 1.f } },
-      { { 1.f, 0.f, 0.f } },
-      { { 1.f, 0.f, 1.f } }
+      0.f, 0.f, 0.f,
+      1.f, 0.f, 0.f,
+      1.f, 0.f, 1.f,
+      0.f, 0.f, 1.f
     };
 
-    Pumbra::Context context(200);
-    context.setModel(model);
+    Pumbra::Polygon windowVerts =
+    {
+      0.25f, 0.f, 0.25f,
+      0.75f, 0.f, 0.25f,
+      0.75f, 0.f, 0.5f,
+      0.25f, 0.f, 0.5f
+    };
 
-    Pumbra::Sun sun(2.00f,0.4f);
+    Pumbra::Polygon awningVerts =
+    {
+      0.25f, 0.f, 0.5f,
+      0.75f, 0.f, 0.5f,
+      0.75f, -0.5f, 0.5f,
+      0.25f, -0.5f, 0.5f
+    };
 
-    context.setScene(surface, sun.getView());
-    context.showRendering();
-    std::size_t pixels = context.countPixels();
+    Pumbra::Surface wall(wallVerts);
+    wall.addHole(windowVerts);
 
-    std::cout << pixels << std::endl;
+    Pumbra::Surface window(windowVerts);
+    Pumbra::Surface awning(awningVerts);
+
+    Pumbra::Penumbra pumbra;
+
+    unsigned wallId = pumbra.addSurface(wall);
+    unsigned windowId = pumbra.addSurface(window);
+    unsigned awningId = pumbra.addSurface(awning);
+
+    pumbra.setModel();
+    pumbra.setSunPosition(2.00f,0.4f);
+    pumbra.setSunPosition(3.14f, 0.0f);
+    pumbra.renderScene(wallId);
+    float wallPSSF = pumbra.calculatePSSF(wallId);
+
+    std::cout << "Wall PSSF: " << wallPSSF << std::endl;
+
+    pumbra.renderScene(windowId);
+    float windowPSSF = pumbra.calculatePSSF(windowId);
+
+    std::cout << "Window PSSF: " << windowPSSF << std::endl;
 
     return 0;
 }

@@ -1,7 +1,4 @@
 include_directories("${penumbra_SOURCE_DIR}/include")
-include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glad/include)
-include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw-3.2.1/include)
-include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw-3.2.1/deps)
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)

@@ -27,6 +27,7 @@ if (APPLE)
 endif()
 
 add_subdirectory(vendor/glfw-3.2.1)
+add_subdirectory(vendor/libtess2)
 
 add_subdirectory(src)
 add_subdirectory(examples)
