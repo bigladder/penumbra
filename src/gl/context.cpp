@@ -142,7 +142,9 @@ void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
   float near_(-MAX_FLOAT);
   float far_(MAX_FLOAT);
 
-  for (int i = first; i < first + count; i += 3) {
+  const int vertexSize = 3;
+
+  for (int i = first*vertexSize; i < first*vertexSize + count*vertexSize; i += vertexSize) {
     vec4 point = {
       model.vertexArray[i],
       model.vertexArray[i + 1],
@@ -201,6 +203,7 @@ void Context::showRendering(GLint first, GLsizei count)
     glfwPollEvents();
   }
 
+  glfwSetWindowShouldClose(window, 0);
   glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
   glfwHideWindow(window);
 }
@@ -250,9 +253,6 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
   model.draw(first, count);
   glEndQuery(GL_SAMPLES_PASSED);
 
-  // reset to default framebuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
   // wait until the result is available
   GLint ready(0);
   while (!ready) {
@@ -262,6 +262,11 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
   // retrieve result
   GLint pixelCount;
   glGetQueryObjectiv(query, GL_QUERY_RESULT, &pixelCount);
+
+  // reset to default framebuffer
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
   return pixelCount*pixelArea;
 

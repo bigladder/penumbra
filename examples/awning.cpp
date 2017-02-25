@@ -47,7 +47,7 @@ int main(void)
 
     pumbra.setModel();
     pumbra.setSunPosition(2.00f,0.4f);
-    pumbra.setSunPosition(3.14f, 0.0f);
+    //pumbra.setSunPosition(3.14f, 0.0f);
     pumbra.renderScene(wallId);
     float wallPSSF = pumbra.calculatePSSF(wallId);
 

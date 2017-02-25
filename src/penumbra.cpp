@@ -28,10 +28,11 @@ unsigned Penumbra::addSurface(const Surface& surface)
 
 int Penumbra::setModel()
 {
+  const int vertexSize = 3;
   unsigned nextStartingIndex = 0;
   for (auto& surface : penumbra->surfaces ) {
     TessData tess = surface.tessellate();
-    penumbra->surfaceBuffers.push_back({nextStartingIndex,tess.numVerts});
+    penumbra->surfaceBuffers.push_back({nextStartingIndex/vertexSize,tess.numVerts/vertexSize});
     for (unsigned i = 0; i < tess.numVerts; ++i) {
       penumbra->model.push_back(tess.vertices[i]);
     }
