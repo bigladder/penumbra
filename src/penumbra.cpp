@@ -13,9 +13,9 @@ namespace Pumbra{
 
 // TODO also catch exceptions
 
-Penumbra::Penumbra()
+Penumbra::Penumbra(unsigned int size)
 {
-  penumbra = std::unique_ptr<PenumbraPrivate>(new PenumbraPrivate);
+  penumbra = std::unique_ptr<PenumbraPrivate>(new PenumbraPrivate(size));
 }
 
 Penumbra::~Penumbra(){}
@@ -28,21 +28,23 @@ unsigned Penumbra::addSurface(const Surface& surface)
 
 int Penumbra::setModel()
 {
-  if (penumbra->surfaces.size() == 0) {
-    throw; // TODO: Error
-  }
-  const int vertexSize = 3;
-  unsigned nextStartingIndex = 0;
-  for (auto& surface : penumbra->surfaces ) {
-    TessData tess = surface.tessellate();
-    penumbra->surfaceBuffers.push_back({nextStartingIndex/vertexSize,tess.numVerts/vertexSize});
-    for (unsigned i = 0; i < tess.numVerts; ++i) {
-      penumbra->model.push_back(tess.vertices[i]);
+  if (penumbra->surfaces.size() > 0) {
+    const int vertexSize = 3;
+    unsigned nextStartingIndex = 0;
+    for (auto& surface : penumbra->surfaces ) {
+      TessData tess = surface.tessellate();
+      penumbra->surfaceBuffers.push_back({nextStartingIndex/vertexSize,tess.numVerts/vertexSize});
+      for (unsigned i = 0; i < tess.numVerts; ++i) {
+        penumbra->model.push_back(tess.vertices[i]);
+      }
+      nextStartingIndex += tess.numVerts;
     }
-    nextStartingIndex += tess.numVerts;
-  }
 
-  penumbra->context.setModel(penumbra->model);
+    penumbra->context.setModel(penumbra->model);
+  }
+  else {
+    // TODO post warning
+  }
   return PN_SUCCESS;
 }
 
@@ -66,32 +68,40 @@ int Penumbra::setSunPosition(
 
 float Penumbra::calculatePSSF(unsigned surfaceIndex)
 {
-  // TODO check if surface ID exists
-  penumbra->context.setScene(
-    penumbra->surfaceBuffers[surfaceIndex].first,
-    penumbra->surfaceBuffers[surfaceIndex].second,
-    penumbra->sun.getView()
-  );
+  if (penumbra->checkSurface(surfaceIndex)) {
+    penumbra->context.setScene(
+      penumbra->surfaceBuffers[surfaceIndex].first,
+      penumbra->surfaceBuffers[surfaceIndex].second,
+      penumbra->sun.getView()
+    );
 
-  return penumbra->context.calculatePSSF(
-    penumbra->surfaceBuffers[surfaceIndex].first,
-    penumbra->surfaceBuffers[surfaceIndex].second
-  );
+    return penumbra->context.calculatePSSF(
+      penumbra->surfaceBuffers[surfaceIndex].first,
+      penumbra->surfaceBuffers[surfaceIndex].second
+    );
+  } else {
+    // TODO error
+  }
 }
 
 int Penumbra::renderScene(unsigned surfaceIndex)
 {
-
-  penumbra->context.setScene(
-    penumbra->surfaceBuffers[surfaceIndex].first,
-    penumbra->surfaceBuffers[surfaceIndex].second,
-    penumbra->sun.getView()
-  );
-  penumbra->context.showRendering(
-    penumbra->surfaceBuffers[surfaceIndex].first,
-    penumbra->surfaceBuffers[surfaceIndex].second
-  );
-  return PN_SUCCESS;
+  if (penumbra->checkSurface(surfaceIndex)) {
+    penumbra->context.setScene(
+      penumbra->surfaceBuffers[surfaceIndex].first,
+      penumbra->surfaceBuffers[surfaceIndex].second,
+      penumbra->sun.getView()
+    );
+    penumbra->context.showRendering(
+      penumbra->surfaceBuffers[surfaceIndex].first,
+      penumbra->surfaceBuffers[surfaceIndex].second
+    );
+    return PN_SUCCESS;
+  }
+  else {
+    // TODO error
+    return PN_FAILURE;
+  }
 }
 
 void Penumbra::setMessageCallback(
@@ -103,8 +113,9 @@ void Penumbra::setMessageCallback(
   penumbra->messageCallbackContextPtr = contextPtr;
 }
 
-PenumbraPrivate::PenumbraPrivate() :
-  surfaceCounter(0)
+PenumbraPrivate::PenumbraPrivate(unsigned size) :
+  surfaceCounter(0),
+  context(size)
 {}
 
 PenumbraPrivate::~PenumbraPrivate(){}
@@ -112,6 +123,11 @@ PenumbraPrivate::~PenumbraPrivate(){}
 void PenumbraPrivate::addSurface(const Surface& surface)
 {
   surfaces.push_back(*surface.surface);
+}
+
+bool PenumbraPrivate::checkSurface(const unsigned index)
+{
+  return index < surfaces.size();
 }
 
 void PenumbraPrivate::sayMessage(

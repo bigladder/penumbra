@@ -18,7 +18,7 @@ namespace Pumbra {
 class PenumbraPrivate {
 
 public:
-  PenumbraPrivate();
+  PenumbraPrivate(unsigned size=512);
   ~PenumbraPrivate();
   void addSurface(const Surface& surface);
 
@@ -30,6 +30,7 @@ public:
   std::vector<float> model;
   unsigned surfaceCounter;
   std::vector<SurfacePrivate> surfaces;
+  bool checkSurface(const unsigned index);
   std::vector<std::pair<unsigned, unsigned>> surfaceBuffers; // first = Starting index, second = number of coordinates
 
 private:

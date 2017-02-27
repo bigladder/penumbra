@@ -16,6 +16,7 @@
 namespace Pumbra {
 
 const int PN_SUCCESS = 0;
+const int PN_FAILURE = 1;
 const int MSG_INFO = 0;
 const int MSG_WARN = 1;
 const int MSG_ERR = 2;
@@ -30,7 +31,7 @@ class PenumbraPrivate;
 
 class Penumbra {
 public:
-  Penumbra();
+  Penumbra(unsigned size = 512);
   ~Penumbra();
 
 public:
