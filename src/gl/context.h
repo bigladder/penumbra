@@ -33,6 +33,7 @@ public:
   void setModel(const std::vector<float>& vertices);
   void setScene(GLint first, GLsizei count, mat4x4 sunView);
   float calculatePSSF(GLint first, GLsizei count);
+  void clearModel();
 
 private:
   GLFWwindow* window;
@@ -41,6 +42,7 @@ private:
   static const char* fragmentShaderSource;
   unsigned size;
   GLModel model;
+  bool modelSet;
   float pixelArea;
   float modelBox[8][4];
   mat4x4 projection, view, mvp;

@@ -36,6 +36,7 @@ public:
 public:
   unsigned addSurface(const Surface& surface);
   int setModel();
+  int clearModel();
   int setSunPosition(
     const float azm, // in radians, clockwise, north = 0
     const float alt  // in radians, horizon = 0, vertical = pi/2

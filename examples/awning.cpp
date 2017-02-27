@@ -46,7 +46,7 @@ int main(void)
     unsigned awningId = pumbra.addSurface(awning);
 
     pumbra.setModel();
-    pumbra.setSunPosition(2.00f,0.4f);
+    pumbra.setSunPosition(2.50f,0.3f);
     //pumbra.setSunPosition(3.14f, 0.0f);
     pumbra.renderScene(wallId);
     float wallPSSF = pumbra.calculatePSSF(wallId);
@@ -57,6 +57,29 @@ int main(void)
     float windowPSSF = pumbra.calculatePSSF(windowId);
 
     std::cout << "Window PSSF: " << windowPSSF << std::endl;
+
+    pumbra.clearModel();
+
+    Pumbra::Polygon finVerts =
+    {
+      0.75f, -0.25f, 0.5f,
+      0.75f, -0.25f, 0.25f,
+      0.75f, 0.0f, 0.25f,
+      0.75f, 0.0f, 0.5f
+    };
+
+    Pumbra::Surface fin(finVerts);
+
+    windowId = pumbra.addSurface(window);
+    awningId = pumbra.addSurface(awning);
+    unsigned finID = pumbra.addSurface(fin);
+
+    pumbra.setModel();
+
+    pumbra.renderScene(windowId);
+    windowPSSF = pumbra.calculatePSSF(windowId);
+
+    std::cout << "Window PSSF with fin: " << windowPSSF << std::endl;
 
     return 0;
 }

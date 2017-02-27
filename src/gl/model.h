@@ -18,6 +18,7 @@ public:
   ~GLModel();
   void setVertices(const std::vector<float>& vertices);
   void draw(GLint first, GLsizei count);
+  void clearModel();
   std::vector<float> vertexArray;
   unsigned numVerts;
 private:

@@ -84,6 +84,10 @@ Context::~Context(){
   glfwTerminate();
 }
 
+void Context::clearModel(){
+  model.clearModel();
+}
+
 void Context::setModel(const std::vector<float>& vertices) {
 
   // set model vertices
@@ -210,12 +214,13 @@ void Context::showRendering(GLint first, GLsizei count)
 
 void Context::drawScene(GLint first, GLsizei count)
 {
+  const int vertexSize = 3;
   glViewport(0, 0, size, size);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
   glUniform3f(16, 0.5f, 0.5f, 0.5f);
-  model.draw(0, model.numVerts);
+  model.draw(0, model.numVerts/vertexSize);
   glDepthFunc(GL_EQUAL);
   glUniform3f(16, 1.f, 1.f, 1.f);
   model.draw(first, count);
@@ -242,12 +247,13 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
   glGenQueries(1, &query);
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
+  const int vertexSize = 3;
   glUniform3f(16, 0.5f, 0.5f, 0.5f); // TODO: Change shader to ignore color in this case
   glViewport(0, 0, size, size);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
-  model.draw(0, model.numVerts);
+  model.draw(0, model.numVerts/vertexSize);
   glDepthFunc(GL_EQUAL);
   glBeginQuery(GL_SAMPLES_PASSED, query);
   model.draw(first, count);

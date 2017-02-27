@@ -6,6 +6,10 @@
 
 namespace Pumbra {
 GLModel::~GLModel() {
+  clearModel();
+}
+
+void GLModel::clearModel() {
   glDeleteVertexArrays(1, &vao);
   glDeleteBuffers(1, &vbo);
 }

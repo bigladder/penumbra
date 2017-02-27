@@ -28,6 +28,9 @@ unsigned Penumbra::addSurface(const Surface& surface)
 
 int Penumbra::setModel()
 {
+  if (penumbra->surfaces.size() == 0) {
+    throw; // TODO: Error
+  }
   const int vertexSize = 3;
   unsigned nextStartingIndex = 0;
   for (auto& surface : penumbra->surfaces ) {
@@ -43,6 +46,15 @@ int Penumbra::setModel()
   return PN_SUCCESS;
 }
 
+int Penumbra::clearModel(){
+  penumbra->surfaces.clear();
+  penumbra->surfaceCounter = 0;
+  penumbra->surfaceBuffers.clear();
+  penumbra->model.clear();
+  penumbra->context.clearModel();
+  return PN_SUCCESS;
+}
+
 int Penumbra::setSunPosition(
   const float azm, // in radians, clockwise, north = 0
   const float alt  // in radians, horizon = 0, vertical = pi/2
@@ -54,6 +66,7 @@ int Penumbra::setSunPosition(
 
 float Penumbra::calculatePSSF(unsigned surfaceIndex)
 {
+  // TODO check if surface ID exists
   penumbra->context.setScene(
     penumbra->surfaceBuffers[surfaceIndex].first,
     penumbra->surfaceBuffers[surfaceIndex].second,
