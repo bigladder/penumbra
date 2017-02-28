@@ -1,7 +1,9 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
 * See the LICENSE file for additional terms and conditions. */
 
+// Penumbra
 #include <sun.h>
+#include <error.h>
 
 namespace Pumbra {
 
@@ -37,7 +39,7 @@ void Sun::setView(float azm, float alt){
 void Sun::setView(){
 
   if (!posSet) {
-    throw; // warning
+    showMessage(MSG_WARN, "setView() called, but azimuth and altitude have not yet been set.");
   }
 
   float cosAlt = std::cos(altitude);

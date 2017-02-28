@@ -8,10 +8,9 @@
 // Penumbra
 #include <penumbra/penumbra.h>
 #include <penumbra-private.h>
+#include <error.h>
 
 namespace Pumbra{
-
-// TODO also catch exceptions
 
 Penumbra::Penumbra(unsigned int size)
 {
@@ -43,7 +42,7 @@ int Penumbra::setModel()
     penumbra->context.setModel(penumbra->model);
   }
   else {
-    // TODO post warning
+    showMessage(MSG_WARN,"No surfaces added to Penumbra before calling setModel().");
   }
   return PN_SUCCESS;
 }
@@ -80,7 +79,8 @@ float Penumbra::calculatePSSF(unsigned surfaceIndex)
       penumbra->surfaceBuffers[surfaceIndex].second
     );
   } else {
-    // TODO error
+    showMessage(MSG_ERR, "Surface index, X, does not exist. Cannot calculate PSSF."); // TODO format string
+    return -1.f;
   }
 }
 
@@ -99,7 +99,7 @@ int Penumbra::renderScene(unsigned surfaceIndex)
     return PN_SUCCESS;
   }
   else {
-    // TODO error
+    showMessage(MSG_ERR, "Surface index, X, does not exist. Cannot render scene."); // TODO format string
     return PN_FAILURE;
   }
 }
@@ -109,8 +109,8 @@ void Penumbra::setMessageCallback(
   void* contextPtr
 )
 {
-  penumbra->callBackFunction = callBackFunction;
-  penumbra->messageCallbackContextPtr = contextPtr;
+  penumbraCallbackFunction = callBackFunction;
+  messageCallbackContextPtr = contextPtr;
 }
 
 PenumbraPrivate::PenumbraPrivate(unsigned size) :
@@ -130,23 +130,5 @@ bool PenumbraPrivate::checkSurface(const unsigned index)
   return index < surfaces.size();
 }
 
-void PenumbraPrivate::sayMessage(
-  const int messageType,
-  const std::string message
-) const
-{
-  if (callBackFunction != NULL) {
-    (*callBackFunction)(messageType, message, messageCallbackContextPtr);
-  } else {
-    if (messageType == MSG_ERR) {
-      std::cerr << "Error: " << message << std::endl;
-      exit(EXIT_FAILURE);
-    } else if (messageType == MSG_WARN) {
-      std::cerr << "Warning: " << message << std::endl;
-    } else /*if (messageType == MSG_INFO)*/ {
-      std::cout << "Note: " << message << std::endl;
-    }
-  }
-}
 
 }

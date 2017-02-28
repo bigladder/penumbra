@@ -20,24 +20,16 @@ class PenumbraPrivate {
 public:
   PenumbraPrivate(unsigned size=512);
   ~PenumbraPrivate();
-  void addSurface(const Surface& surface);
 
 public:
+  void addSurface(const Surface& surface);
   Context context;
   Sun sun;
-  PenumbraCallbackFunction callBackFunction;
-  void* messageCallbackContextPtr;
   std::vector<float> model;
   unsigned surfaceCounter;
   std::vector<SurfacePrivate> surfaces;
   bool checkSurface(const unsigned index);
   std::vector<std::pair<unsigned, unsigned>> surfaceBuffers; // first = Starting index, second = number of coordinates
-
-private:
-  void sayMessage(
-    const int messageType,
-    const std::string message
-  ) const;
 
 };
 

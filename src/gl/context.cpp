@@ -5,6 +5,7 @@
 
 // Penumbra
 #include <gl/context.h>
+#include <error.h>
 
 namespace Pumbra {
 
@@ -48,7 +49,9 @@ Context::Context(std::size_t size) :
 {
   glfwSetErrorCallback([](int error, const char* description){fprintf(stderr, "Error (%d): %s\n", error, description);});
 
-  if (!glfwInit()) {throw;}
+  if (!glfwInit()) {
+    showMessage(MSG_ERR, "Unable to initialize GLFW.");
+  }
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -59,7 +62,7 @@ Context::Context(std::size_t size) :
   glfwMakeContextCurrent(window);
   if (!window) {
     glfwTerminate();
-    throw;
+    showMessage(MSG_ERR, "Unable to create OpenGL context.");
   }
 
   // OpenGL extension loader
@@ -241,7 +244,7 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
 
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (status != GL_FRAMEBUFFER_COMPLETE) {
-    throw;
+    showMessage(MSG_ERR, "Unable to create framebuffer.");
   }
 
   glGenQueries(1, &query);

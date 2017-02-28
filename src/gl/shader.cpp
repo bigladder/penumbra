@@ -6,6 +6,7 @@
 
 // Penumbra
 #include <gl/shader.h>
+#include <error.h>
 
 namespace Pumbra {
 GLShader::GLShader(GLenum type, const char* source) {
@@ -26,7 +27,7 @@ GLShader::GLShader(GLenum type, const char* source) {
           fprintf(stderr, "ERROR: \n%s\n\n", info_log);
           glDeleteShader(shader);
           shader = 0;
-          throw;
+          showMessage(MSG_ERR, "Unable to compile shader.");
       }
   }
 }

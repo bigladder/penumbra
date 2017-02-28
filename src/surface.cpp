@@ -8,6 +8,7 @@
 // Penumbra
 #include <penumbra/surface.h>
 #include <surface-private.h>
+#include <error.h>
 
 namespace Pumbra {
 
@@ -75,7 +76,7 @@ TessData SurfacePrivate::tessellate()
   tess = tessNewTess(nullptr);
 
   if (!tess) {
-    throw;
+    showMessage(MSG_ERR, "Unable to create tessellator.");
   }
 
   int polySize = 3; // making triangles
@@ -90,7 +91,7 @@ TessData SurfacePrivate::tessellate()
   }
 
   if (!tessTesselate(tess, TESS_WINDING_ODD, TESS_POLYGONS, polySize, vertexSize, nullptr)) {
-    throw;
+    showMessage(MSG_ERR, "Unable to tessellate surface.");
   }
 
   // For now convert to glDrawArrays() style of vertices, sometime may change to glDrawElements (with element buffers)
