@@ -9,20 +9,11 @@
 
 namespace Pumbra {
 
-// TODO: remove color or make color uniform (see explicit uniform location)
-// https://www.khronos.org/opengl/wiki/Uniform_(GLSL)
-// May require regeneration of GLAD
-
-// TODO: Separate into more objects:
-// - Camera
-// - Results? (a container for the surface and its properties)
-
 const char* Context::vertexShaderSource =
 R"src(
   #version 330
-  #extension GL_ARB_explicit_uniform_location : require
-  layout(location = 0) uniform mat4 MVP;
-  layout(location = 16) uniform vec3 vCol;
+  uniform mat4 MVP;
+  uniform vec3 vCol;
   in vec3 vPos;
   out vec3 color;
   void main()
@@ -43,11 +34,16 @@ R"src(
   }
 )src";
 
+static void glErrorCallback(int error, const char* description)
+{
+  showMessage(MSG_INFO, description);
+}
 
 Context::Context(std::size_t size) :
   size(size)
 {
-  glfwSetErrorCallback([](int error, const char* description){fprintf(stderr, "Error (%d): %s\n", error, description);});
+ 
+  glfwSetErrorCallback(glErrorCallback);
 
   if (!glfwInit()) {
     showMessage(MSG_ERR, "Unable to initialize GLFW.");
@@ -62,11 +58,19 @@ Context::Context(std::size_t size) :
   glfwMakeContextCurrent(window);
   if (!window) {
     glfwTerminate();
-    showMessage(MSG_ERR, "Unable to create OpenGL context.");
+    showMessage(MSG_ERR, "Unable to create OpenGL context. OpenGL 3.3 is required to perform shading calculations.");
   }
 
   // OpenGL extension loader
   gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+
+  if (!glfwExtensionSupported("GL_ARB_explicit_attrib_location")) {
+    showMessage(MSG_ERR, "OpenGL explicit attribute location not supported by graphics driver.");
+  }
+
+  //std::string glVersion = (char*)glGetString(GL_VERSION);
+  //showMessage(MSG_INFO, "OpenGL version = " + glVersion);
+
   glfwSwapInterval(1);
 
   glEnable(GL_DEPTH_TEST);
@@ -75,6 +79,8 @@ Context::Context(std::size_t size) :
   GLProgram program(vertexShaderSource, fragmentShaderSource);
 
   glBindAttribLocation(program.getInt(), 0, "vPos");
+  mvpLocation = glGetUniformLocation(program.getInt(), "MVP");
+  vColLocation = glGetUniformLocation(program.getInt(), "vCol");
 
   glGenFramebuffers(1, &fbo);
   glGenRenderbuffers(1, &rbo);
@@ -211,7 +217,6 @@ void Context::showRendering(GLint first, GLsizei count)
   }
 
   glfwSetWindowShouldClose(window, 0);
-  glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
   glfwHideWindow(window);
 }
 
@@ -222,17 +227,17 @@ void Context::drawScene(GLint first, GLsizei count)
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
-  glUniform3f(16, 0.5f, 0.5f, 0.5f);
+  glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
   model.draw(0, model.numVerts/vertexSize);
   glDepthFunc(GL_EQUAL);
-  glUniform3f(16, 1.f, 1.f, 1.f);
+  glUniform3f(vColLocation, 1.f, 1.f, 1.f);
   model.draw(first, count);
 }
 
 void Context::setMVP()
 {
   mat4x4_mul(mvp, projection, view);
-  glUniformMatrix4fv(0, 1, GL_FALSE, (const GLfloat*)mvp);
+  glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat*)mvp);
 }
 
 float Context::calculatePSSF(GLint first, GLsizei count) {
@@ -251,7 +256,7 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
   const int vertexSize = 3;
-  glUniform3f(16, 0.5f, 0.5f, 0.5f); // TODO: Change shader to ignore color in this case
+  glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f); // TODO: Change shader to ignore color in this case
   glViewport(0, 0, size, size);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

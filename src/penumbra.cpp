@@ -17,6 +17,25 @@ Penumbra::Penumbra(unsigned int size)
   penumbra = std::unique_ptr<PenumbraPrivate>(new PenumbraPrivate(size));
 }
 
+Penumbra::Penumbra(
+  PenumbraCallbackFunction callbackFunction,
+  unsigned size
+)
+{
+  setMessageCallback(callbackFunction, NULL);
+  penumbra = std::unique_ptr<PenumbraPrivate>(new PenumbraPrivate(size));
+}
+
+Penumbra::Penumbra(
+  PenumbraCallbackFunction callbackFunction,
+  void* contextPtr,
+  unsigned size
+)
+{
+  setMessageCallback(callbackFunction, contextPtr);
+  penumbra = std::unique_ptr<PenumbraPrivate>(new PenumbraPrivate(size));
+}
+
 Penumbra::~Penumbra(){}
 
 unsigned Penumbra::addSurface(const Surface& surface)

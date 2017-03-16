@@ -46,6 +46,7 @@ private:
   float pixelArea;
   float modelBox[8][4];
   mat4x4 projection, view, mvp;
+  GLint mvpLocation, vColLocation;
 
   void setMVP();
 

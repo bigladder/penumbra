@@ -9,8 +9,9 @@
 
 namespace Pumbra {
 
-static PenumbraCallbackFunction penumbraCallbackFunction;
-static void* messageCallbackContextPtr;
+extern PenumbraCallbackFunction penumbraCallbackFunction;
+extern void* messageCallbackContextPtr;
+
 void showMessage(
   const int messageType,
   const std::string message

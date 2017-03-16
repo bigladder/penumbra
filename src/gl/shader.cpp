@@ -17,18 +17,18 @@ GLShader::GLShader(GLenum type, const char* source) {
   shader = glCreateShader(type);
   if (shader != 0)
   {
-      glShaderSource(shader, 1, (const GLchar**)&source, NULL);
-      glCompileShader(shader);
-      glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
-      if (shader_ok != GL_TRUE)
-      {
-          fprintf(stderr, "ERROR: Failed to compile %s shader\n", (type == GL_FRAGMENT_SHADER) ? "fragment" : "vertex" );
-          glGetShaderInfoLog(shader, 8192, &log_length,info_log);
-          fprintf(stderr, "ERROR: \n%s\n\n", info_log);
-          glDeleteShader(shader);
-          shader = 0;
-          showMessage(MSG_ERR, "Unable to compile shader.");
-      }
+    glShaderSource(shader, 1, (const GLchar**)&source, NULL);
+    glCompileShader(shader);
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
+    if (shader_ok != GL_TRUE)
+    {       
+      glGetShaderInfoLog(shader, 8192, &log_length,info_log);
+      glDeleteShader(shader);
+      shader = 0;
+      std::string shaderTypeStr = (type == GL_FRAGMENT_SHADER) ? "fragment" : "vertex";
+      showMessage(MSG_INFO, "OpenGL " + shaderTypeStr + " shader: " + info_log);
+      showMessage(MSG_ERR, "Unable to compile " + shaderTypeStr + " shader.");
+    }
   }
 }
 
