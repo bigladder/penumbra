@@ -11,11 +11,11 @@ namespace Pumbra {
 
 const char* Context::vertexShaderSource =
 R"src(
-  #version 330
+  #version 120
   uniform mat4 MVP;
   uniform vec3 vCol;
-  in vec3 vPos;
-  out vec3 color;
+  attribute vec3 vPos;
+  varying vec3 color;
   void main()
   {
     gl_Position = MVP * vec4(vPos, 1.0);
@@ -25,12 +25,11 @@ R"src(
 
 const char* Context::fragmentShaderSource =
 R"src(
-  #version 330
-  in vec3 color;
-  out vec4 outColor;
+  #version 120
+  varying vec3 color;
   void main()
   {
-    outColor = vec4(color, 1.0);
+    gl_FragColor = vec4(color, 1.0);
   }
 )src";
 
@@ -49,24 +48,18 @@ Context::Context(std::size_t size) :
     showMessage(MSG_ERR, "Unable to initialize GLFW.");
   }
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
   glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
   window = glfwCreateWindow(1, 1, "Penumbra", NULL, NULL);
   glfwMakeContextCurrent(window);
   if (!window) {
     glfwTerminate();
-    showMessage(MSG_ERR, "Unable to create OpenGL context. OpenGL 3.3 is required to perform shading calculations.");
+    showMessage(MSG_ERR, "Unable to create OpenGL context. OpenGL 2.1 is required to perform shading calculations.");
   }
 
   // OpenGL extension loader
   gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-
-  if (!glfwExtensionSupported("GL_ARB_explicit_attrib_location")) {
-    showMessage(MSG_ERR, "OpenGL explicit attribute location not supported by graphics driver.");
-  }
 
   //std::string glVersion = (char*)glGetString(GL_VERSION);
   //showMessage(MSG_INFO, "OpenGL version = " + glVersion);
@@ -281,6 +274,7 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+  glDeleteQueries(1, &query);
 
   return pixelCount*pixelArea;
 
