@@ -11,7 +11,7 @@ void errorCallback(
   const int messageType,
   const std::string message,
   void* contextPtr
-) 
+)
 {
   if (messageType == Pumbra::MSG_INFO) {
     std::cout << "  NOTE: " << message << std::endl;
@@ -88,7 +88,7 @@ int main(void)
 
     windowId = pumbra.addSurface(window);
     awningId = pumbra.addSurface(awning);
-    unsigned finID = pumbra.addSurface(fin);
+    /*unsigned finID = */pumbra.addSurface(fin);
 
     pumbra.setModel();
 

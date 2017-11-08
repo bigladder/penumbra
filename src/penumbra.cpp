@@ -133,8 +133,8 @@ void Penumbra::setMessageCallback(
 }
 
 PenumbraPrivate::PenumbraPrivate(unsigned size) :
-  surfaceCounter(0),
-  context(size)
+  context(size),
+  surfaceCounter(0)
 {}
 
 PenumbraPrivate::~PenumbraPrivate(){}

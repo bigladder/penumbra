@@ -12,6 +12,7 @@
 
 namespace Pumbra {
 
+/*
 void* stdAlloc(void* userData, unsigned size)
 {
 	int* allocated = ( int*)userData;
@@ -25,6 +26,7 @@ void stdFree(void* userData, void* ptr)
 	TESS_NOTUSED(userData);
 	free(ptr);
 }
+*/
 
 TessData::TessData(
   const float* array,

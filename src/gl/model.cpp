@@ -4,13 +4,23 @@
 // Penumbra
 #include <gl/model.h>
 
+#ifdef __APPLE__
+#define glGenVertexArraysX glGenVertexArraysAPPLE
+#define glBindVertexArrayX glBindVertexArrayAPPLE
+#define glDeleteVertexArraysX glDeleteVertexArraysAPPLE
+#else
+#define glGenVertexArraysX glGenVertexArrays
+#define glBindVertexArrayX glBindVertexArray
+#define glDeleteVertexArraysX glDeleteVertexArrays
+#endif
+
 namespace Pumbra {
 GLModel::~GLModel() {
   clearModel();
 }
 
 void GLModel::clearModel() {
-  glDeleteVertexArrays(1, &vao);
+  glDeleteVertexArraysX(1, &vao);
   glDeleteBuffers(1, &vbo);
 }
 
@@ -19,8 +29,8 @@ void GLModel::setVertices(const std::vector<float>& vertices) {
   vertexArray = vertices;
   numVerts = vertices.size();
   // Set up vertex array object
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
+  glGenVertexArraysX(1, &vao);
+  glBindVertexArrayX(vao);
 
   // Set up array buffer to store vertex information
   glGenBuffers(1, &vbo);
@@ -34,7 +44,7 @@ void GLModel::setVertices(const std::vector<float>& vertices) {
 }
 
 void GLModel::draw(GLint first, GLsizei count) {
-  glBindVertexArray(vao);
+  glBindVertexArrayX(vao);
   glDrawArrays(GL_TRIANGLES, first, count);
 }
 

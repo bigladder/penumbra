@@ -33,15 +33,16 @@ R"src(
   }
 )src";
 
-static void glErrorCallback(int error, const char* description)
+static void glErrorCallback(int, const char* description)
 {
   showMessage(MSG_INFO, description);
 }
 
-Context::Context(std::size_t size) :
-  size(size)
+Context::Context(unsigned size) :
+  size(size),
+  modelSet(false)
 {
- 
+
   glfwSetErrorCallback(glErrorCallback);
 
   if (!glfwInit()) {
@@ -61,6 +62,15 @@ Context::Context(std::size_t size) :
   // OpenGL extension loader
   gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
+  if (!glfwExtensionSupported("GL_ARB_vertex_array_object") && !glfwExtensionSupported("GL_APPLE_vertex_array_object")) {
+    glfwTerminate();
+    showMessage(MSG_ERR, "Your version of OpenGL does not support vertex array objects.");
+  }
+  if (!glfwExtensionSupported("GL_EXT_framebuffer_object")) {
+    glfwTerminate();
+    showMessage(MSG_ERR, "Your version of OpenGL does not support framebuffer objects.");
+  }
+
   //std::string glVersion = (char*)glGetString(GL_VERSION);
   //showMessage(MSG_INFO, "OpenGL version = " + glVersion);
 
@@ -75,19 +85,20 @@ Context::Context(std::size_t size) :
   mvpLocation = glGetUniformLocation(program.getInt(), "MVP");
   vColLocation = glGetUniformLocation(program.getInt(), "vCol");
 
-  glGenFramebuffers(1, &fbo);
-  glGenRenderbuffers(1, &rbo);
+  glGenFramebuffersEXT(1, &fbo);
+  glGenRenderbuffersEXT(1, &rbo);
 
 }
 
 Context::~Context(){
-  glDeleteFramebuffers(1, &fbo);
-  glDeleteRenderbuffers(1, &rbo);
+  glDeleteFramebuffersEXT(1, &fbo);
+  glDeleteRenderbuffersEXT(1, &rbo);
   glfwTerminate();
 }
 
 void Context::clearModel(){
   model.clearModel();
+  modelSet = false;
 }
 
 void Context::setModel(const std::vector<float>& vertices) {
@@ -100,7 +111,7 @@ void Context::setModel(const std::vector<float>& vertices) {
 
 
   // calculate bounding box
-  for(int i = 0; i < vertices.size(); i += 3) {
+  for(int i = 0; i < (int)vertices.size(); i += 3) {
     float x = vertices[i];
     float y = vertices[i+1];
     float z = vertices[i+2];
@@ -130,9 +141,15 @@ void Context::setModel(const std::vector<float>& vertices) {
     }
   }
 
+  modelSet = true;
+
 }
 
 void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
+
+  if (!modelSet) {
+    showMessage(MSG_ERR, "Model has not been set. Cannot set OpenGL scene.");
+  }
 
   for (std::size_t i = 0; i < 4; i++) {
     for (std::size_t j = 0; j < 4; j++) {
@@ -234,15 +251,41 @@ void Context::setMVP()
 }
 
 float Context::calculatePSSF(GLint first, GLsizei count) {
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+  glDrawBuffer(GL_NONE);
+  glReadBuffer(GL_NONE);
+  glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rbo);
+  glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, size, size);
+  glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, rbo);
 
-  glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo);
+  GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+  if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+    std::string reason;
+    switch(status) {
+      case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: {
+        reason = "Incomplete attachment.";
+      } break;
+      case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: {
+        reason = "Incomplete or missing attachment.";
+      } break;
+      case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT: {
+        reason = "Incomplete formats.";
+      } break;
+      case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: {
+        reason = "Incomplete draw buffer.";
+      } break;
+      case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT: {
+        reason = "Incomplete read buffer.";
+      } break;
+      case GL_FRAMEBUFFER_UNSUPPORTED_EXT: {
+        reason = "Framebuffers are not supported.";
+      } break;
+      default: {
+        reason = "Reason unknown.";
+      }
+    }
+    showMessage(MSG_ERR, "Unable to create framebuffer. " + reason);
 
-  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-  if (status != GL_FRAMEBUFFER_COMPLETE) {
-    showMessage(MSG_ERR, "Unable to create framebuffer.");
   }
 
   glGenQueries(1, &query);
@@ -271,8 +314,8 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
   glGetQueryObjectiv(query, GL_QUERY_RESULT, &pixelCount);
 
   // reset to default framebuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+  glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
   glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
   glDeleteQueries(1, &query);
 
