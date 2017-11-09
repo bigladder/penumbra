@@ -22,6 +22,9 @@ if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables
     set_target_properties(${EXE_BINARIES} PROPERTIES
                           LINK_FLAGS "/ENTRY:mainCRTStartup")
+    set_target_properties(${EXE_BINARIES} PROPERTIES
+                          LINK_FLAGS "/SUBSYSTEM:CONSOLE")
+    set_target_properties(${EXE_BINARIES} PROPERTIES COMPILE_DEFINITIONS "_CONSOLE")
 endif()
 
 if (APPLE)
