@@ -1,5 +1,5 @@
 /*
-** SGI FREE SOFTWARE LICENSE B (Version 2.0, Sept. 18, 2008) 
+** SGI FREE SOFTWARE LICENSE B (Version 2.0, Sept. 18, 2008)
 ** Copyright (C) [dates of first publication] Silicon Graphics, Inc.
 ** All Rights Reserved.
 **
@@ -9,10 +9,10 @@
 ** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
 ** of the Software, and to permit persons to whom the Software is furnished to do so,
 ** subject to the following conditions:
-** 
+**
 ** The above copyright notice including the dates of first publication and either this
 ** permission notice or a reference to http://oss.sgi.com/projects/FreeB/ shall be
-** included in all copies or substantial portions of the Software. 
+** included in all copies or substantial portions of the Software.
 **
 ** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 ** INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
@@ -20,7 +20,7 @@
 ** BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 ** TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 ** OR OTHER DEALINGS IN THE SOFTWARE.
-** 
+**
 ** Except as contained in this notice, the name of Silicon Graphics, Inc. shall not
 ** be used in advertising or otherwise to promote the sale, use or other dealings in
 ** this Software without prior written authorization from Silicon Graphics, Inc.
@@ -162,7 +162,7 @@ static int FixUpperEdge( TESStesselator *tess, ActiveRegion *reg, TESShalfEdge *
 	reg->eUp = newEdge;
 	newEdge->activeRegion = reg;
 
-	return 1; 
+	return 1;
 }
 
 static ActiveRegion *TopLeftRegion( TESStesselator *tess, ActiveRegion *reg )
@@ -404,7 +404,7 @@ static void SpliceMergeVertices( TESStesselator *tess, TESShalfEdge *e1,
 * e1->Org is kept, while e2->Org is discarded.
 */
 {
-	if ( !tessMeshSplice( tess->mesh, e1, e2 ) ) longjmp(tess->env,1); 
+	if ( !tessMeshSplice( tess->mesh, e1, e2 ) ) longjmp(tess->env,1);
 }
 
 static void VertexWeights( TESSvertex *isect, TESSvertex *org, TESSvertex *dst,
@@ -545,7 +545,7 @@ static int CheckForLeftSplice( TESStesselator *tess, ActiveRegion *regUp )
 		/* eUp->Dst is below eLo, so splice eUp->Dst into eLo */
 		regUp->dirty = regLo->dirty = TRUE;
 		e = tessMeshSplitEdge( tess->mesh, eLo );
-		if (e == NULL) longjmp(tess->env,1);    
+		if (e == NULL) longjmp(tess->env,1);
 		if ( !tessMeshSplice( tess->mesh, eUp->Lnext, eLo->Sym ) ) longjmp(tess->env,1);
 		e->Rface->inside = regUp->inside;
 	}
@@ -654,7 +654,7 @@ static int CheckForIntersect( TESStesselator *tess, ActiveRegion *regUp )
 		if( dstUp == tess->event ) {
 			/* Splice dstUp into eLo, and process the new region(s) */
 			if (tessMeshSplitEdge( tess->mesh, eLo->Sym ) == NULL) longjmp(tess->env,1);
-			if ( !tessMeshSplice( tess->mesh, eUp->Lnext, eLo->Oprev ) ) longjmp(tess->env,1); 
+			if ( !tessMeshSplice( tess->mesh, eUp->Lnext, eLo->Oprev ) ) longjmp(tess->env,1);
 			regLo = regUp;
 			regUp = TopRightRegion( regUp );
 			e = RegionBelow(regUp)->eUp->Rprev;
@@ -1123,10 +1123,10 @@ static void InitEdgeDict( TESStesselator *tess )
 
         /* If the bbox is empty, ensure that sentinels are not coincident by
            slightly enlarging it. */
-	smin = tess->bmin[0] - (w > 0 ? w : 0.01);
-        smax = tess->bmax[0] + (w > 0 ? w : 0.01);
-        tmin = tess->bmin[1] - (h > 0 ? h : 0.01);
-        tmax = tess->bmax[1] + (h > 0 ? h : 0.01);
+	smin = tess->bmin[0] - (w > 0 ? w : 0.01f);
+        smax = tess->bmax[0] + (w > 0 ? w : 0.01f);
+        tmin = tess->bmin[1] - (h > 0 ? h : 0.01f);
+        tmax = tess->bmax[1] + (h > 0 ? h : 0.01f);
 
 	AddSentinel( tess, smin, smax, tmin );
 	AddSentinel( tess, smin, smax, tmax );
@@ -1199,14 +1199,14 @@ static int InitPriorityQ( TESStesselator *tess )
 	PriorityQ *pq;
 	TESSvertex *v, *vHead;
 	int vertexCount = 0;
-	
+
 	vHead = &tess->mesh->vHead;
 	for( v = vHead->next; v != vHead; v = v->next ) {
 		vertexCount++;
 	}
 	/* Make sure there is enough space for sentinels. */
 	vertexCount += MAX( 8, tess->alloc.extraVertices );
-	
+
 	pq = tess->pq = pqNewPriorityQ( &tess->alloc, vertexCount, (int (*)(PQkey, PQkey)) tesvertLeq );
 	if (pq == NULL) return 0;
 
