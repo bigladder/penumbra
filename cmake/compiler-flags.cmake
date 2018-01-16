@@ -27,7 +27,6 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("/nologo")
     ADD_CXX_DEFINITIONS("/EHsc")
-    ADD_CXX_DEFINITIONS("/MP") # Enables multi-processor compilation of source within a single project
     STRING (REGEX REPLACE "/W3" "/W1" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") # Increase to /W2 then /W3 as more serious warnings are addressed (using regex to avoid VC override warnings)
 
     ADD_CXX_DEFINITIONS("/wd4068 /wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996") # Disables warning messages listed above
@@ -43,7 +42,7 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     ADD_CXX_DEBUG_DEFINITIONS("/Ob0") # Disable inlining
     ADD_CXX_DEBUG_DEFINITIONS("/RTCsu") # Runtime checks
     ADD_CXX_DEBUG_DEFINITIONS("/MTd")
-    ADD_CXX_DEBUG_DEFINITIONS("/Z7")
+    ADD_CXX_DEBUG_DEFINITIONS("/Zi")
     SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
 
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"  OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") # g++/Clang
