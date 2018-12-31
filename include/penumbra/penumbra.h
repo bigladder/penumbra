@@ -29,6 +29,8 @@ typedef void(*PenumbraCallbackFunction)(
 
 class PenumbraPrivate;
 
+void penumbraTerminate(); // Call once before exiting calling program to ensure safe cleanup of OpenGL memory
+
 class Penumbra {
 public:
   Penumbra(unsigned size = 512u);

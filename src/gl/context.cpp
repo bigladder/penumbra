@@ -55,19 +55,18 @@ Context::Context(unsigned size) :
   window = glfwCreateWindow(1, 1, "Penumbra", NULL, NULL);
   glfwMakeContextCurrent(window);
   if (!window) {
-    glfwTerminate();
     showMessage(MSG_ERR, "Unable to create OpenGL context. OpenGL 2.1 is required to perform shading calculations.");
   }
 
   // OpenGL extension loader
-  gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    showMessage(MSG_ERR, "Failed to load OpenGL extensions.");
+  }
 
   if (!glfwExtensionSupported("GL_ARB_vertex_array_object") && !glfwExtensionSupported("GL_APPLE_vertex_array_object")) {
-    glfwTerminate();
     showMessage(MSG_ERR, "Your version of OpenGL does not support vertex array objects.");
   }
   if (!glfwExtensionSupported("GL_EXT_framebuffer_object")) {
-    glfwTerminate();
     showMessage(MSG_ERR, "Your version of OpenGL does not support framebuffer objects.");
   }
 
@@ -93,7 +92,7 @@ Context::Context(unsigned size) :
 Context::~Context(){
   glDeleteFramebuffersEXT(1, &fbo);
   glDeleteRenderbuffersEXT(1, &rbo);
-  glfwTerminate();
+  glfwDestroyWindow(window);
 }
 
 void Context::clearModel(){

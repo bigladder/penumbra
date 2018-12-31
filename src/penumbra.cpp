@@ -12,6 +12,10 @@
 
 namespace Pumbra{
 
+void penumbraTerminate() {
+	glfwTerminate();
+}
+
 Penumbra::Penumbra(unsigned int size)
 {
   penumbra = std::unique_ptr<PenumbraPrivate>(new PenumbraPrivate(size));
