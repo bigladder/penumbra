@@ -1,0 +1,23 @@
+language: cpp
+git:
+  depth: 100
+notifications:
+  email: false
+matrix:
+  include:
+  - os: osx
+    compiler: clang
+    osx_image: xcode10.1
+    env: COMPILER=clang
+  - os: linux
+    compiler: gcc
+    dist: xenial
+    env: COMPILER=gcc
+  - os: windows
+
+script:
+- mkdir build
+- cd build
+- cmake -DBUILD_PENUMBRA_TESTING=ON ..
+- cmake --build . --config Release
+- ctest -C Release
