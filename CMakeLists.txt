@@ -12,22 +12,18 @@ endif()
 
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
-include(cmake/compiler-flags.cmake)
+set (CMAKE_MODULE_PATH "${penumbra_SOURCE_DIR}/cmake")
 
-# GLAD library
-add_subdirectory(vendor/glad)
+include(compiler-flags)
 
-# GLFW libaray
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+option( BUILD_PENUMBRA_TESTING "Build Penumbra testing targets" OFF )
 
-if (APPLE)
-  set(GLFW_USE_MENUBAR OFF CACHE BOOL "" FORCE)
-endif()
-
-add_subdirectory(vendor/glfw-3.2.1)
-add_subdirectory(vendor/libtess2)
+# Dependencies
+add_subdirectory(vendor)
 
 add_subdirectory(src)
 add_subdirectory(examples)
+
+if (BUILD_PENUMBRA_TESTING)
+  add_subdirectory(test)
+endif()

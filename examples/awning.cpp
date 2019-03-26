@@ -97,7 +97,5 @@ int main(void)
 
     std::cout << "Window PSSF with fin: " << windowPSSF << std::endl;
 
-	Pumbra::penumbraTerminate();
-
     return 0;
 }
