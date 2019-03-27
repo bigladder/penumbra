@@ -17,6 +17,7 @@ set (CMAKE_MODULE_PATH "${penumbra_SOURCE_DIR}/cmake")
 include(compiler-flags)
 
 option( BUILD_PENUMBRA_TESTING "Build Penumbra testing targets" OFF )
+option( PENUMBRA_COVERAGE "Add coverage reports" OFF)
 
 # Dependencies
 add_subdirectory(vendor)
@@ -27,4 +28,9 @@ add_subdirectory(examples)
 if (BUILD_PENUMBRA_TESTING)
   enable_testing()
   add_subdirectory(test)
+  if (PENUMBRA_COVERAGE)
+    set(ENABLE_COVERAGE ON CACHE BOOL "" FORCE)
+    find_package(codecov)
+    coverage_evaluate()
+  endif()
 endif()

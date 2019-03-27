@@ -8,11 +8,13 @@ matrix:
   - os: osx
     compiler: clang
     osx_image: xcode10.1
-    env: COMPILER=clang
   - os: linux
     compiler: gcc
     dist: xenial
-    env: COMPILER=gcc
+  - os: linux
+    compiler: gcc
+    dist: xenial
+    env: COVERAGE="ON"
   - os: windows
 
 before_install:
@@ -23,6 +25,19 @@ before_install:
 script:
 - mkdir build
 - cd build
-- cmake -DBUILD_PENUMBRA_TESTING=ON ..
+- if [[ "$COVERAGE" == "ON" ]]; then
+  export CONFIG="Debug";
+  else
+  export CONFIG="Release";
+  fi
+- cmake -DBUILD_PENUMBRA_TESTING=ON -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
 - cmake --build . --config Release
-- ctest -C Release
+- ctest --output-on-failure -C Release
+- if [[ "$COVERAGE" == "ON" ]]; then
+  make gcov || travis_terminate 1;
+  fi
+
+after_success:
+- if [[ "$COVERAGE" == "ON" ]]; then
+  bash <(curl -s https://codecov.io/bash) -X gcov || travis_terminate 1;
+  fi
