@@ -25,5 +25,6 @@ add_subdirectory(src)
 add_subdirectory(examples)
 
 if (BUILD_PENUMBRA_TESTING)
+  enable_testing()
   add_subdirectory(test)
 endif()
