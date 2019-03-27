@@ -10,7 +10,7 @@
 void errorCallback(
   const int messageType,
   const std::string message,
-  void* contextPtr
+  void* /*contextPtr*/
 )
 {
   if (messageType == Pumbra::MSG_INFO) {
