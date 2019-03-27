@@ -19,6 +19,16 @@ include(compiler-flags)
 option( BUILD_PENUMBRA_TESTING "Build Penumbra testing targets" OFF )
 option( PENUMBRA_COVERAGE "Add coverage reports" OFF)
 
+# Set up testing/coverage
+if (BUILD_PENUMBRA_TESTING)
+  enable_testing()
+  if (PENUMBRA_COVERAGE)
+    set(ENABLE_COVERAGE ON CACHE BOOL "" FORCE)
+    find_package(codecov)
+  endif()
+endif()
+
+
 # Dependencies
 add_subdirectory(vendor)
 
@@ -26,11 +36,9 @@ add_subdirectory(src)
 add_subdirectory(examples)
 
 if (BUILD_PENUMBRA_TESTING)
-  enable_testing()
   add_subdirectory(test)
   if (PENUMBRA_COVERAGE)
-    set(ENABLE_COVERAGE ON CACHE BOOL "" FORCE)
-    find_package(codecov)
+    add_coverage(penumbra)
     coverage_evaluate()
   endif()
 endif()

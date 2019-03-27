@@ -11,35 +11,37 @@ matrix:
   - os: linux
     compiler: gcc
     dist: xenial
+    services: xvfb
   - os: linux
     compiler: gcc
     dist: xenial
     env: COVERAGE="ON"
+    services: xvfb
   - os: windows
-services:
-- xvfb
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-  sudo apt-get -y install xorg-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev;
+    sudo apt-get -y install xorg-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev;
   fi
 
 script:
 - mkdir build
 - cd build
 - if [[ "$COVERAGE" == "ON" ]]; then
-  export CONFIG="Debug";
+    export CONFIG="Debug";
   else
-  export CONFIG="Release";
+    export CONFIG="Release";
   fi
 - cmake -DBUILD_PENUMBRA_TESTING=ON -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
-- cmake --build . --config Release
-- ctest --output-on-failure -C Release
-- if [[ "$COVERAGE" == "ON" ]]; then
-  make gcov || travis_terminate 1;
+- cmake --build . --config "$CONFIG"
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    ctest --output-on-failure -C "$CONFIG" || travis_terminate 1;
+    if [[ "$COVERAGE" == "ON" ]]; then
+      make gcov || travis_terminate 1;
+    fi
   fi
 
 after_success:
 - if [[ "$COVERAGE" == "ON" ]]; then
-  bash <(curl -s https://codecov.io/bash) -X gcov || travis_terminate 1;
+    bash <(curl -s https://codecov.io/bash) -X gcov || travis_terminate 1;
   fi
