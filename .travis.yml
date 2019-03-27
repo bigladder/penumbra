@@ -16,6 +16,8 @@ matrix:
     dist: xenial
     env: COVERAGE="ON"
   - os: windows
+services:
+- xvfb
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
