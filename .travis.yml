@@ -34,7 +34,7 @@ script:
   fi
 - echo "$CONFIG"
 - cmake -DBUILD_PENUMBRA_TESTING=ON -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
-- cmake --build . --config "$CONFIG"
+- cmake --build . --config Release
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     ctest --output-on-failure -C "$CONFIG" || travis_terminate 1;
     if [[ "$COVERAGE" == "ON" ]]; then
