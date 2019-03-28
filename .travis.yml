@@ -29,16 +29,18 @@ script:
 - cd build
 - if [[ "$COVERAGE" == "ON" ]]; then
     export CONFIG="Debug";
+    export STATIC_LIB="OFF";
   else
     export CONFIG="Release";
     export COVERAGE="OFF";
+    export STATIC_LIB="ON";
   fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     export TESTING="ON";
   else
     export TESTING="OFF";
   fi
-- cmake -DBUILD_PENUMBRA_TESTING="$TESTING" -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
+- cmake -DBUILD_PENUMBRA_TESTING="$TESTING" -DPENUMBRA_STATIC_LIB="$STATIC_LIB" -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
 - cmake --build . --config "$CONFIG"
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     ctest --output-on-failure -C "$CONFIG" || travis_terminate 1;

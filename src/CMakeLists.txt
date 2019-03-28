@@ -16,6 +16,22 @@ include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw-3.2.1/include)
 include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw-3.2.1/deps)
 include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/libtess2/Include)
 
-add_library(penumbra ${library_sources})
+
+option( PENUMBRA_STATIC_LIB "Make libkiva a static library" ON )
+
+if (PENUMBRA_STATIC_LIB)
+  add_library(penumbra STATIC ${library_sources})
+  if(UNIX)
+    set_target_properties(penumbra PROPERTIES COMPILE_FLAGS "-DPENUMBRA_STATIC_DEFINE -fPIC")
+  else()
+    set_target_properties(penumbra PROPERTIES COMPILE_FLAGS "-DPENUMBRA_STATIC_DEFINE")
+  endif()
+else()
+  set(CMAKE_MACOSX_RPATH 1)
+  add_library(penumbra SHARED ${library_sources})
+endif()
+
+include(GenerateExportHeader)
+generate_export_header(penumbra)
 
 target_link_libraries(penumbra glad glfw tess2)
