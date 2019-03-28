@@ -32,6 +32,7 @@ script:
   else
     export CONFIG="Release";
   fi
+- echo "$CONFIG"
 - cmake -DBUILD_PENUMBRA_TESTING=ON -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
 - cmake --build . --config "$CONFIG"
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
