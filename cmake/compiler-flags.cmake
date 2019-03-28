@@ -72,6 +72,10 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleC
       ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     endif()
 
+    if (UNIX)
+      ADD_CXX_DEFINITIONS("-fPIC") # Faster compiler processing
+    endif()
+
     # ADDITIONAL GCC-SPECIFIC FLAGS
     if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
