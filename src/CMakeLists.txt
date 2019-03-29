@@ -35,3 +35,7 @@ include(GenerateExportHeader)
 generate_export_header(penumbra)
 
 target_link_libraries(penumbra glad glfw tess2)
+
+if (PENUMBRA_COVERAGE)
+  add_coverage(penumbra)
+endif()
