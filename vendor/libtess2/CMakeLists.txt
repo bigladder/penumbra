@@ -11,6 +11,10 @@ set(library_sources
 include_directories(${tess2_SOURCE_DIR}/Include)
 include_directories(${tess2_SOURCE_DIR}/Source)
 
+if (UNIX)
+    add_definitions("-fPIC")
+endif()
+
 add_library(tess2 ${library_sources})
 
 #add_subdirectory(Example) # Doesn't work with OpenGL 3.2
