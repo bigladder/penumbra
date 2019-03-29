@@ -10,7 +10,7 @@
 void errorCallback(
   const int messageType,
   const std::string message,
-  void* contextPtr
+  void* /*contextPtr*/
 )
 {
   if (messageType == Pumbra::MSG_INFO) {
@@ -96,8 +96,6 @@ int main(void)
     windowPSSF = pumbra.calculatePSSF(windowId);
 
     std::cout << "Window PSSF with fin: " << windowPSSF << std::endl;
-
-	Pumbra::penumbraTerminate();
 
     return 0;
 }
