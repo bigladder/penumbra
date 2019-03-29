@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/bigladder/penumbra.svg?branch=develop)](https://travis-ci.org/bigladder/penumbra)
+[![codecov](https://codecov.io/gh/bigladder/penumbra/branch/master/graph/badge.svg)](https://codecov.io/gh/bigladder/penumbra)
 
 # Penumbra
 
