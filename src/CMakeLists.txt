@@ -16,8 +16,7 @@ include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw-3.2.1/include)
 include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw-3.2.1/deps)
 include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/libtess2/Include)
 
-
-option( PENUMBRA_STATIC_LIB "Make libkiva a static library" ON )
+option( PENUMBRA_STATIC_LIB "Make penumbra a static library" ON )
 
 if (PENUMBRA_STATIC_LIB)
   add_library(penumbra STATIC ${library_sources})
