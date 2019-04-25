@@ -25,7 +25,7 @@ TEST(PenumbraTest, azimuth) {
 	for (float azm = 0.0f; azm <= 2*M_PI; azm += M_PI_4) {
     pumbra.setSunPosition(azm, 0.0f);
     float wallPSSF = pumbra.calculatePSSF(wallId);
-    EXPECT_NEAR(wallPSSF, abs(cos(azm)), 0.0001) << "azm evaluates to " << azm;
+    EXPECT_NEAR(wallPSSF, std::abs(cos(azm)), 0.0001) << "azm evaluates to " << azm;
     //pumbra.renderScene(wallId);
 	}
 }
