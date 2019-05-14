@@ -12,8 +12,8 @@ set(library_sources
 include_directories(${penumbra_SOURCE_DIR}/include)
 include_directories(${penumbra_SOURCE_DIR}/src)
 include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glad/include)
-include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw-3.2.1/include)
-include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw-3.2.1/deps)
+include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw/include)
+include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw/deps)
 include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/libtess2/Include)
 
 option( PENUMBRA_STATIC_LIB "Make penumbra a static library" ON )
