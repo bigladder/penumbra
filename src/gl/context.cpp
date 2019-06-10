@@ -245,7 +245,7 @@ void Context::setModel(const std::vector<float>& vertices) {
   modelSet = true;
 }
 
-void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
+void Context::setScene(SurfaceBuffer surfaceBuffer, mat4x4 sunView) {
 
   if (!modelSet) {
     showMessage(MSG_ERR, "Model has not been set. Cannot set OpenGL scene.");
@@ -261,7 +261,7 @@ void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
    near_ = -MAX_FLOAT;
    far_ = MAX_FLOAT;
 
-  for (int i = first*model.vertexSize; i < first*model.vertexSize + count*model.vertexSize; i += model.vertexSize) {
+  for (int i = surfaceBuffer.begin*model.vertexSize; i < surfaceBuffer.begin*model.vertexSize + surfaceBuffer.count*model.vertexSize; i += model.vertexSize) {
     vec4 point = {
       model.vertexArray[i],
       model.vertexArray[i + 1],
@@ -309,28 +309,6 @@ void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
   setMVP();
 }
 
-
-void Context::showRendering(GLint first, GLsizei count)
-{
-  glfwSetWindowSize(window, size, size);
-  glfwShowWindow(window);
-
-  if (!isRenderMode) {  // if not currently render mode
-    initRenderMode();
-  }
-
-  while (!glfwWindowShouldClose(window))
-  {
-    glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
-    drawRendering(first, count);
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-  }
-
-  glfwSetWindowShouldClose(window, 0);
-  glfwHideWindow(window);
-}
-
 void Context::calcCameraView() {
 // Do something here to give the appearance of rotating the scene.
   mat4x4 tempMat;	//Transpose changes the affects of consecutive rotations from local to global space.
@@ -339,7 +317,6 @@ void Context::calcCameraView() {
   mat4x4_rotate_Y(tempMat, cameraView, cameraRotAngleY);
   mat4x4_transpose(cameraView, tempMat);	//Transpose back.
 }
-
 
 void Context::setMVP()
 {
@@ -383,18 +360,34 @@ void Context::drawModel() {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
-  model.draw(0, model.numVerts/model.vertexSize);
+  model.drawAll();
   glDepthFunc(GL_EQUAL);
 }
 
-void Context::drawRendering(GLint first, GLsizei count)
+void Context::showRendering(SurfaceBuffer surfaceBuffer)
 {
-  drawModel();
-  glUniform3f(vColLocation, 1.f, 1.f, 1.f);
-  model.draw(first, count);
+    glfwSetWindowSize(window, size, size);
+    glfwShowWindow(window);
+
+    if (!isRenderMode) {  // if not currently render mode
+        initRenderMode();
+    }
+
+    while (!glfwWindowShouldClose(window))
+    {
+        glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
+        drawModel();
+        glUniform3f(vColLocation, 1.f, 1.f, 1.f);
+        model.draw(surfaceBuffer);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwSetWindowShouldClose(window, 0);
+    glfwHideWindow(window);
 }
 
-float Context::calculatePSSF(GLint first, GLsizei count) {
+float Context::calculatePSSF(SurfaceBuffer surfaceBuffer) {
 
   if (isRenderMode) {  // if currently render mode, switch to off screen mode
     initOffScreenMode();
@@ -404,7 +397,7 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
   glGenQueries(1, &query);
   drawModel();
   glBeginQuery(GL_SAMPLES_PASSED, query);
-  model.draw(first, count);
+  model.draw(surfaceBuffer);
   glEndQuery(GL_SAMPLES_PASSED);
 
   // wait until the result is available

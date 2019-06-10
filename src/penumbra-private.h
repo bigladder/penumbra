@@ -29,7 +29,7 @@ public:
   unsigned surfaceCounter;
   std::vector<SurfacePrivate> surfaces;
   bool checkSurface(const unsigned index);
-  std::vector<std::pair<unsigned, unsigned>> surfaceBuffers; // first = Starting index, second = number of coordinates
+  std::vector<SurfaceBuffer> surfaceBuffers;
 
 };
 

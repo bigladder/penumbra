@@ -28,10 +28,10 @@ class Context {
 public:
   Context(unsigned size=512);
   ~Context();
-  void showRendering(GLint first, GLsizei count);
+  void showRendering(SurfaceBuffer surfaceBuffer);
   void setModel(const std::vector<float>& vertices);
-  void setScene(GLint first, GLsizei count, mat4x4 sunView);
-  float calculatePSSF(GLint first, GLsizei count);
+  void setScene(SurfaceBuffer surfaceBuffer, mat4x4 sunView);
+  float calculatePSSF(SurfaceBuffer surfaceBuffer);
   void clearModel();
 
 private:
@@ -56,7 +56,6 @@ private:
   bool lbutton_down;
   bool isRenderMode;
 
-  void drawRendering(GLint first, GLsizei count);
   void drawModel();
   void setMVP();
   void setCameraMVP();

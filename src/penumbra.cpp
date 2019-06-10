@@ -55,7 +55,7 @@ int Penumbra::setModel()
     unsigned nextStartingIndex = 0;
     for (auto& surface : penumbra->surfaces ) {
       TessData tess = surface.tessellate();
-      penumbra->surfaceBuffers.push_back({nextStartingIndex/vertexSize,tess.numVerts/vertexSize});
+      penumbra->surfaceBuffers.emplace_back(nextStartingIndex/vertexSize,tess.numVerts/vertexSize);
       for (unsigned i = 0; i < tess.numVerts; ++i) {
         penumbra->model.push_back(tess.vertices[i]);
       }
@@ -92,14 +92,12 @@ float Penumbra::calculatePSSF(unsigned surfaceIndex)
 {
   if (penumbra->checkSurface(surfaceIndex)) {
     penumbra->context.setScene(
-      penumbra->surfaceBuffers[surfaceIndex].first,
-      penumbra->surfaceBuffers[surfaceIndex].second,
+      penumbra->surfaceBuffers[surfaceIndex],
       penumbra->sun.getView()
     );
 
     return penumbra->context.calculatePSSF(
-      penumbra->surfaceBuffers[surfaceIndex].first,
-      penumbra->surfaceBuffers[surfaceIndex].second
+      penumbra->surfaceBuffers[surfaceIndex]
     );
   } else {
     showMessage(MSG_ERR, "Surface index, X, does not exist. Cannot calculate PSSF."); // TODO format string
@@ -107,17 +105,42 @@ float Penumbra::calculatePSSF(unsigned surfaceIndex)
   }
 }
 
+std::map<unsigned, float> Penumbra::calculateInteriorPSSFs(std::vector<unsigned>  transparentSurfaceIndices, std::vector<unsigned> interiorSurfaceIndices) {
+  std::map<unsigned, float> pssfs;
+  if (transparentSurfaceIndices.size() > 0) {
+    if (penumbra->checkSurface(transparentSurfaceIndices[0])) {
+      penumbra->context.setScene(
+          penumbra->surfaceBuffers[transparentSurfaceIndices[0]],
+          penumbra->sun.getView()
+      );
+      for (auto& intSurf : interiorSurfaceIndices) {
+        if (penumbra->checkSurface(intSurf)) {
+          pssfs[intSurf] = penumbra->context.calculatePSSF(
+              penumbra->surfaceBuffers[intSurf]
+          );
+        } else {
+          showMessage(MSG_ERR, "Interior surface index, X, does not exist. Cannot calculate PSSF."); // TODO format string
+        }
+      }
+    } else {
+      showMessage(MSG_ERR, "Transparent surface index, X, does not exist. Cannot calculate PSSF."); // TODO format string
+    }
+  } else {
+    showMessage(MSG_ERR, "Cannot calculate interior PSSFs without defining at least one transparent surface index."); // TODO format string
+  }
+  return pssfs;
+}
+
+
 int Penumbra::renderScene(unsigned surfaceIndex)
 {
   if (penumbra->checkSurface(surfaceIndex)) {
     penumbra->context.setScene(
-      penumbra->surfaceBuffers[surfaceIndex].first,
-      penumbra->surfaceBuffers[surfaceIndex].second,
+      penumbra->surfaceBuffers[surfaceIndex],
       penumbra->sun.getView()
     );
     penumbra->context.showRendering(
-      penumbra->surfaceBuffers[surfaceIndex].first,
-      penumbra->surfaceBuffers[surfaceIndex].second
+      penumbra->surfaceBuffers[surfaceIndex]
     );
     return PN_SUCCESS;
   }
@@ -126,6 +149,11 @@ int Penumbra::renderScene(unsigned surfaceIndex)
     return PN_FAILURE;
   }
 }
+
+int Penumbra::renderInteriorScene(std::vector<unsigned>  transparentSurfaceIndices, std::vector<unsigned> interiorSurfaceIndices) {
+  return PN_SUCCESS;
+}
+
 
 void Penumbra::setMessageCallback(
   PenumbraCallbackFunction callBackFunction,

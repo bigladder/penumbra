@@ -16,6 +16,11 @@
 
 namespace Pumbra {
 
+SurfaceBuffer::SurfaceBuffer(GLint begin, GLint count) :
+  begin(begin),
+  count(count)
+{}
+
 GLModel::~GLModel() {
   clearModel();
 }
@@ -44,9 +49,20 @@ void GLModel::setVertices(const std::vector<float>& vertices) {
 
 }
 
-void GLModel::draw(GLint first, GLsizei count) {
+void GLModel::draw(SurfaceBuffer surfaceBuffer) {
   glBindVertexArrayX(vao);
-  glDrawArrays(GL_TRIANGLES, first, count);
+  glDrawArrays(GL_TRIANGLES, surfaceBuffer.begin, surfaceBuffer.count);
 }
+
+void GLModel::drawAll() {
+  glBindVertexArrayX(vao);
+  glDrawArrays(GL_TRIANGLES, 0, numVerts/vertexSize);
+}
+
+/*void GLModel::drawExcept(GLint first, GLsizei count) {
+  glBindVertexArrayX(vao);
+  glDrawArrays(GL_TRIANGLES, 0, first - 1);
+  glDrawArrays(GL_TRIANGLES, first + count, numVerts/vertexSize);
+}*/
 
 }

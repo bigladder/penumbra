@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <map>
 
 // Penumbra
 #include <penumbra/surface.h>
@@ -34,7 +35,7 @@ void penumbraTerminate(); // Call once before exiting calling program to ensure 
 class Penumbra {
 public:
   Penumbra(unsigned size = 512u);
-  
+
   Penumbra(
     PenumbraCallbackFunction callbackFunction,
     unsigned size = 512u
@@ -57,7 +58,9 @@ public:
     const float alt  // in radians, horizon = 0, vertical = pi/2
   );
   float calculatePSSF(unsigned surfaceIndex);
+  std::map<unsigned, float> calculateInteriorPSSFs(std::vector<unsigned>  transparentSurfaceIndices, std::vector<unsigned> interiorSurfaceIndices);
   int renderScene(unsigned surfaceIndex); // Primarily for debug purposes
+  int renderInteriorScene(std::vector<unsigned>  transparentSurfaceIndices, std::vector<unsigned> interiorSurfaceIndices); // Primarily for debug purposes
   void setMessageCallback(
     PenumbraCallbackFunction callbackFunction,
     void* contextPtr

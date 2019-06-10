@@ -13,11 +13,19 @@
 
 namespace Pumbra {
 
+class SurfaceBuffer {
+public:
+  SurfaceBuffer(GLint begin = 0u, GLint count = 0u);
+  GLint begin;
+  GLint count;
+};
+
 class GLModel {
 public:
   ~GLModel();
   void setVertices(const std::vector<float>& vertices);
-  void draw(GLint first, GLsizei count);
+  void draw(SurfaceBuffer surfaceBuffer);
+  void drawAll();
   void clearModel();
   std::vector<float> vertexArray;
   unsigned numVerts;
