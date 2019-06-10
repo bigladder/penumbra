@@ -378,7 +378,7 @@ void Context::showRendering(SurfaceBuffer surfaceBuffer)
         glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
         drawModel();
         glUniform3f(vColLocation, 1.f, 1.f, 1.f);
-        model.draw(surfaceBuffer);
+        model.drawSurface(surfaceBuffer);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -397,7 +397,7 @@ float Context::calculatePSSF(SurfaceBuffer surfaceBuffer) {
   glGenQueries(1, &query);
   drawModel();
   glBeginQuery(GL_SAMPLES_PASSED, query);
-  model.draw(surfaceBuffer);
+  model.drawSurface(surfaceBuffer);
   glEndQuery(GL_SAMPLES_PASSED);
 
   // wait until the result is available

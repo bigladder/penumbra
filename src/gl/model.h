@@ -24,7 +24,7 @@ class GLModel {
 public:
   ~GLModel();
   void setVertices(const std::vector<float>& vertices);
-  void draw(SurfaceBuffer surfaceBuffer);
+  void drawSurface(SurfaceBuffer surfaceBuffer);
   void drawAll();
   void clearModel();
   std::vector<float> vertexArray;

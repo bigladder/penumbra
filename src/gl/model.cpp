@@ -49,7 +49,7 @@ void GLModel::setVertices(const std::vector<float>& vertices) {
 
 }
 
-void GLModel::draw(SurfaceBuffer surfaceBuffer) {
+void GLModel::drawSurface(SurfaceBuffer surfaceBuffer) {
   glDrawArrays(GL_TRIANGLES, surfaceBuffer.begin, surfaceBuffer.count);
 }
 
