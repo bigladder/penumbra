@@ -40,7 +40,13 @@ static void glErrorCallback(int, const char* description)
 
 Context::Context(unsigned size) :
   size(size),
-  modelSet(false)
+  modelSet(false),
+  isWireFrame(false),
+  isCameraMode(false),
+  viewScale(1.f),
+  cameraRotAngleX(0.f),
+  cameraRotAngleY(0.f),
+  lbutton_down(true)
 {
 
   glfwSetErrorCallback(glErrorCallback);
@@ -194,7 +200,7 @@ void Context::setModel(const std::vector<float>& vertices) {
 
 
   // calculate bounding box
-  for(int i = 0; i < (int)vertices.size(); i += vertexSize) {
+  for(int i = 0; i < (int)vertices.size(); i += model.vertexSize) {
     float x = vertices[i];
     float y = vertices[i+1];
     float z = vertices[i+2];
@@ -243,7 +249,7 @@ void Context::setScene(GLint first, GLsizei count, mat4x4 sunView) {
    near_ = -MAX_FLOAT;
    far_ = MAX_FLOAT;
 
-  for (int i = first*vertexSize; i < first*vertexSize + count*vertexSize; i += vertexSize) {
+  for (int i = first*model.vertexSize; i < first*model.vertexSize + count*model.vertexSize; i += model.vertexSize) {
     vec4 point = {
       model.vertexArray[i],
       model.vertexArray[i + 1],
@@ -317,7 +323,7 @@ void Context::drawScene(GLint first, GLsizei count)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
   glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
-  model.draw(0, model.numVerts/vertexSize);
+  model.draw(0, model.numVerts/model.vertexSize);
   glDepthFunc(GL_EQUAL);
   glUniform3f(vColLocation, 1.f, 1.f, 1.f);
   model.draw(first, count);
@@ -416,7 +422,7 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
-  model.draw(0, model.numVerts/vertexSize);
+  model.draw(0, model.numVerts/model.vertexSize);
   glDepthFunc(GL_EQUAL);
   glBeginQuery(GL_SAMPLES_PASSED, query);
   model.draw(first, count);

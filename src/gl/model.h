@@ -21,6 +21,7 @@ public:
   void clearModel();
   std::vector<float> vertexArray;
   unsigned numVerts;
+  static const int vertexSize = 3;
 private:
   GLuint vbo, vao;
 };

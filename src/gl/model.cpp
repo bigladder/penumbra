@@ -15,6 +15,7 @@
 #endif
 
 namespace Pumbra {
+
 GLModel::~GLModel() {
   clearModel();
 }

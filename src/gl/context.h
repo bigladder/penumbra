@@ -36,7 +36,6 @@ public:
   void clearModel();
 
 private:
-  static const int vertexSize= 3;
   GLFWwindow* window;
   GLuint query, fbo, rbo;
   static const char* vertexShaderSource;
@@ -49,13 +48,13 @@ private:
   mat4x4 projection, view, mvp;
   mat4x4 cameraView;
   GLint mvpLocation, vColLocation;
-  bool isWireFrame = false;
-  bool isCameraMode = false;
+  bool isWireFrame;
+  bool isCameraMode;
   float left, right, bottom, top, near_, far_;
-  float viewScale = 1.;
+  float viewScale;
   double prevPosX, prevPosY;
-  float cameraRotAngleX = 0, cameraRotAngleY = 0;
-  bool lbutton_down = true;
+  float cameraRotAngleX, cameraRotAngleY;
+  bool lbutton_down;
 
   void setMVP();
   void setCameraMVP();
