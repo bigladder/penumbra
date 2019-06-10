@@ -26,10 +26,9 @@ namespace Pumbra {
 class Context {
 
 public:
-  Context(unsigned size=600);
+  Context(unsigned size=512);
   ~Context();
   void showRendering(GLint first, GLsizei count);
-  void drawScene(GLint first, GLsizei count);
   void setModel(const std::vector<float>& vertices);
   void setScene(GLint first, GLsizei count, mat4x4 sunView);
   float calculatePSSF(GLint first, GLsizei count);
@@ -55,12 +54,17 @@ private:
   double prevPosX, prevPosY;
   float cameraRotAngleX, cameraRotAngleY;
   bool lbutton_down;
+  bool isRenderMode;
 
+  void drawRendering(GLint first, GLsizei count);
+  void drawModel();
   void setMVP();
   void setCameraMVP();
   void calcCameraView();
   void toggleWireFrame();
   void toggleCameraMode();
+  void initOffScreenMode();
+  void initRenderMode();
 
 };
 

@@ -46,7 +46,8 @@ Context::Context(unsigned size) :
   viewScale(1.f),
   cameraRotAngleX(0.f),
   cameraRotAngleY(0.f),
-  lbutton_down(true)
+  lbutton_down(true),
+  isRenderMode(false)
 {
 
   glfwSetErrorCallback(glErrorCallback);
@@ -78,8 +79,17 @@ Context::Context(unsigned size) :
 
   //std::string glVersion = (char*)glGetString(GL_VERSION);
   //showMessage(MSG_INFO, "OpenGL version = " + glVersion);
+  GLint max_view_size[2];
+  glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &max_view_size[0]);
+  GLuint max_res = std::min(GL_MAX_RENDERBUFFER_SIZE_EXT, max_view_size[0]);
+  if (size >= max_res) {
+      showMessage(MSG_WARN, "The selected resolution is larger than the maximum allowable by your hardware. The size will be reset to be equal to the maximum allowable.");  // TODO: Format
+      this->size = max_res;
+  }
 
-  //Input callbacks for orbit mode
+  glViewport(0, 0, this->size, this->size);
+
+    //Input callbacks for orbit mode
   glfwSetWindowUserPointer(window, this);
 #define glfwWPtr(w)  static_cast<Context*>(glfwGetWindowUserPointer(w))
 
@@ -155,6 +165,8 @@ Context::Context(unsigned size) :
 
   glGenFramebuffersEXT(1, &fbo);
   glGenRenderbuffersEXT(1, &rbo);
+
+  initOffScreenMode();
 
 }
 
@@ -303,30 +315,20 @@ void Context::showRendering(GLint first, GLsizei count)
   glfwSetWindowSize(window, size, size);
   glfwShowWindow(window);
 
+  if (!isRenderMode) {  // if not currently render mode
+    initRenderMode();
+  }
+
   while (!glfwWindowShouldClose(window))
   {
-    glUniform3f(vColLocation,.5f, .5f, .5f);
-    drawScene(first, count);
+    glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
+    drawRendering(first, count);
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
   glfwSetWindowShouldClose(window, 0);
   glfwHideWindow(window);
-}
-
-void Context::drawScene(GLint first, GLsizei count)
-{
-
-  glViewport(0, 0, size, size);
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDepthFunc(GL_LESS);
-  glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
-  model.draw(0, model.numVerts/model.vertexSize);
-  glDepthFunc(GL_EQUAL);
-  glUniform3f(vColLocation, 1.f, 1.f, 1.f);
-  model.draw(first, count);
 }
 
 void Context::calcCameraView() {
@@ -343,6 +345,7 @@ void Context::setMVP()
 {
   glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat*)mvp);
 }
+
 void Context::setCameraMVP()
 {
 	float deltaW, deltaH;
@@ -376,54 +379,30 @@ void Context::setCameraMVP()
 	glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat*)cMVP);
 }
 
-float Context::calculatePSSF(GLint first, GLsizei count) {
-  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-  glDrawBuffer(GL_NONE);
-  glReadBuffer(GL_NONE);
-  glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rbo);
-  glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, size, size);
-  glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, rbo);
-
-  GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-  if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-    std::string reason;
-    switch(status) {
-      case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: {
-        reason = "Incomplete attachment.";
-      } break;
-      case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: {
-        reason = "Incomplete or missing attachment.";
-      } break;
-      case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT: {
-        reason = "Incomplete formats.";
-      } break;
-      case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: {
-        reason = "Incomplete draw buffer.";
-      } break;
-      case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT: {
-        reason = "Incomplete read buffer.";
-      } break;
-      case GL_FRAMEBUFFER_UNSUPPORTED_EXT: {
-        reason = "Framebuffers are not supported.";
-      } break;
-      default: {
-        reason = "Reason unknown.";
-      }
-    }
-    showMessage(MSG_ERR, "Unable to create framebuffer. " + reason);
-
-  }
-
-  glGenQueries(1, &query);
-  glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
-  glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f); // TODO: Change shader to ignore color in this case
-  glViewport(0, 0, size, size);
+void Context::drawModel() {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
   model.draw(0, model.numVerts/model.vertexSize);
   glDepthFunc(GL_EQUAL);
+}
+
+void Context::drawRendering(GLint first, GLsizei count)
+{
+  drawModel();
+  glUniform3f(vColLocation, 1.f, 1.f, 1.f);
+  model.draw(first, count);
+}
+
+float Context::calculatePSSF(GLint first, GLsizei count) {
+
+  if (isRenderMode) {  // if currently render mode, switch to off screen mode
+    initOffScreenMode();
+    isRenderMode = false;
+  }
+
+  glGenQueries(1, &query);
+  drawModel();
   glBeginQuery(GL_SAMPLES_PASSED, query);
   model.draw(first, count);
   glEndQuery(GL_SAMPLES_PASSED);
@@ -438,14 +417,65 @@ float Context::calculatePSSF(GLint first, GLsizei count) {
   GLint pixelCount;
   glGetQueryObjectiv(query, GL_QUERY_RESULT, &pixelCount);
 
-  // reset to default framebuffer
-  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-  glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
-  glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
   glDeleteQueries(1, &query);
 
   return pixelCount*pixelArea;
+}
 
+void Context::initOffScreenMode() {
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+  glDrawBuffer(GL_NONE);
+  glReadBuffer(GL_NONE);
+  glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rbo);
+  glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, size, size);
+  glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, rbo);
+
+  GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+  if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+    std::string reason;
+    switch (status) {
+    case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT: {
+      reason = "Incomplete attachment.";
+    }
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT: {
+      reason = "Incomplete or missing attachment.";
+    }
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT: {
+      reason = "Incomplete formats.";
+    }
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT: {
+      reason = "Incomplete draw buffer.";
+    }
+      break;
+    case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT: {
+      reason = "Incomplete read buffer.";
+    }
+      break;
+    case GL_FRAMEBUFFER_UNSUPPORTED_EXT: {
+      reason = "Framebuffers are not supported.";
+    }
+      break;
+    default: {
+      reason = "Reason unknown.";
+    }
+    }
+    showMessage(MSG_ERR, "Unable to create framebuffer. " + reason);
+
+  }
+
+  glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+  glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f); // TODO: Change shader to ignore color in this case
+}
+
+void Context::initRenderMode() {
+    // set to default framebuffer and renderbuffer
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 
 }
