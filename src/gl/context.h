@@ -1,5 +1,5 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+ * See the LICENSE file for additional terms and conditions. */
 
 #ifndef CONTEXT_H_
 #define CONTEXT_H_
@@ -27,21 +27,24 @@ namespace Pumbra {
 class Context {
 
 public:
-  Context(unsigned size=512);
+  Context(unsigned size = 512);
   ~Context();
-  void showRendering(const SurfaceBuffer& surfaceBuffer);
-  void setModel(const std::vector<float>& vertices);
-  void setScene(const SurfaceBuffer& surfaceBuffer, mat4x4 sunView, bool clipFar = true);
-  float calculatePSSF(const SurfaceBuffer& surfaceBuffer);
-  std::map<unsigned, float> calculateInteriorPSSFs(const std::vector<SurfaceBuffer>& hiddenSurfaces, const std::vector<SurfaceBuffer>& interiorSurfaces);
-  void showInteriorRendering(const std::vector<SurfaceBuffer>& hiddenSurfaces, const SurfaceBuffer& interiorSurface);
+  void showRendering(const SurfaceBuffer &surfaceBuffer);
+  void setModel(const std::vector<float> &vertices);
+  void setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool clipFar = true);
+  float calculatePSSF(const SurfaceBuffer &surfaceBuffer);
+  std::map<unsigned, float>
+  calculateInteriorPSSFs(const std::vector<SurfaceBuffer> &hiddenSurfaces,
+                         const std::vector<SurfaceBuffer> &interiorSurfaces);
+  void showInteriorRendering(const std::vector<SurfaceBuffer> &hiddenSurfaces,
+                             const SurfaceBuffer &interiorSurface);
   void clearModel();
 
 private:
-  GLFWwindow* window;
+  GLFWwindow *window;
   GLuint query, fbo, rbo;
-  static const char* vertexShaderSource;
-  static const char* fragmentShaderSource;
+  static const char *vertexShaderSource;
+  static const char *fragmentShaderSource;
   unsigned size;
   GLModel model;
   bool modelSet;
@@ -60,7 +63,7 @@ private:
   bool isRenderMode;
 
   void drawModel();
-  void drawExcept(const std::vector<SurfaceBuffer>& hiddenSurfaces);
+  void drawExcept(const std::vector<SurfaceBuffer> &hiddenSurfaces);
   void setMVP();
   void setCameraMVP();
   void calcCameraView();
@@ -68,9 +71,8 @@ private:
   void toggleCameraMode();
   void initOffScreenMode();
   void initRenderMode();
-
 };
 
-}
+} // namespace Pumbra
 
 #endif // CONTEXT_H_

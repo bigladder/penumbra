@@ -1,5 +1,5 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+ * See the LICENSE file for additional terms and conditions. */
 
 // Penumbra
 #include <gl/model.h>
@@ -16,25 +16,20 @@
 
 namespace Pumbra {
 
-SurfaceBuffer::SurfaceBuffer(GLuint begin, GLuint count, GLint index) :
-  begin(begin),
-  count(count),
-  index(index)
-{}
+SurfaceBuffer::SurfaceBuffer(GLuint begin, GLuint count, GLint index)
+    : begin(begin), count(count), index(index) {}
 
-GLModel::~GLModel() {
-  clearModel();
-}
+GLModel::~GLModel() { clearModel(); }
 
 void GLModel::clearModel() {
   glDeleteVertexArraysX(1, &vao);
   glDeleteBuffers(1, &vbo);
 }
 
-void GLModel::setVertices(const std::vector<float>& vertices) {
+void GLModel::setVertices(const std::vector<float> &vertices) {
 
   vertexArray = vertices;
-  numPoints = vertices.size()/vertexSize;
+  numPoints = vertices.size() / vertexSize;
   // Set up vertex array object
   glGenVertexArraysX(1, &vao);
   glBindVertexArrayX(vao);
@@ -42,21 +37,18 @@ void GLModel::setVertices(const std::vector<float>& vertices) {
   // Set up array buffer to store vertex information
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float)*vertices.size(), &vertices[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 
   // Set drawing pointers for current vertex buffer
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *)0);
 }
 
 void GLModel::drawSurface(SurfaceBuffer surfaceBuffer) {
   glDrawArrays(GL_TRIANGLES, surfaceBuffer.begin, surfaceBuffer.count);
 }
 
-void GLModel::drawAll() {
-  glDrawArrays(GL_TRIANGLES, 0, numPoints);
-}
+void GLModel::drawAll() { glDrawArrays(GL_TRIANGLES, 0, numPoints); }
 
 void GLModel::drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) {
 
@@ -66,11 +58,9 @@ void GLModel::drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) {
   }
 
   // Sort vector
-  std::sort(hiddenSurfaces.begin(), hiddenSurfaces.end(),
-    [](const SurfaceBuffer& a, const SurfaceBuffer& b) -> bool {
-      return a.begin > b.begin;
-    }
-  );
+  std::sort(
+      hiddenSurfaces.begin(), hiddenSurfaces.end(),
+      [](const SurfaceBuffer &a, const SurfaceBuffer &b) -> bool { return a.begin > b.begin; });
 
   // Begin (if first hidden surface isn't first surface)
   if (hiddenSurfaces[0].begin != 0u) {
@@ -90,7 +80,7 @@ void GLModel::drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) {
       nextBegin = hiddenSurfaces[i].begin + hiddenSurfaces[i].count;
       break;
     }
-    glDrawArrays(GL_TRIANGLES, nextBegin, hiddenSurfaces[i+1].begin - 1);
+    glDrawArrays(GL_TRIANGLES, nextBegin, hiddenSurfaces[i + 1].begin - 1);
   }
 
   if (nextBegin < numPoints) {
@@ -98,4 +88,4 @@ void GLModel::drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) {
   }
 }
 
-}
+} // namespace Pumbra
