@@ -12,6 +12,7 @@
 #include <vector>
 #include <array>
 #include <limits>
+#include <map>
 
 // Penumbra
 #include <sun.h>
@@ -28,10 +29,12 @@ class Context {
 public:
   Context(unsigned size=512);
   ~Context();
-  void showRendering(SurfaceBuffer surfaceBuffer);
+  void showRendering(const SurfaceBuffer& surfaceBuffer);
   void setModel(const std::vector<float>& vertices);
-  void setScene(SurfaceBuffer surfaceBuffer, mat4x4 sunView);
-  float calculatePSSF(SurfaceBuffer surfaceBuffer);
+  void setScene(const SurfaceBuffer& surfaceBuffer, mat4x4 sunView, bool clipFar = true);
+  float calculatePSSF(const SurfaceBuffer& surfaceBuffer);
+  std::map<unsigned, float> calculateInteriorPSSFs(const std::vector<SurfaceBuffer>& hiddenSurfaces, const std::vector<SurfaceBuffer>& interiorSurfaces);
+  void showInteriorRendering(const std::vector<SurfaceBuffer>& hiddenSurfaces, const SurfaceBuffer& interiorSurface);
   void clearModel();
 
 private:
@@ -57,6 +60,7 @@ private:
   bool isRenderMode;
 
   void drawModel();
+  void drawExcept(const std::vector<SurfaceBuffer>& hiddenSurfaces);
   void setMVP();
   void setCameraMVP();
   void calcCameraView();

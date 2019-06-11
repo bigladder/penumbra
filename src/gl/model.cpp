@@ -16,9 +16,10 @@
 
 namespace Pumbra {
 
-SurfaceBuffer::SurfaceBuffer(GLint begin, GLint count) :
+SurfaceBuffer::SurfaceBuffer(GLuint begin, GLuint count, GLint index) :
   begin(begin),
-  count(count)
+  count(count),
+  index(index)
 {}
 
 GLModel::~GLModel() {
@@ -33,7 +34,7 @@ void GLModel::clearModel() {
 void GLModel::setVertices(const std::vector<float>& vertices) {
 
   vertexArray = vertices;
-  numVerts = vertices.size();
+  numPoints = vertices.size()/vertexSize;
   // Set up vertex array object
   glGenVertexArraysX(1, &vao);
   glBindVertexArrayX(vao);
@@ -54,12 +55,47 @@ void GLModel::drawSurface(SurfaceBuffer surfaceBuffer) {
 }
 
 void GLModel::drawAll() {
-  glDrawArrays(GL_TRIANGLES, 0, numVerts/vertexSize);
+  glDrawArrays(GL_TRIANGLES, 0, numPoints);
 }
 
-/*void GLModel::drawExcept(GLint first, GLsizei count) {
-  glDrawArrays(GL_TRIANGLES, 0, first - 1);
-  glDrawArrays(GL_TRIANGLES, first + count, numVerts/vertexSize);
-}*/
+void GLModel::drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) {
+
+  if (hiddenSurfaces.size() == 0) { // draw all if no hidden surfaces
+    drawAll();
+    return;
+  }
+
+  // Sort vector
+  std::sort(hiddenSurfaces.begin(), hiddenSurfaces.end(),
+    [](const SurfaceBuffer& a, const SurfaceBuffer& b) -> bool {
+      return a.begin > b.begin;
+    }
+  );
+
+  // Begin (if first hidden surface isn't first surface)
+  if (hiddenSurfaces[0].begin != 0u) {
+    glDrawArrays(GL_TRIANGLES, 0, hiddenSurfaces[0].begin);
+  }
+
+  GLuint nextBegin = hiddenSurfaces[0].begin + hiddenSurfaces[0].count;
+
+  // Loop through all exceptions
+  for (std::size_t i = 1; i < hiddenSurfaces.size(); ++i) {
+    if (nextBegin == numPoints) {
+      // This is the last surface
+      return;
+    }
+    if (nextBegin == hiddenSurfaces[i].begin) {
+      // Next surface is also hidden
+      nextBegin = hiddenSurfaces[i].begin + hiddenSurfaces[i].count;
+      break;
+    }
+    glDrawArrays(GL_TRIANGLES, nextBegin, hiddenSurfaces[i+1].begin - 1);
+  }
+
+  if (nextBegin < numPoints) {
+    glDrawArrays(GL_TRIANGLES, nextBegin, numPoints - nextBegin);
+  }
+}
 
 }

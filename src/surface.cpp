@@ -81,18 +81,15 @@ TessData SurfacePrivate::tessellate()
     showMessage(MSG_ERR, "Unable to create tessellator.");
   }
 
-  int polySize = 3; // making triangles
-  int vertexSize = 3; // i.e., 3D
-
   // Add primary polygon
-  tessAddContour(tess, polySize, &polygon[0], sizeof(float) * vertexSize, (int)polygon.size() / vertexSize);
+  tessAddContour(tess, TessData::polySize, &polygon[0], sizeof(float) * TessData::vertexSize, (int)polygon.size() / TessData::vertexSize);
 
   // Add holes
   for (auto& hole : holes) {
-    tessAddContour(tess, polySize, &hole[0], sizeof(float) * vertexSize, (int)hole.size() / vertexSize);
+    tessAddContour(tess, TessData::polySize, &hole[0], sizeof(float) * TessData::vertexSize, (int)hole.size() / TessData::vertexSize);
   }
 
-  if (!tessTesselate(tess, TESS_WINDING_ODD, TESS_POLYGONS, polySize, vertexSize, nullptr)) {
+  if (!tessTesselate(tess, TESS_WINDING_ODD, TESS_POLYGONS, TessData::polySize, TessData::vertexSize, nullptr)) {
     showMessage(MSG_ERR, "Unable to tessellate surface.");
   }
 
@@ -101,10 +98,10 @@ TessData SurfacePrivate::tessellate()
   const TESSreal* verts = tessGetVertices(tess);
   const int nelems = tessGetElementCount(tess);
   const TESSindex* elems = tessGetElements(tess);
-  for (int i = 0; i < nelems * polySize; ++i) {
+  for (int i = 0; i < nelems * TessData::polySize; ++i) {
     const int vert = *(elems+i);
-    for (int j = 0; j < vertexSize; ++j) {
-      vertexArray.push_back(verts[vert * vertexSize + j]);
+    for (int j = 0; j < TessData::vertexSize; ++j) {
+      vertexArray.push_back(verts[vert * TessData::vertexSize + j]);
     }
   }
 

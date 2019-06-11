@@ -20,6 +20,8 @@ struct TessData {
   );
   std::vector<float> vertices;
   unsigned numVerts;
+  static const int polySize = 3; // making triangles
+  static const int vertexSize = 3; // i.e., 3D
 };
 
 class SurfacePrivate{

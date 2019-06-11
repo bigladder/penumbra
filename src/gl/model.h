@@ -15,9 +15,10 @@ namespace Pumbra {
 
 class SurfaceBuffer {
 public:
-  SurfaceBuffer(GLint begin = 0u, GLint count = 0u);
-  GLint begin;
-  GLint count;
+  SurfaceBuffer(GLuint begin = 0u, GLuint count = 0u, GLint index = -1);
+  GLuint begin;
+  GLuint count;
+  GLint index;
 };
 
 class GLModel {
@@ -26,10 +27,11 @@ public:
   void setVertices(const std::vector<float>& vertices);
   void drawSurface(SurfaceBuffer surfaceBuffer);
   void drawAll();
+  void drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces);
   void clearModel();
   std::vector<float> vertexArray;
-  unsigned numVerts;
-  static const int vertexSize = 3;
+  unsigned numPoints;
+  static const int vertexSize = 3;  // i.e., 3D
 private:
   GLuint vbo, vao;
 };

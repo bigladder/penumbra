@@ -31,9 +31,9 @@ TEST(PenumbraTest, azimuth) {
 	}
 }
 
-TEST(PenumbraTest, shape2) {
+TEST(PenumbraTest, interior) {
 	float const r_W = 2., r_D = 1., r_H = 1.;	//Overall dimensions
-	float const w_W = .2, w_H = .2;	//Window dimensions
+	float const w_W = 1., w_H = .5;	//Window dimensions
 
 	Pumbra::Polygon wallFrontVerts =
 	{
@@ -114,23 +114,39 @@ TEST(PenumbraTest, shape2) {
 	Pumbra::Penumbra pumbra2;
 
 	unsigned wallFrontId = pumbra2.addSurface(wallFront);
-  /* unsigned windowId = */ pumbra2.addSurface(window);
-	/* unsigned wallBackId = */ pumbra2.addSurface(wallBack);
+  unsigned windowId = pumbra2.addSurface(window);
+	unsigned wallBackId = pumbra2.addSurface(wallBack);
   /* unsigned roofId = */ pumbra2.addSurface(roof);
-	/* unsigned floorId = */ pumbra2.addSurface(floor);
-	/* unsigned sideWallLeftId = */ pumbra2.addSurface(sideWallLeft);
-	/* unsigned sideWallRightId = */ pumbra2.addSurface(sideWallRight);
+	unsigned floorId = pumbra2.addSurface(floor);
+	unsigned sideWallLeftId = pumbra2.addSurface(sideWallLeft);
+	unsigned sideWallRightId = pumbra2.addSurface(sideWallRight);
 
 	pumbra2.setModel();
 	pumbra2.setSunPosition(0.0f, 0.f);
 	float wallPSSF2 = pumbra2.calculatePSSF(wallFrontId);
-	EXPECT_NEAR(wallPSSF2, r_W*r_H - w_W * w_H, 0.0001);
-	//pumbra2.renderScene(wallFrontId);
+  EXPECT_NEAR(wallPSSF2, r_W*r_H - w_W * w_H, 0.0001);
+  //pumbra2.renderScene(wallFrontId);
+
+	float backWallInteriorPSSF = pumbra2.calculateInteriorPSSFs({windowId},{wallBackId})[wallBackId];
+  EXPECT_NEAR(backWallInteriorPSSF, w_W * w_H, 0.0001);
+  //pumbra2.renderInteriorScene({windowId},{wallBackId});
 
 	pumbra2.setSunPosition(3.1415f, 0.f);
 	float wallPSSF3 = pumbra2.calculatePSSF(wallFrontId);
 	EXPECT_NEAR(wallPSSF3, 0, 0.0001);	//WallFront should be blocked by back wall.
 	//pumbra2.renderScene(wallFrontId);
+
+	pumbra2.setSunPosition(0.5f, 0.5f);
+	std::map<unsigned, float> intPSSFs = pumbra2.calculateInteriorPSSFs({windowId},{wallBackId, floorId, sideWallLeftId, sideWallRightId});
+	backWallInteriorPSSF = intPSSFs[wallBackId];
+	float floorInteriorPSSF = intPSSFs[floorId];
+	float leftWallInteriorPSSF = intPSSFs[sideWallLeftId];
+	float rightWallInteriorPSSF = intPSSFs[sideWallRightId];
+	EXPECT_GT(backWallInteriorPSSF, 0);
+	EXPECT_GT(floorInteriorPSSF, 0);
+	EXPECT_GT(leftWallInteriorPSSF, 0);
+	EXPECT_EQ(rightWallInteriorPSSF, 0);
+	//pumbra2.renderInteriorScene({windowId},{wallBackId, floorId, sideWallLeftId, sideWallRightId});
 
 }
 

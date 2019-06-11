@@ -245,7 +245,7 @@ void Context::setModel(const std::vector<float>& vertices) {
   modelSet = true;
 }
 
-void Context::setScene(SurfaceBuffer surfaceBuffer, mat4x4 sunView) {
+void Context::setScene(const SurfaceBuffer& surfaceBuffer, mat4x4 sunView, bool clipFar) {
 
   if (!modelSet) {
     showMessage(MSG_ERR, "Model has not been set. Cannot set OpenGL scene.");
@@ -261,7 +261,7 @@ void Context::setScene(SurfaceBuffer surfaceBuffer, mat4x4 sunView) {
    near_ = -MAX_FLOAT;
    far_ = MAX_FLOAT;
 
-  for (int i = surfaceBuffer.begin*model.vertexSize; i < surfaceBuffer.begin*model.vertexSize + surfaceBuffer.count*model.vertexSize; i += model.vertexSize) {
+  for (GLuint i = surfaceBuffer.begin*model.vertexSize; i < surfaceBuffer.begin*model.vertexSize + surfaceBuffer.count*model.vertexSize; i += model.vertexSize) {
     vec4 point = {
       model.vertexArray[i],
       model.vertexArray[i + 1],
@@ -277,11 +277,14 @@ void Context::setScene(SurfaceBuffer surfaceBuffer, mat4x4 sunView) {
     far_ = std::min(trans[2], far_);
   }
 
-  // Use model box to determine near clipping plane
+  // Use model box to determine near clipping plane (and far if looking interior)
   for (std::size_t i = 0; i < 8; i++) {
     vec4 trans;
     mat4x4_mul_vec4(trans, view, modelBox[i]);
     near_ = std::max(trans[2], near_);
+    if (!clipFar) {
+        far_ = std::min(trans[2], far_);
+    }
   }
 
   // account for camera position
@@ -364,13 +367,22 @@ void Context::drawModel() {
   glDepthFunc(GL_EQUAL);
 }
 
-void Context::showRendering(SurfaceBuffer surfaceBuffer)
+void Context::drawExcept(const std::vector<SurfaceBuffer>& hiddenSurfaces) {
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glDepthFunc(GL_LESS);
+  model.drawExcept(hiddenSurfaces);
+  glDepthFunc(GL_EQUAL);
+}
+
+void Context::showRendering(const SurfaceBuffer& surfaceBuffer)
 {
     glfwSetWindowSize(window, size, size);
     glfwShowWindow(window);
 
-    if (!isRenderMode) {  // if not currently render mode
+    if (!isRenderMode) {  // if not currently render mode, switch to it
         initRenderMode();
+        isRenderMode = true;
     }
 
     while (!glfwWindowShouldClose(window))
@@ -387,7 +399,30 @@ void Context::showRendering(SurfaceBuffer surfaceBuffer)
     glfwHideWindow(window);
 }
 
-float Context::calculatePSSF(SurfaceBuffer surfaceBuffer) {
+void Context::showInteriorRendering(const std::vector<SurfaceBuffer>& hiddenSurfaces, const SurfaceBuffer& interiorSurface) {
+  glfwSetWindowSize(window, size, size);
+  glfwShowWindow(window);
+
+  if (!isRenderMode) {  /// if not currently render mode, switch to it
+    initRenderMode();
+    isRenderMode = true;
+  }
+
+  while (!glfwWindowShouldClose(window))
+  {
+    glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
+    drawExcept(hiddenSurfaces);
+    glUniform3f(vColLocation, 1.f, 1.f, 1.f);
+    model.drawSurface(interiorSurface);
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+  }
+
+  glfwSetWindowShouldClose(window, 0);
+  glfwHideWindow(window);
+}
+
+float Context::calculatePSSF(const SurfaceBuffer& surfaceBuffer) {
 
   if (isRenderMode) {  // if currently render mode, switch to off screen mode
     initOffScreenMode();
@@ -414,6 +449,40 @@ float Context::calculatePSSF(SurfaceBuffer surfaceBuffer) {
 
   return pixelCount*pixelArea;
 }
+
+std::map<unsigned, float> Context::calculateInteriorPSSFs(const std::vector<SurfaceBuffer>& hiddenSurfaces, const std::vector<SurfaceBuffer>& interiorSurfaces) {
+
+    if (isRenderMode) {  // if currently render mode, switch to off screen mode
+        initOffScreenMode();
+        isRenderMode = false;
+    }
+
+    glGenQueries(1, &query);
+    drawExcept(hiddenSurfaces);
+
+    std::map<unsigned, float> pssfs;
+    for (auto& intSurf : interiorSurfaces) {
+        glGenQueries(1, &query);
+        glBeginQuery(GL_SAMPLES_PASSED, query);
+        model.drawSurface(intSurf);
+        glEndQuery(GL_SAMPLES_PASSED);
+
+        // wait until the result is available
+        GLint ready(0);
+        while (!ready) {
+            glGetQueryObjectiv(query, GL_QUERY_RESULT_AVAILABLE, &ready);
+        }
+
+        // retrieve result
+        GLint pixelCount;
+        glGetQueryObjectiv(query, GL_QUERY_RESULT, &pixelCount);
+
+        glDeleteQueries(1, &query);
+        pssfs[intSurf.index] = pixelCount*pixelArea;
+    }
+    return pssfs;
+}
+
 
 void Context::initOffScreenMode() {
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
