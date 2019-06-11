@@ -1,6 +1,9 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
+// Standard
+#include <algorithm>
+
 // Penumbra
 #include <gl/model.h>
 
