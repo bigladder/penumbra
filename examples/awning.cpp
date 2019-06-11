@@ -44,14 +44,14 @@ int main(void) {
   pumbra.setSunPosition(2.50f, 0.3f);
   // pumbra.setSunPosition(3.14f, 0.0f);
   pumbra.renderScene(wallId);
-  float wallPSSF = pumbra.calculatePSSF(wallId);
+  float wallPSSA = pumbra.calculatePSSA(wallId);
 
-  std::cout << "Wall PSSF: " << wallPSSF << std::endl;
+  std::cout << "Wall PSSA: " << wallPSSA << std::endl;
 
   pumbra.renderScene(windowId);
-  float windowPSSF = pumbra.calculatePSSF(windowId);
+  float windowPSSA = pumbra.calculatePSSA(windowId);
 
-  std::cout << "Window PSSF: " << windowPSSF << std::endl;
+  std::cout << "Window PSSA: " << windowPSSA << std::endl;
 
   pumbra.clearModel();
 
@@ -67,9 +67,9 @@ int main(void) {
   pumbra.setModel();
 
   pumbra.renderScene(windowId);
-  windowPSSF = pumbra.calculatePSSF(windowId);
+  windowPSSA = pumbra.calculatePSSA(windowId);
 
-  std::cout << "Window PSSF with fin: " << windowPSSF << std::endl;
+  std::cout << "Window PSSA with fin: " << windowPSSA << std::endl;
 
   return 0;
 }

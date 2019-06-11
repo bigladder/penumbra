@@ -283,7 +283,7 @@ void Context::setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool 
   top += deltaY;
 
   // calculate pixel area (A[i]*cos(theta) for each pixel of the surface)
-  // multiplies by the number of pixels to get projected sunlit surface fraction
+  // multiplies by the number of pixels to get projected sunlit surface area
 
   pixelArea = (right - left) * (top - bottom) / (size * size);
 
@@ -398,7 +398,7 @@ void Context::showInteriorRendering(const std::vector<SurfaceBuffer> &hiddenSurf
   glfwHideWindow(window);
 }
 
-float Context::calculatePSSF(const SurfaceBuffer &surfaceBuffer) {
+float Context::calculatePSSA(const SurfaceBuffer &surfaceBuffer) {
 
   if (isRenderMode) { // if currently render mode, switch to off screen mode
     initOffScreenMode();
@@ -427,7 +427,7 @@ float Context::calculatePSSF(const SurfaceBuffer &surfaceBuffer) {
 }
 
 std::map<unsigned, float>
-Context::calculateInteriorPSSFs(const std::vector<SurfaceBuffer> &hiddenSurfaces,
+Context::calculateInteriorPSSAs(const std::vector<SurfaceBuffer> &hiddenSurfaces,
                                 const std::vector<SurfaceBuffer> &interiorSurfaces) {
 
   if (isRenderMode) { // if currently render mode, switch to off screen mode
@@ -438,7 +438,7 @@ Context::calculateInteriorPSSFs(const std::vector<SurfaceBuffer> &hiddenSurfaces
   glGenQueries(1, &query);
   drawExcept(hiddenSurfaces);
 
-  std::map<unsigned, float> pssfs;
+  std::map<unsigned, float> pssas;
   for (auto &intSurf : interiorSurfaces) {
     glGenQueries(1, &query);
     glBeginQuery(GL_SAMPLES_PASSED, query);
@@ -456,9 +456,9 @@ Context::calculateInteriorPSSFs(const std::vector<SurfaceBuffer> &hiddenSurfaces
     glGetQueryObjectiv(query, GL_QUERY_RESULT, &pixelCount);
 
     glDeleteQueries(1, &query);
-    pssfs[intSurf.index] = pixelCount * pixelArea;
+    pssas[intSurf.index] = pixelCount * pixelArea;
   }
-  return pssfs;
+  return pssas;
 }
 
 void Context::initOffScreenMode() {

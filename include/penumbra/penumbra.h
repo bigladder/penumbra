@@ -47,8 +47,8 @@ public:
   int setSunPosition(const float azm, // in radians, clockwise, north = 0
                      const float alt  // in radians, horizon = 0, vertical = pi/2
   );
-  float calculatePSSF(unsigned surfaceIndex);
-  std::map<unsigned, float> calculateInteriorPSSFs(std::vector<unsigned> transparentSurfaceIndices,
+  float calculatePSSA(unsigned surfaceIndex);
+  std::map<unsigned, float> calculateInteriorPSSAs(std::vector<unsigned> transparentSurfaceIndices,
                                                    std::vector<unsigned> interiorSurfaceIndices);
   int renderScene(unsigned surfaceIndex); // Primarily for debug purposes
   int renderInteriorScene(

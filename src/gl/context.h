@@ -32,9 +32,9 @@ public:
   void showRendering(const SurfaceBuffer &surfaceBuffer);
   void setModel(const std::vector<float> &vertices);
   void setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool clipFar = true);
-  float calculatePSSF(const SurfaceBuffer &surfaceBuffer);
+  float calculatePSSA(const SurfaceBuffer &surfaceBuffer);
   std::map<unsigned, float>
-  calculateInteriorPSSFs(const std::vector<SurfaceBuffer> &hiddenSurfaces,
+  calculateInteriorPSSAs(const std::vector<SurfaceBuffer> &hiddenSurfaces,
                          const std::vector<SurfaceBuffer> &interiorSurfaces);
   void showInteriorRendering(const std::vector<SurfaceBuffer> &hiddenSurfaces,
                              const SurfaceBuffer &interiorSurface);
