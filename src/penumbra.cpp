@@ -74,6 +74,14 @@ int Penumbra::setSunPosition(const float azm, // in radians, clockwise, north = 
   return PN_SUCCESS;
 }
 
+float Penumbra::getSunAzimuth() {
+  return penumbra->sun.getAzimuth();
+}
+
+float Penumbra::getSunAltitude() {
+  return penumbra->sun.getAltitude();
+}
+
 float Penumbra::calculatePSSA(unsigned surfaceIndex) {
   if (penumbra->checkSurface(surfaceIndex)) {
     penumbra->context.setScene(penumbra->surfaceBuffers[surfaceIndex], penumbra->sun.getView());
