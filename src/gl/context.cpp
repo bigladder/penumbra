@@ -44,7 +44,9 @@ const char *Context::calculationVertexShaderSource =
   }
 )src";
 
-static void glErrorCallback(int, const char *description) { showMessage(MSG_INFO, description); }
+static void glErrorCallback(int, const char *description) {
+  showMessage(MSG_INFO, description);
+}
 
 Context::Context(unsigned size)
     : size(size), modelSet(false), isWireFrame(false), isCameraMode(false), viewScale(1.f),
@@ -168,7 +170,8 @@ Context::Context(unsigned size)
   glBindAttribLocation(calcProgram->getInt(), 0, "vPos");
 
   // Program for on-screen rendering (mostly for debugging)
-  renderProgram = std::unique_ptr<GLProgram>(new GLProgram(renderVertexShaderSource, renderFragmentShaderSource));
+  renderProgram = std::unique_ptr<GLProgram>(
+      new GLProgram(renderVertexShaderSource, renderFragmentShaderSource));
   glBindAttribLocation(renderProgram->getInt(), 0, "vPos");
   vColLocation = glGetUniformLocation(renderProgram->getInt(), "vCol");
 
@@ -186,7 +189,6 @@ Context::~Context() {
   glDeleteProgram(calcProgram->getInt());
   glDeleteProgram(renderProgram->getInt());
   glfwDestroyWindow(window);
-
 }
 void Context::toggleWireFrame() {
   isWireFrame = !isWireFrame;
@@ -324,7 +326,9 @@ void Context::calcCameraView() {
   mat4x4_transpose(cameraView, tempMat); // Transpose back.
 }
 
-void Context::setMVP() { glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat *)mvp); }
+void Context::setMVP() {
+  glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat *)mvp);
+}
 
 void Context::setCameraMVP() {
   float deltaW, deltaH;
