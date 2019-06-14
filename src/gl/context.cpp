@@ -160,19 +160,23 @@ Context::Context(unsigned size)
 
   glEnable(GL_DEPTH_TEST);
 
-  // Shader program
+  // Shader programs
+
+  // Program for off-screen calculation
   calcProgram = std::unique_ptr<GLProgram>(new GLProgram(calculationVertexShaderSource, nullptr));
 
   glBindAttribLocation(calcProgram->getInt(), 0, "vPos");
 
+  // Program for on-screen rendering (mostly for debugging)
   renderProgram = std::unique_ptr<GLProgram>(new GLProgram(renderVertexShaderSource, renderFragmentShaderSource));
   glBindAttribLocation(renderProgram->getInt(), 0, "vPos");
-  mvpLocation = glGetUniformLocation(calcProgram->getInt(), "MVP");
   vColLocation = glGetUniformLocation(renderProgram->getInt(), "vCol");
 
+  // Frame and render buffers
   glGenFramebuffersEXT(1, &fbo);
   glGenRenderbuffersEXT(1, &rbo);
 
+  // Start in off-screen mode
   initOffScreenMode();
 }
 
@@ -468,6 +472,7 @@ Context::calculateInteriorPSSAs(const std::vector<SurfaceBuffer> &hiddenSurfaces
 
 void Context::initOffScreenMode() {
   glUseProgram(calcProgram->getInt());
+  mvpLocation = glGetUniformLocation(calcProgram->getInt(), "MVP");
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
@@ -511,6 +516,8 @@ void Context::initOffScreenMode() {
 void Context::initRenderMode() {
   // set to default framebuffer and renderbuffer
   glUseProgram(renderProgram->getInt());
+  mvpLocation = glGetUniformLocation(renderProgram->getInt(), "MVP");
+  setMVP();
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
   glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
   glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
