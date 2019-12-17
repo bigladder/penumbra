@@ -49,10 +49,15 @@ public:
   );
   float getSunAzimuth();
   float getSunAltitude();
+  void submitPSSA(unsigned surfaceIndex);
+  void submitPSSA(const std::vector<unsigned> &surfaceIndices);
+  void submitPSSA();
   unsigned getNumSurfaces();
   float calculatePSSA(unsigned surfaceIndex);
-  std::map<unsigned, float> calculateInteriorPSSAs(std::vector<unsigned> transparentSurfaceIndices,
-                                                   std::vector<unsigned> interiorSurfaceIndices);
+  std::vector<float> calculatePSSA(const std::vector<unsigned> &surfaceIndices);
+  std::vector<float> calculatePSSA();
+  std::map<unsigned, float> calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurfaceIndices,
+                                                   const std::vector<unsigned> &interiorSurfaceIndices);
   int renderScene(unsigned surfaceIndex); // Primarily for debug purposes
   int renderInteriorScene(
       std::vector<unsigned> transparentSurfaceIndices,
