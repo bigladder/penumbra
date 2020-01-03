@@ -19,7 +19,7 @@ Penumbra::Penumbra(unsigned int size) {
 }
 
 Penumbra::Penumbra(PenumbraCallbackFunction callbackFunction, unsigned size) {
-  setMessageCallback(callbackFunction, NULL);
+  setMessageCallback(callbackFunction, nullptr);
   penumbra = std::unique_ptr<PenumbraPrivate>(new PenumbraPrivate(size));
 }
 
@@ -29,6 +29,23 @@ Penumbra::Penumbra(PenumbraCallbackFunction callbackFunction, void *contextPtr, 
 }
 
 Penumbra::~Penumbra() {}
+
+VendorName Penumbra::getVendorName() {
+  auto vendorType = VendorName::None;
+  auto vendorName = penumbra->context.vendorName();
+  if (vendorName == "NVIDIA") {
+      vendorType = VendorName::NVIDIA;
+  } else if (vendorName == "AMD" || vendorName == "ATI" || vendorName == "Advanced Micro Devices" || vendorName == "ATI Technologies Inc.") {
+      vendorType = VendorName::AMD;
+  } else if (vendorName == "Intel" || vendorName == "INTEL") {
+      vendorType = VendorName::Intel;
+  } else if (vendorName == "VMware, Inc.") {
+      vendorType = VendorName::VMware;
+  } else {
+      showMessage(MSG_ERR, "Failed to find GPU or vendor name (" + vendorName + ") is not in list.");
+  }
+  return vendorType;
+}
 
 unsigned Penumbra::addSurface(const Surface &surface) {
   penumbra->addSurface(surface);
