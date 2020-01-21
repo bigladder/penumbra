@@ -14,10 +14,10 @@ jobs:
     - name: configure
       env:
         CC: ${{ matrix.compiler }}
-      - run: 
-          mkdir build
-          cd build
-          cmake -DBUILD_PENUMBRA_TESTING="$TESTING" -DPENUMBRA_STATIC_LIB="$STATIC_LIB" -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
+      run: 
+        mkdir build
+        cd build
+        cmake -DBUILD_PENUMBRA_TESTING="$TESTING" -DPENUMBRA_STATIC_LIB="$STATIC_LIB" -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
     - name: build
       run: cmake --build build
     - name: test
@@ -34,10 +34,10 @@ jobs:
     - name: configure
       env:
         CC: ${{ matrix.compiler }}
-      - run: 
-          mkdir build
-          cd build
-          cmake -DBUILD_PENUMBRA_TESTING="$TESTING" -DPENUMBRA_STATIC_LIB="$STATIC_LIB" -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
+      run: 
+        mkdir build
+        cd build
+        cmake -DBUILD_PENUMBRA_TESTING="$TESTING" -DPENUMBRA_STATIC_LIB="$STATIC_LIB" -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
     - name: build
       run: cmake --build build
     - name: test
