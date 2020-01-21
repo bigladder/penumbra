@@ -46,6 +46,7 @@ jobs:
         mkdir build
         cd build
         cmake -DBUILD_PENUMBRA_TESTING="ON" -DPENUMBRA_STATIC_LIB="ON" -DPENUMBRA_COVERAGE="OFF" -DCMAKE_BUILD_TYPE="RELEASE" ..
+    - name: build
       run: |
         cd build
         make
