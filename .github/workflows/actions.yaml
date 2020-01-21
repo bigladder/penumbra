@@ -21,7 +21,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DBUILD_GMOCK="ON" -DBUILD_GTEST="ON" -DBUILD_PENUMBRA_TESTING="ON" -DPENUMBRA_STATIC_LIB="OFF" -DPENUMBRA_COVERAGE="OFF" -DCMAKE_BUILD_TYPE="Debug"
+        cmake -DBUILD_GMOCK="ON" -DBUILD_GTEST="ON" -DBUILD_PENUMBRA_TESTING="ON" -DPENUMBRA_STATIC_LIB="OFF" -DPENUMBRA_COVERAGE="OFF" -DCMAKE_BUILD_TYPE="Debug" ..
     - name: build      
       run: |
         cd build
@@ -45,7 +45,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DBUILD_GMOCK="ON" -DBUILD_GTEST="ON" -DBUILD_PENUMBRA_TESTING="ON" -DPENUMBRA_STATIC_LIB="OFF" -DPENUMBRA_COVERAGE="OFF" -DCMAKE_BUILD_TYPE="Debug"
+        cmake -DBUILD_GMOCK="ON" -DBUILD_GTEST="ON" -DBUILD_PENUMBRA_TESTING="ON" -DPENUMBRA_STATIC_LIB="OFF" -DPENUMBRA_COVERAGE="OFF" -DCMAKE_BUILD_TYPE="Debug" ..
     - name: build
       run: |
         cd build
