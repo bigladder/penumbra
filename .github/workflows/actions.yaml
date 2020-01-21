@@ -12,7 +12,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: package install
-      run: sudo apt-get -y install xorg-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev
+      run: |
+        sudo apt-get update 
+        sudo apt-get -y install xorg-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev
     - name: configure
       env:
         CC: ${{ matrix.compiler }}
