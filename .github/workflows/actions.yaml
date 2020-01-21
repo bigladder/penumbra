@@ -37,11 +37,6 @@ jobs:
         compiler: [gcc, clang]
     steps:
     - uses: actions/checkout@v1
-    - name: package install
-      run: |
-        git clone --recurse-submodules git@github.com:LunarG/VulkanTools.git
-        cd VulkanTools
-        ./update_external_sources.bat
     - name: configure
       env:
         CC: ${{ matrix.compiler }}
