@@ -2,15 +2,13 @@ name: C/C++ CI
 
 on: [push]
 
-strategy:
-  matrix:
-    compiler: [gcc, clang]
-
 jobs:
   build-ubuntu:
 
     runs-on: ubuntu-latest
-    
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
     steps:
     - uses: actions/checkout@v1
     - name: preinstall
@@ -27,7 +25,9 @@ jobs:
   build-windows:
 
     runs-on: ${{ matrix.os }}
-    
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
     steps:
     - uses: actions/checkout@v1
     - name: configure
