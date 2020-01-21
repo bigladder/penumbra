@@ -24,7 +24,7 @@ jobs:
 
   build-windows:
 
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     strategy:
       matrix:
         compiler: [gcc, clang]
