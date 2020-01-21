@@ -23,7 +23,9 @@ jobs:
         cd build
         cmake -DBUILD_PENUMBRA_TESTING="$TESTING" -DPENUMBRA_STATIC_LIB="$STATIC_LIB" -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
     - name: build
-      run: cmake --build build
+      run: |
+        cd build
+        make
     - name: test
       run: |
         cd build
@@ -34,7 +36,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        compiler: [gcc, clang]
+        compiler: [gcc, clang, msvc]
     steps:
     - uses: actions/checkout@v1
     - name: configure
@@ -43,9 +45,10 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DBUILD_PENUMBRA_TESTING="$TESTING" -DPENUMBRA_STATIC_LIB="ON" -DPENUMBRA_COVERAGE="OFF" -DCMAKE_BUILD_TYPE="RELEASE" ..
-    - name: build
-      run: cmake --build build
+        cmake -DBUILD_PENUMBRA_TESTING="ON" -DPENUMBRA_STATIC_LIB="ON" -DPENUMBRA_COVERAGE="OFF" -DCMAKE_BUILD_TYPE="RELEASE" ..
+      run: |
+        cd build
+        make
     - name: test
       run: |
         cd build
