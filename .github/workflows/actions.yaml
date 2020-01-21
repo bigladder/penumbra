@@ -48,7 +48,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DBUILD_PENUMBRA_TESTING="$TESTING" -DPENUMBRA_STATIC_LIB="$STATIC_LIB" -DPENUMBRA_COVERAGE="$COVERAGE" -DCMAKE_BUILD_TYPE="$CONFIG" ..
+        cmake -DBUILD_PENUMBRA_TESTING="$TESTING" -DPENUMBRA_STATIC_LIB="ON" -DPENUMBRA_COVERAGE="OFF" -DCMAKE_BUILD_TYPE="RELEASE" ..
     - name: build
       run: cmake --build build
     - name: test
