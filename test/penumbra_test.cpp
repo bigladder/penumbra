@@ -121,6 +121,123 @@ TEST(PenumbraTest, interior) {
   // pumbra2.renderInteriorScene({windowId},{wallBackId, floorId, sideWallLeftId, sideWallRightId});
 }
 
+TEST(PenumbraTest, CalculatePSSA_Multiple_Surfaces) {
+  //create a cube
+    float const r_W = 1.f, r_D = 1.f, r_H = 1.f; // Overall dimensions
+
+
+    Pumbra::Polygon wallFrontVerts = {
+            -r_W / 2.f, r_D / 2.f, -r_H / 2.f,
+            r_W / 2.f,  r_D / 2.f, -r_H / 2.f,
+            r_W / 2.f,  r_D / 2.f, r_H / 2.f,
+            -r_W / 2.f, r_D / 2.f, r_H / 2.f,
+    };
+
+    Pumbra::Polygon wallBackVerts = {
+             r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
+            -r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
+            -r_W / 2.f, -r_D / 2.f, r_H / 2.f,
+             r_W / 2.f, -r_D / 2.f, r_H / 2.f,
+    };
+
+    Pumbra::Polygon roofVerts = {
+            -r_W / 2.f,  r_D / 2.f, r_H / 2.f,
+             r_W / 2.f,  r_D / 2.f, r_H / 2.f,
+             r_W / 2.f, -r_D / 2.f, r_H / 2.f,
+            -r_W / 2.f, -r_D / 2.f, r_H / 2.f,
+    };
+
+    Pumbra::Polygon floorVerts = {
+            -r_W / 2.f, r_D / 2.f,  -r_H / 2.f, r_W / 2.f,  r_D / 2.f,  -r_H / 2.f,
+            r_W / 2.f,  -r_D / 2.f, -r_H / 2.f, -r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
+    };
+
+    Pumbra::Polygon sideWallLeftVerts = {
+            -r_W / 2.f, r_D / 2.f,  -r_H / 2.f, -r_W / 2.f, r_D / 2.f,  r_H / 2.f,
+            -r_W / 2.f, -r_D / 2.f, r_H / 2.f,  -r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
+    };
+
+    Pumbra::Polygon sideWallRightVerts = {
+            r_W / 2.f, r_D / 2.f,  -r_H / 2.f, r_W / 2.f, r_D / 2.f,  r_H / 2.f,
+            r_W / 2.f, -r_D / 2.f, r_H / 2.f,  r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
+    };
+
+    Pumbra::Surface wallFront(wallFrontVerts);
+    Pumbra::Surface wallBack(wallBackVerts);
+    Pumbra::Surface roof(roofVerts);
+    Pumbra::Surface floor(floorVerts);
+    Pumbra::Surface sideWallLeft(sideWallLeftVerts);
+    Pumbra::Surface sideWallRight(sideWallRightVerts);
+
+    Pumbra::Penumbra pumbra;
+
+    unsigned wallFrontId        = pumbra.addSurface(wallFront);
+    unsigned wallBackId         = pumbra.addSurface(wallBack);
+    unsigned roofId             = pumbra.addSurface(roof);
+    unsigned floorId            = pumbra.addSurface(floor);
+    unsigned sideWallLeftId     = pumbra.addSurface(sideWallLeft);
+    unsigned sideWallRightId    = pumbra.addSurface(sideWallRight);
+
+    std::vector<unsigned> test_cube{wallFrontId, wallBackId, roofId, floorId, sideWallLeftId, sideWallRightId};
+
+    pumbra.setModel();
+
+    // Scenario: Shade Front Wall
+    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
+    pumbra.setSunPosition(0.0f, 0.0f);
+    std::vector<float> results = pumbra.calculatePSSA(test_cube);
+    EXPECT_NEAR(results[0], std::abs(cos(0.0f)), 0.0001);
+    EXPECT_NEAR(results[1], 0.0, 0.0001);
+    EXPECT_NEAR(results[2], 0.0, 0.0001);
+    EXPECT_NEAR(results[3], 0.0, 0.0001);
+    EXPECT_NEAR(results[4], 0.0, 0.0001);
+    EXPECT_NEAR(results[5], 0.0, 0.0001);
+
+    // Scenario: Shade Right Wall
+    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
+    pumbra.setSunPosition(1.570796, 0.f);
+    results = pumbra.calculatePSSA(test_cube);
+    EXPECT_NEAR(results[0], 0.0, 0.0001);
+    EXPECT_NEAR(results[1], 0.0, 0.0001);
+    EXPECT_NEAR(results[2], 0.0, 0.0001);
+    EXPECT_NEAR(results[3], 0.0, 0.0001);
+    EXPECT_NEAR(results[4], 0.0, 0.0001);
+    EXPECT_NEAR(results[5], std::abs(cos(0.0)), 0.0001);
+
+    // Scenario: Shade Left Wall
+    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
+    pumbra.setSunPosition(-1.570796f, 0.f);
+    results = pumbra.calculatePSSA(test_cube);
+    EXPECT_NEAR(results[0], 0.0, 0.0001);
+    EXPECT_NEAR(results[1], 0.0, 0.0001);
+    EXPECT_NEAR(results[2], 0.0, 0.0001);
+    EXPECT_NEAR(results[3], 0.0, 0.0001);
+    EXPECT_NEAR(results[4], std::abs(cos(0.0)), 0.0001);
+    EXPECT_NEAR(results[5], 0.0, 0.0001);
+
+    // Scenario: Shade Back Wall
+    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
+    pumbra.setSunPosition(3.141593f, 0.f);
+    results = pumbra.calculatePSSA(test_cube);
+    EXPECT_NEAR(results[0], 0.0, 0.0001);
+    EXPECT_NEAR(results[1], std::abs(cos(0.0)), 0.0001);
+    EXPECT_NEAR(results[2], 0.0, 0.0001);
+    EXPECT_NEAR(results[3], 0.0, 0.0001);
+    EXPECT_NEAR(results[4], 0.0, 0.0001);
+    EXPECT_NEAR(results[5], 0.0, 0.0001);
+
+    // Scenario: Shade Roof
+    // Expect front wall to be full shades, equating to size of front wall area (2.0f)
+    pumbra.setSunPosition(0.0f, 1.570796f); //other side of cube over cube?
+    results = pumbra.calculatePSSA(test_cube);
+    EXPECT_NEAR(results[0], 0.0, 0.0001);
+    EXPECT_NEAR(results[1], 0.0, 0.0001);
+    EXPECT_NEAR(results[2], std::abs(cos(0.0f)), 0.0001);
+    EXPECT_NEAR(results[3], 0.0, 0.0001);
+    EXPECT_NEAR(results[4], 0.0, 0.0001);
+    EXPECT_NEAR(results[5], 0.0, 0.0001);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
 
