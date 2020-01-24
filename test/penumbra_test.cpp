@@ -176,93 +176,38 @@ TEST(PenumbraTest, CalculatePSSA_Multiple_Surfaces) {
 
     Pumbra::Penumbra pumbra;
 
-    unsigned wallFrontId        = pumbra.addSurface(wallFront);
-    unsigned wallBackId         = pumbra.addSurface(wallBack);
-    unsigned roofId             = pumbra.addSurface(roof);
-    unsigned floorId            = pumbra.addSurface(floor);
-    unsigned sideWallLeftId     = pumbra.addSurface(sideWallLeft);
-    unsigned sideWallRightId    = pumbra.addSurface(sideWallRight);
+    const unsigned wallFrontId        = pumbra.addSurface(wallFront);
+    const unsigned wallBackId         = pumbra.addSurface(wallBack);
+    const unsigned roofId             = pumbra.addSurface(roof);
+    const unsigned floorId            = pumbra.addSurface(floor);
+    const unsigned sideWallLeftId     = pumbra.addSurface(sideWallLeft);
+    const unsigned sideWallRightId    = pumbra.addSurface(sideWallRight);
 
-    std::vector<unsigned> test_cube{wallFrontId, wallBackId, roofId, floorId, sideWallLeftId, sideWallRightId};
+    const std::vector<unsigned> test_cube{wallFrontId, wallBackId, roofId, floorId, sideWallLeftId, sideWallRightId};
 
     pumbra.setModel();
 
-    // Scenario: Shade Front Wall
-    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
     pumbra.setSunPosition(0.0f, 0.0f);
     std::vector<float> results = pumbra.calculatePSSA(test_cube);
-    EXPECT_NEAR(results[0], std::abs(cos(0.0f)), 0.0001);
-    EXPECT_NEAR(results[1], 0.0, 0.0001);
-    EXPECT_NEAR(results[2], 0.0, 0.0001);
-    EXPECT_NEAR(results[3], 0.0, 0.0001);
-    EXPECT_NEAR(results[4], 0.0, 0.0001);
-    EXPECT_NEAR(results[5], 0.0, 0.0001);
 
-    // Scenario: Half Shade Front Wall and Right Wall
-    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
-    pumbra.setSunPosition(0.785398f, 0.0f);
-    results = pumbra.calculatePSSA();
-    EXPECT_NEAR(results[0], std::abs(cos(0.785398f)), 0.0001);
-    EXPECT_NEAR(results[1], 0.0, 0.0001);
-    EXPECT_NEAR(results[2], 0.0, 0.0001);
-    EXPECT_NEAR(results[3], 0.0, 0.0001);
-    EXPECT_NEAR(results[4], 0.0, 0.0001);
-    EXPECT_NEAR(results[5], std::abs(cos(0.785398f)), 0.0001);
+    const std::map<std::pair<double, double>, std::vector<float>> angular_test_data {
+            {{ 0.0f,       0.0f },  { std::abs(cos(0.0f)),      0.0,                        0.0,                    0.0,    0.0,                        0.0                         }},
+            {{ 0.785398f,  0.0f },  { std::abs(cos(0.785398f)), 0.0,                        0.0,                    0.0,    0.0,                        std::abs(cos(0.785398f))    }},
+            {{ 1.570796f,  0.0f },  { 0.0,                      0.0,                        0.0,                    0.0,    0.0,                        std::abs(cos(0.0f))         }},
+            {{ 2.356194f,  0.0f },  { 0.0,                      std::abs(cos(0.785398f)),   0.0,                    0.0,    0.0,                        std::abs(cos(0.785398f))    }},
+            {{ -1.570796f, 0.0f },  { 0.0,                      0.0,                        0.0,                    0.0,    std::abs(cos(0.0f)),        0.0                         }},
+            {{ 3.141593f,  0.0f },  { 0.0,                      std::abs(cos(0.0f)),        0.0,                    0.0,    0.0,                        0.0                         }},
+            {{ 0.0f,  1.570796f },  { 0.0,                      0.0,                        std::abs(cos(0.0f)),    0.0,    0.0,                        0.0                         }}
+    };
 
-    // Scenario: Shade Right Wall
-    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
-    pumbra.setSunPosition(1.570796, 0.f);
-    results = pumbra.calculatePSSA();
-    EXPECT_NEAR(results[0], 0.0, 0.0001);
-    EXPECT_NEAR(results[1], 0.0, 0.0001);
-    EXPECT_NEAR(results[2], 0.0, 0.0001);
-    EXPECT_NEAR(results[3], 0.0, 0.0001);
-    EXPECT_NEAR(results[4], 0.0, 0.0001);
-    EXPECT_NEAR(results[5], std::abs(cos(0.0)), 0.0001);
-
-    // Scenario: Half Shade Right Wall and Back Wall
-    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
-    pumbra.setSunPosition(2.356194, 0.f);
-    results = pumbra.calculatePSSA();
-    EXPECT_NEAR(results[0], 0.0, 0.0001);
-    EXPECT_NEAR(results[1], std::abs(cos(0.785398f)), 0.0001);
-    EXPECT_NEAR(results[2], 0.0, 0.0001);
-    EXPECT_NEAR(results[3], 0.0, 0.0001);
-    EXPECT_NEAR(results[4], 0.0, 0.0001);
-    EXPECT_NEAR(results[5], std::abs(cos(0.785398f)), 0.0001);
-
-    // Scenario: Shade Left Wall
-    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
-    pumbra.setSunPosition(-1.570796f, 0.f);
-    results = pumbra.calculatePSSA();
-    EXPECT_NEAR(results[0], 0.0, 0.0001);
-    EXPECT_NEAR(results[1], 0.0, 0.0001);
-    EXPECT_NEAR(results[2], 0.0, 0.0001);
-    EXPECT_NEAR(results[3], 0.0, 0.0001);
-    EXPECT_NEAR(results[4], std::abs(cos(0.0)), 0.0001);
-    EXPECT_NEAR(results[5], 0.0, 0.0001);
-
-    // Scenario: Shade Back Wall
-    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
-    pumbra.setSunPosition(3.141593f, 0.f);
-    results = pumbra.calculatePSSA();
-    EXPECT_NEAR(results[0], 0.0, 0.0001);
-    EXPECT_NEAR(results[1], std::abs(cos(0.0)), 0.0001);
-    EXPECT_NEAR(results[2], 0.0, 0.0001);
-    EXPECT_NEAR(results[3], 0.0, 0.0001);
-    EXPECT_NEAR(results[4], 0.0, 0.0001);
-    EXPECT_NEAR(results[5], 0.0, 0.0001);
-
-    // Scenario: Shade Roof
-    // Expect front wall to be full shades, equating to size of front wall area (1.0f)
-    pumbra.setSunPosition(0.0f, 1.570796f);
-    results = pumbra.calculatePSSA();
-    EXPECT_NEAR(results[0], 0.0, 0.0001);
-    EXPECT_NEAR(results[1], 0.0, 0.0001);
-    EXPECT_NEAR(results[2], std::abs(cos(0.0f)), 0.0001);
-    EXPECT_NEAR(results[3], 0.0, 0.0001);
-    EXPECT_NEAR(results[4], 0.0, 0.0001);
-    EXPECT_NEAR(results[5], 0.0, 0.0001);
+    for( auto const& [sunPosition, expectedResults] : angular_test_data )
+    {
+        pumbra.setSunPosition(sunPosition.first, sunPosition.second);
+        results = pumbra.calculatePSSA();
+        for(int i=0; i < expectedResults.size(); i++){
+            EXPECT_NEAR(results[i], expectedResults[i], 0.0001);
+        }
+    }
 }
 
 int main(int argc, char **argv) {
