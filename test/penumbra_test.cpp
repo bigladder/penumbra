@@ -121,7 +121,7 @@ TEST(PenumbraTest, interior) {
   // pumbra2.renderInteriorScene({windowId},{wallBackId, floorId, sideWallLeftId, sideWallRightId});
 }
 
-TEST(PenumbraTest, CalculatePSSA_Multiple_Surfaces) {
+TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
   //create a cube
     float const r_W = 1.f, r_D = 1.f, r_H = 1.f; // Overall dimensions
 
@@ -207,6 +207,32 @@ TEST(PenumbraTest, CalculatePSSA_Multiple_Surfaces) {
         for(int i=0; i < expectedResults.size(); i++){
             EXPECT_NEAR(results[i], expectedResults[i], 0.0001);
         }
+    }
+}
+
+TEST(PenumbraTest, vendor_name) {
+
+    Pumbra::Penumbra pumbra;
+    Pumbra::VendorName vname = pumbra.getVendorName();
+
+    switch(vname) {
+        case Pumbra::VendorName::None:
+            SUCCEED();
+            break;
+        case Pumbra::VendorName::NVIDIA:
+            SUCCEED();
+            break;
+        case Pumbra::VendorName::AMD:
+            SUCCEED();
+            break;
+        case Pumbra::VendorName::Intel:
+            SUCCEED();
+            break;
+        case Pumbra::VendorName::VMware:
+            SUCCEED();
+            break;
+        default:
+            FAIL() << "Vendor Name not found.";
     }
 }
 
