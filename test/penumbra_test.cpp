@@ -24,20 +24,44 @@ float calculate_surface_exposure(float azimuth, float elevation){
     return incident_azimuth*incident_elevation;
 }
 
+TEST(PenumbraTest, check_azimuth) {
+
+    Pumbra::Penumbra pumbra;
+
+    pumbra.setModel();
+
+    // Loop azimuth around the surface (with zero altitude).
+    for (float azm = 0.0f; azm <= 2 * M_PI; azm += M_PI_4) {
+        pumbra.setSunPosition(azm, 0.0f);
+        float check_azimuth = pumbra.getSunAzimuth();
+        EXPECT_EQ(azm, check_azimuth);
+    }
+}
+
+TEST(PenumbraTest, check_altitude) {
+    Pumbra::Penumbra pumbra;
+
+    pumbra.setModel();
+
+    // Loop azimuth around the horizon (with zero altitude).
+    for (float alt = 0.0f; alt <= 2 * M_PI; alt += M_PI_4) {
+        pumbra.setSunPosition(0.0f, alt);
+        float check_altitude = pumbra.getSunAltitude();
+        EXPECT_EQ(alt, check_altitude);
+    }
+}
+
 TEST(PenumbraTest, azimuth) {
-  Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
-  Pumbra::Surface wall(wallVerts);
   Pumbra::Penumbra pumbra;
 
   unsigned wallId = pumbra.addSurface(wall);
   pumbra.setModel();
 
-  // Loop azimuth around the surface (with zero altitude).
+  // Loop altitude around the sky (with zero altitude).
   for (float azm = 0.0f; azm <= 2 * M_PI; azm += M_PI_4) {
     pumbra.setSunPosition(azm, 0.0f);
     float wallPSSA = pumbra.calculatePSSA(wallId);
     EXPECT_NEAR(wallPSSA, std::abs(cos(azm)), 0.0001) << "azm evaluates to " << azm;
-    // pumbra.renderScene(wallId);
   }
 }
 
@@ -294,6 +318,28 @@ TEST(PenumbraTest, side_count_check) {
     pumbra.setModel();
 
     EXPECT_EQ(pumbra.getNumSurfaces(), 1);
+
+    pumbra.clearModel();
+
+    float const r_W = 1.f, r_D = 1.f, r_H = 1.f; // Overall dimensions
+
+    Pumbra::Polygon wallFrontVerts = { -.5f, .5f, -.5f, .5f, .5f, -.5f, .5f, .5f, .5f, -.5f, .5f, .5f };
+
+    Pumbra::Polygon wallBackVerts = { .5f, -.5f, -.5f, -.5f, -.5f, -.5f, -.5f, -.5f, .5f, .5f, -.5f, .5f };
+
+    Pumbra::Polygon roofVerts = { -.5f, .5f, .5f, .5f, .5f, .5f, .5f, -.5f, .5f, -.5f, -.5f, .5f };
+
+    Pumbra::Surface wallFront(wallFrontVerts);
+    Pumbra::Surface wallBack(wallBackVerts);
+    Pumbra::Surface roof(roofVerts);
+
+    const unsigned wallFrontId        = pumbra.addSurface(wallFront);
+    const unsigned wallBackId         = pumbra.addSurface(wallBack);
+    const unsigned roofId             = pumbra.addSurface(roof);
+
+    pumbra.setModel();
+
+    EXPECT_EQ(pumbra.getNumSurfaces(), 3);
 }
 
 int main(int argc, char **argv) {
