@@ -284,6 +284,18 @@ TEST(PenumbraTest, vendor_name) {
     }
 }
 
+TEST(PenumbraTest, side_count_check) {
+
+    Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
+    Pumbra::Surface wall(wallVerts);
+    Pumbra::Penumbra pumbra;
+
+    unsigned wallId = pumbra.addSurface(wall);
+    pumbra.setModel();
+
+    EXPECT_EQ(pumbra.getNumSurfaces(), 1);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
 
