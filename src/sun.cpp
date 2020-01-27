@@ -3,7 +3,7 @@
 
 // Penumbra
 #include <sun.h>
-#include <error.h>
+#include "error.h"
 
 namespace Pumbra {
 
