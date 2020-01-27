@@ -8,6 +8,22 @@
 
 #include <penumbra/penumbra.h>
 
+float calculate_surface_exposure(float azimuth, float elevation){
+
+    // Due to the one sided nature of shaded surfaces, we will revert
+    // negative values to zero, as this indicates that the opposite side
+    // of the surface is shaded. This shading should be disregarded.
+    auto incident_azimuth = cos(azimuth);
+    if (incident_azimuth< 0){
+        incident_azimuth=0;
+    }
+    auto incident_elevation = cos(elevation);
+    if (incident_elevation< 0){
+        incident_elevation=0;
+    }
+    return incident_azimuth*incident_elevation;
+}
+
 TEST(PenumbraTest, azimuth) {
   Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
   Pumbra::Surface wall(wallVerts);
@@ -190,22 +206,54 @@ TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
     pumbra.setSunPosition(0.0f, 0.0f);
     std::vector<float> results = pumbra.calculatePSSA(test_cube);
 
-    const std::map<std::pair<double, double>, std::vector<float>> angular_test_data {
-            {{ 0.0f,       0.0f },  { std::abs(cos(0.0f)),      0.0,                        0.0,                    0.0,    0.0,                        0.0                         }},
-            {{ 0.785398f,  0.0f },  { std::abs(cos(0.785398f)), 0.0,                        0.0,                    0.0,    0.0,                        std::abs(cos(0.785398f))    }},
-            {{ 1.570796f,  0.0f },  { 0.0,                      0.0,                        0.0,                    0.0,    0.0,                        std::abs(cos(0.0f))         }},
-            {{ 2.356194f,  0.0f },  { 0.0,                      std::abs(cos(0.785398f)),   0.0,                    0.0,    0.0,                        std::abs(cos(0.785398f))    }},
-            {{ -1.570796f, 0.0f },  { 0.0,                      0.0,                        0.0,                    0.0,    std::abs(cos(0.0f)),        0.0                         }},
-            {{ 3.141593f,  0.0f },  { 0.0,                      std::abs(cos(0.0f)),        0.0,                    0.0,    0.0,                        0.0                         }},
-            {{ 0.0f,  1.570796f },  { 0.0,                      0.0,                        std::abs(cos(0.0f)),    0.0,    0.0,                        0.0                         }}
+    const std::vector<std::pair<float, float>> angular_test_data{
+            { 0.0f,       0.0f },   // wallFront full shade
+            { 0.785398f,  0.0f },   // wallFront half shade, sideWallRightId half shade
+            { 1.570796f,  0.0f },   // sideWallRight full shade
+            { 2.356194f,  0.0f },   // wallBack half shade, sideWallRight half shade
+            { -1.570796f, 0.0f },   // sideWallLeft full shade
+            { 3.141593f,  0.0f },   // wallBack full shade
+            { 0.0f,  1.570796f },   // roof full shade
+            { 0.0f,  -1.570796f },  // floor full shade
     };
 
-    for( auto const& [sunPosition, expectedResults] : angular_test_data )
+    for( auto const& sunPosition : angular_test_data )
     {
         pumbra.setSunPosition(sunPosition.first, sunPosition.second);
         results = pumbra.calculatePSSA();
-        for(int i=0; i < expectedResults.size(); i++){
-            EXPECT_NEAR(results[i], expectedResults[i], 0.0001);
+        float azimuth, elevation;
+        for( auto side : test_cube){
+            switch (side) {
+                case 0: //wallFrontId
+                    azimuth = sunPosition.first;
+                    elevation = sunPosition.second;
+                    break;
+                case 1: //wallBackId
+                    azimuth = sunPosition.first + 3.141593f;
+                    elevation = sunPosition.second;
+                    break;
+                case 2: //roofId
+                    azimuth = sunPosition.first;
+                    elevation = sunPosition.second - 1.570796f;
+                    break;
+                case 3: //floorId
+                    azimuth = sunPosition.first;
+                    elevation = sunPosition.second + 1.570796f;
+                    break;
+                case 4: //sideWallLeftId
+                    azimuth = sunPosition.first + 1.570796f;
+                    elevation = sunPosition.second;
+                    break;
+                case 5: //sideWallRightId
+                    azimuth = sunPosition.first - 1.570796f;
+                    elevation = sunPosition.second;
+                    break;
+            }
+            unsigned id = side;
+            float expectedResults = calculate_surface_exposure(azimuth, elevation);
+            float r = results[side];
+            EXPECT_NEAR(results[side], expectedResults, 0.0001);
+
         }
     }
 }
