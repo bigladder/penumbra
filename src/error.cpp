@@ -5,7 +5,7 @@
 #include <iostream>
 
 // Penumbra
-#include <error.h>
+#include "error.h"
 
 namespace Pumbra {
 
