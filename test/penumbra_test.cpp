@@ -52,17 +52,18 @@ TEST(PenumbraTest, check_altitude) {
 }
 
 TEST(PenumbraTest, azimuth) {
-  Pumbra::Penumbra pumbra;
-
-  unsigned wallId = pumbra.addSurface(wall);
-  pumbra.setModel();
-
-  // Loop altitude around the sky (with zero altitude).
-  for (float azm = 0.0f; azm <= 2 * M_PI; azm += M_PI_4) {
-    pumbra.setSunPosition(azm, 0.0f);
-    float wallPSSA = pumbra.calculatePSSA(wallId);
-    EXPECT_NEAR(wallPSSA, std::abs(cos(azm)), 0.0001) << "azm evaluates to " << azm;
-  }
+    Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
+    Pumbra::Surface wall(wallVerts);
+    Pumbra::Penumbra pumbra;
+    unsigned wallId = pumbra.addSurface(wall);
+    pumbra.setModel();
+    // Loop azimuth around the surface (with zero altitude).
+    for (float azm = 0.0f; azm <= 2 * M_PI; azm += M_PI_4) {
+        pumbra.setSunPosition(azm, 0.0f);
+        float wallPSSA = pumbra.calculatePSSA(wallId);
+        EXPECT_NEAR(wallPSSA, std::abs(cos(azm)), 0.0001) << "azm evaluates to " << azm;
+        // pumbra.renderScene(wallId);
+    }
 }
 
 TEST(PenumbraTest, interior) {
