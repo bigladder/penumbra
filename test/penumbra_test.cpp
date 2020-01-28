@@ -24,6 +24,9 @@ float calculate_surface_exposure(float azimuth, float altitude){
     return incident_azimuth*incident_altitude;
 }
 
+Pumbra::PenumbraCallbackFunction penumbraCallbackFunction;
+void *messageCallbackContextPtr;
+
 TEST(PenumbraTest, check_azimuth) {
 
     Pumbra::Penumbra pumbra;
@@ -347,6 +350,35 @@ TEST(PenumbraTest, side_count_check) {
     pumbra.setModel();
 
     EXPECT_EQ(pumbra.getNumSurfaces(), 3);
+}
+
+TEST(PenumbraTest, bad_surface_input_errors) {
+
+    const std::vector<unsigned> bad_test_cube{5, 6, 7, 8, 9, 10};
+
+    Pumbra::Polygon wallFrontVerts = { -.5f, .5f, -.5f, .5f, .5f, -.5f, .5f, .5f, .5f, -.5f, .5f, .5f };
+
+    Pumbra::Polygon wallBackVerts = { .5f, -.5f, -.5f, -.5f, -.5f, -.5f, -.5f, -.5f, .5f, .5f, -.5f, .5f };
+
+    Pumbra::Polygon roofVerts = { -.5f, .5f, .5f, .5f, .5f, .5f, .5f, -.5f, .5f, -.5f, -.5f, .5f };
+
+    Pumbra::Surface wallFront(wallFrontVerts);
+    Pumbra::Surface wallBack(wallBackVerts);
+    Pumbra::Surface roof(roofVerts);
+
+    Pumbra::Penumbra pumbra(penumbraCallbackFunction, messageCallbackContextPtr);
+
+    const unsigned wallFrontId        = pumbra.addSurface(wallFront);
+    const unsigned wallBackId         = pumbra.addSurface(wallBack);
+    const unsigned roofId             = pumbra.addSurface(roof);
+
+    pumbra.setModel();
+
+    EXPECT_EXIT(pumbra.calculatePSSA(bad_test_cube), ::testing::ExitedWithCode(EXIT_FAILURE), "Error: Surface index, X, does not exist. Cannot calculate PSSA.");
+
+    EXPECT_DEATH(pumbra.renderScene(11), "Surface index, X, does not exist. Cannot render scene.");
+
+    EXPECT_DEATH(pumbra.fetchPSSA(bad_test_cube), "Surface index, X, does not exist. Cannot calculate PSSA.");
 }
 
 int main(int argc, char **argv) {
