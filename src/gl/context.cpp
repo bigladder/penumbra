@@ -310,7 +310,7 @@ float Context::setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool
   }
 
   // account for camera position
-  near_ -= 1.f;
+  near_ -= 0.999f; // For some reason, -1. is too tight when sun is perpendicular to the surface.
   far_ -= 1.001f; // For some reason, -1. is too tight when sun is perpendicular to the surface.
 
   // Grow horizontal extents of view by one pixel on each side
@@ -375,7 +375,7 @@ float Context::setScene(mat4x4 sunView, bool clipFar) {
   }
 
   // account for camera position
-  near_ -= 1.f;
+  near_ -= 0.999f; // For some reason, -1. is too tight when sun is perpendicular to the surface.
   far_ -= 1.001f; // For some reason, -1. is too tight when sun is perpendicular to the surface.
 
   // Grow horizontal extents of view by one pixel on each side

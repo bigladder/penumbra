@@ -8,7 +8,7 @@
 
 #include <penumbra/penumbra.h>
 
-float calculate_surface_exposure(float azimuth, float elevation){
+float calculate_surface_exposure(float azimuth, float altitude){
 
     // Due to the one sided nature of shaded surfaces, we will revert
     // negative values to zero, as this indicates that the opposite side
@@ -17,11 +17,11 @@ float calculate_surface_exposure(float azimuth, float elevation){
     if (incident_azimuth< 0){
         incident_azimuth=0;
     }
-    auto incident_elevation = cos(elevation);
-    if (incident_elevation< 0){
-        incident_elevation=0;
+    auto incident_altitude = cos(altitude);
+    if (incident_altitude< 0){
+        incident_altitude=0;
     }
-    return incident_azimuth*incident_elevation;
+    return incident_azimuth*incident_altitude;
 }
 
 TEST(PenumbraTest, check_azimuth) {
@@ -43,7 +43,7 @@ TEST(PenumbraTest, check_altitude) {
 
     pumbra.setModel();
 
-    // Loop azimuth around the horizon (with zero altitude).
+    // Loop altitude around the axis (with zero azimuth).
     for (float alt = 0.0f; alt <= 2 * M_PI; alt += M_PI_4) {
         pumbra.setSunPosition(0.0f, alt);
         float check_altitude = pumbra.getSunAltitude();
@@ -231,52 +231,58 @@ TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
     pumbra.setSunPosition(0.0f, 0.0f);
     std::vector<float> results = pumbra.calculatePSSA(test_cube);
 
+    float M_PI_3_4 = M_PI_4+M_PI_2;
+
     const std::vector<std::pair<float, float>> angular_test_data{
             { 0.0f,       0.0f },   // wallFront full shade
-            { 0.785398f,  0.0f },   // wallFront half shade, sideWallRightId half shade
-            { 1.570796f,  0.0f },   // sideWallRight full shade
-            { 2.356194f,  0.0f },   // wallBack half shade, sideWallRight half shade
-            { -1.570796f, 0.0f },   // sideWallLeft full shade
-            { 3.141593f,  0.0f },   // wallBack full shade
-            { 0.0f,  1.570796f },   // roof full shade
-            { 0.0f,  -1.570796f },  // floor full shade
+            { M_PI_4,     0.0f },   // wallFront half shade, sideWallRightId half shade
+            { M_PI_2,     0.0f },   // sideWallRight full shade  !!
+            { M_PI_3_4,   0.0f },   // wallBack half shade, sideWallRight half shade
+            { -M_PI_2,    0.0f },   // sideWallLeft full shade  !!
+            { M_PI,       0.0f },   // wallBack full shade
+            { 0.0f,     M_PI_2 },   // roof full shade  !!
+            { 0.0f,    -M_PI_2 },   // floor full shade !!
     };
 
     for( auto const& sunPosition : angular_test_data )
     {
         pumbra.setSunPosition(sunPosition.first, sunPosition.second);
         results = pumbra.calculatePSSA();
-        float azimuth, elevation;
+        float azimuth, altitude;
         for( auto side : test_cube){
             switch (side) {
                 case 0: //wallFrontId
                     azimuth = sunPosition.first;
-                    elevation = sunPosition.second;
+                    altitude = sunPosition.second;
                     break;
                 case 1: //wallBackId
-                    azimuth = sunPosition.first + 3.141593f;
-                    elevation = sunPosition.second;
+                    azimuth = sunPosition.first + M_PI;
+                    altitude = sunPosition.second;
                     break;
                 case 2: //roofId
                     azimuth = sunPosition.first;
-                    elevation = sunPosition.second - 1.570796f;
+                    altitude = sunPosition.second - M_PI_2;
                     break;
                 case 3: //floorId
                     azimuth = sunPosition.first;
-                    elevation = sunPosition.second + 1.570796f;
+                    altitude = sunPosition.second + M_PI_2;
                     break;
                 case 4: //sideWallLeftId
-                    azimuth = sunPosition.first + 1.570796f;
-                    elevation = sunPosition.second;
+                    azimuth = sunPosition.first + M_PI_2;
+                    altitude = sunPosition.second;
                     break;
                 case 5: //sideWallRightId
-                    azimuth = sunPosition.first - 1.570796f;
-                    elevation = sunPosition.second;
+                    azimuth = sunPosition.first - M_PI_2;
+                    altitude = sunPosition.second;
                     break;
+                default:
+                    FAIL() << "Side not found.";
             }
-            unsigned id = side;
-            float expectedResults = calculate_surface_exposure(azimuth, elevation);
-            float r = results[side];
+
+            float expectedResults = calculate_surface_exposure(azimuth, altitude);
+
+            //pumbra.renderScene(side);
+
             EXPECT_NEAR(results[side], expectedResults, 0.0001);
 
         }
