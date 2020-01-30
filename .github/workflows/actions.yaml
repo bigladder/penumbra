@@ -3,50 +3,20 @@ name: C/C++ CI
 on: [push]
 
 jobs:
-  build-ubuntu:
-
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        compiler: [gcc, clang]
-    steps:
-    - uses: actions/checkout@v1
-    - name: package install
-      run: |
-        sudo apt-get update 
-        sudo apt-get -y install xorg-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev
-    - name: configure
-      env:
-        CC: ${{ matrix.compiler }}
-      run: |
-        mkdir build
-        cd build
-        cmake -DBUILD_GMOCK="ON" -DBUILD_GTEST="ON" -DBUILD_PENUMBRA_TESTING="ON" -DPENUMBRA_STATIC_LIB="OFF" -DPENUMBRA_COVERAGE="OFF" -DCMAKE_BUILD_TYPE="Debug" ..
-    - name: build
-      run: |
-        cmake --build . --config "ON"
-    - name: test
-      run: |
-        ctest
-
   build-windows:
 
     runs-on: windows-latest
-    strategy:
-      matrix:
-        compiler: [gcc, clang, msvc]
+
     steps:
     - uses: actions/checkout@v1
     - name: configure
-      env:
-        CC: ${{ matrix.compiler }}
       run: |
         mkdir build
         cd build
         cmake -DBUILD_GMOCK="ON" -DBUILD_GTEST="ON" -DBUILD_PENUMBRA_TESTING="ON" -DPENUMBRA_STATIC_LIB="OFF" -DPENUMBRA_COVERAGE="OFF" -DCMAKE_BUILD_TYPE="Debug" ..
     - name: build
       run: |
-        cmake --build . --config "ON"
+        cmake --build .
     - name: test
       run: |
         ctest
