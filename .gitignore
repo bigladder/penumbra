@@ -3,3 +3,5 @@ builds/
 .idea/
 .DS_Store
 cmake-build-*/
+.vscode
+
