@@ -21,7 +21,7 @@ matrix:
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    sudo apt-get -y install mesa-common-dev;
+    sudo apt-get -y install xrandr-dev mesa-common-dev;
   fi
 
 script:
