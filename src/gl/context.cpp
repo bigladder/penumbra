@@ -284,33 +284,26 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer &surfaceBuffer, bool
   top = -MAX_FLOAT;
   near_ = -MAX_FLOAT;
   far_ = MAX_FLOAT;
+
+  GLuint i = 0;
+  GLuint end = model.vertexArray.size();
+
   if (surfaceBuffer.count>=0){
-            for (GLuint i = surfaceBuffer.begin * model.vertexSize;
-           i < surfaceBuffer.begin * model.vertexSize + surfaceBuffer.count * model.vertexSize;
-           i += model.vertexSize) {
-          vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
-          vec4 trans;
-          mat4x4_mul_vec4(trans, view, point);
-          left = std::min(trans[0], left);
-          right = std::max(trans[0], right);
-          bottom = std::min(trans[1], bottom);
-          top = std::max(trans[1], top);
-          // near_ = min(trans[2], near_);
-          far_ = std::min(trans[2], far_);
-      }
+    i = surfaceBuffer.begin * model.vertexSize;
+    GLuint end = surfaceBuffer.begin * model.vertexSize + surfaceBuffer.count * model.vertexSize;
   }
-  else {
-      for (GLuint i = 0; i < model.vertexArray.size(); i += model.vertexSize) {
-          vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
-          vec4 trans;
-          mat4x4_mul_vec4(trans, view, point);
-          left = std::min(trans[0], left);
-          right = std::max(trans[0], right);
-          bottom = std::min(trans[1], bottom);
-          top = std::max(trans[1], top);
-          // near_ = min(trans[2], near_);
-          far_ = std::min(trans[2], far_);
-      }
+
+  while (i <= end){
+    vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
+    vec4 trans;
+    mat4x4_mul_vec4(trans, view, point);
+    left = std::min(trans[0], left);
+    right = std::max(trans[0], right);
+    bottom = std::min(trans[1], bottom);
+    top = std::max(trans[1], top);
+    // near_ = min(trans[2], near_);
+    far_ = std::min(trans[2], far_);
+    i += model.vertexSize;
   }
 
   // Use model box to determine near clipping plane (and far if looking interior)
