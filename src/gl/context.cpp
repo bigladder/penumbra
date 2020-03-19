@@ -285,13 +285,8 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer &surfaceBuffer, bool
   near_ = -MAX_FLOAT;
   far_ = MAX_FLOAT;
 
-  GLuint i = 0;
-  GLuint end = model.vertexArray.size();
-
-  if (surfaceBuffer.count>=0){
-    i = surfaceBuffer.begin * model.vertexSize;
-    GLuint end = surfaceBuffer.begin * model.vertexSize + surfaceBuffer.count * model.vertexSize;
-  }
+  GLuint i = (surfaceBuffer.count)? surfaceBuffer.begin * model.vertexSize : 0;
+  GLuint end = (surfaceBuffer.count)? surfaceBuffer.begin * model.vertexSize + surfaceBuffer.count * model.vertexSize : model.vertexArray.size();
 
   while (i < end){
     vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
