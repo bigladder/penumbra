@@ -293,7 +293,7 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer &surfaceBuffer, bool
     GLuint end = surfaceBuffer.begin * model.vertexSize + surfaceBuffer.count * model.vertexSize;
   }
 
-  while (i <= end){
+  while (i < end){
     vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
     vec4 trans;
     mat4x4_mul_vec4(trans, view, point);
