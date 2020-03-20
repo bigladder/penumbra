@@ -269,7 +269,7 @@ void Context::setModel(const std::vector<float> &vertices, const std::vector<Sur
   modelSet = true;
 }
 
-float Context::setScene(mat4x4 sunView, const SurfaceBuffer &surfaceBuffer, bool clipFar) {
+float Context::setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer, bool clipFar) {
 
   if (!modelSet) {
     showMessage(MSG_ERR, "Model has not been set. Cannot set OpenGL scene.");
@@ -285,9 +285,9 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer &surfaceBuffer, bool
   near_ = -MAX_FLOAT;
   far_ = MAX_FLOAT;
 
-  // index of -1 means surface buffer has not been set. Use set entire model instead.
-  GLuint beg = surfaceBuffer.index >= 0 ? surfaceBuffer.begin * model.vertexSize : 0;
-  GLuint end = surfaceBuffer.index >= 0 ? surfaceBuffer.begin * model.vertexSize + surfaceBuffer.count * model.vertexSize : model.vertexArray.size();
+  // If surface buffer has not been set use entire model instead.
+  GLuint beg = surfaceBuffer ? surfaceBuffer->begin * model.vertexSize : 0;
+  GLuint end = surfaceBuffer ? surfaceBuffer->begin * model.vertexSize + surfaceBuffer->count * model.vertexSize : model.vertexArray.size();
 
   for (GLuint i = beg; i < end; i += model.vertexSize) {
     vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
@@ -410,7 +410,7 @@ void Context::showRendering(const unsigned surfaceIndex, mat4x4 sunView) {
   }
 
   auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
-  setScene(sunView, surfaceBuffer);
+  setScene(sunView, &surfaceBuffer);
 
   while (!glfwWindowShouldClose(window)) {
     glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
@@ -442,7 +442,7 @@ void Context::showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIn
     hiddenSurfaces.push_back(model.surfaceBuffers[hiddenSurf]);
   }
 
-  setScene(sunView, model.surfaceBuffers[hiddenSurfaceIndices.at(0)], false);
+  setScene(sunView, &model.surfaceBuffers[hiddenSurfaceIndices.at(0)], false);
 
   while (!glfwWindowShouldClose(window)) {
     glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
@@ -459,7 +459,7 @@ void Context::showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIn
 
 void Context::submitPSSA(const unsigned surfaceIndex, mat4x4 sunView) {
   auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
-  auto const pixelArea = setScene(sunView, surfaceBuffer);
+  auto const pixelArea = setScene(sunView, &surfaceBuffer);
   drawModel();
   glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
   model.drawSurface(surfaceBuffer);
@@ -497,7 +497,7 @@ void Context::bufferedQuery(const SurfaceBuffer &surfaceBuffer) {
 void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
   for (auto const surfaceIndex : surfaceIndices) {
     auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
-    auto const pixelArea = setScene(sunView, surfaceBuffer);
+    auto const pixelArea = setScene(sunView, &surfaceBuffer);
     drawModel();
     glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
     model.drawSurface(surfaceBuffer);
@@ -508,7 +508,7 @@ void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sun
 
 void Context::submitPSSA(mat4x4 sunView) {
   for (auto const & surfaceBuffer : model.surfaceBuffers) {
-    auto const pixelArea = setScene(sunView, surfaceBuffer);
+    auto const pixelArea = setScene(sunView, &surfaceBuffer);
     drawModel();
     glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
     model.drawSurface(surfaceBuffer);
@@ -587,7 +587,7 @@ Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndice
 
   glGenQueries(pssasQueries.size(), pssasQueries.data());
 
-  auto const pixelArea = setScene( sunView, model.surfaceBuffers[hiddenSurfaceIndices.at(0)], false);
+  auto const pixelArea = setScene( sunView, &model.surfaceBuffers[hiddenSurfaceIndices.at(0)], false);
 
   std::vector<SurfaceBuffer> hiddenSurfaces;
   for (auto const hiddenSurf : hiddenSurfaceIndices) {
