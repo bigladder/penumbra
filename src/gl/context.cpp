@@ -285,10 +285,11 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer &surfaceBuffer, bool
   near_ = -MAX_FLOAT;
   far_ = MAX_FLOAT;
 
-  GLuint i = (surfaceBuffer.count)? surfaceBuffer.begin * model.vertexSize : 0;
-  GLuint end = (surfaceBuffer.count)? surfaceBuffer.begin * model.vertexSize + surfaceBuffer.count * model.vertexSize : model.vertexArray.size();
+  // index of -1 means surface buffer has not been set. Use set entire model instead.
+  GLuint beg = surfaceBuffer.index >= 0 ? surfaceBuffer.begin * model.vertexSize : 0;
+  GLuint end = surfaceBuffer.index >= 0 ? surfaceBuffer.begin * model.vertexSize + surfaceBuffer.count * model.vertexSize : model.vertexArray.size();
 
-  while (i < end){
+  for (GLuint i = beg; i < end; i += model.vertexSize) {
     vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
     vec4 trans;
     mat4x4_mul_vec4(trans, view, point);
@@ -298,7 +299,6 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer &surfaceBuffer, bool
     top = std::max(trans[1], top);
     // near_ = min(trans[2], near_);
     far_ = std::min(trans[2], far_);
-    i += model.vertexSize;
   }
 
   // Use model box to determine near clipping plane (and far if looking interior)
