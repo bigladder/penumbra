@@ -330,10 +330,15 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer, bool
 
   auto const pixelArea = (right - left) * (top - bottom) / (size * size);
 
-  mat4x4_ortho(projection, left, right, bottom, top, -near_, -far_);
-  mat4x4_mul(mvp, projection, view);
+  if (pixelArea > 0.0)
+  {
+      mat4x4_ortho(projection, left, right, bottom, top, -near_, -far_);
+      mat4x4_mul(mvp, projection, view);
 
-  setMVP();
+      setMVP();
+  }
+
+  // TODO: Consider what to do with the camera if pixelArea happens to be zero
 
   return pixelArea;
 }
