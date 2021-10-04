@@ -54,7 +54,7 @@ jobs:
           mklink libglapi.dll "x64\libglapi.dll"
         working-directory: build
       - name: Test
-        run: ctest -C ${{ matrix.config }} --output-on-failure
+        run: ctest -C ${{ matrix.config }} --output-on-failure --extra-verbose
         working-directory: build
       - name: Code Coverage Analysis
         if: matrix.coverage == 'ON'
