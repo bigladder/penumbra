@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Install Linux Libraries
+        run: sudo apt-get -y install xorg-dev libgl1-mesa-dev
+        if: matrix.os == 'ubuntu-latest'
       - name: Create Build Directory
         run: cmake -E make_directory ${{github.workspace}}/build
       - name: Configure CMake
