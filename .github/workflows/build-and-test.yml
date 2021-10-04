@@ -23,9 +23,8 @@ jobs:
       - name: Download Mesa3D on Windows
         if: matrix.os == 'windows-latest'
         shell: cmd
-        run: |
-          curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/20.3.2/mesa3d-20.3.2-release-msvc.7z
-        working-directory: ${{github.workspace}}/build
+        run: curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/20.3.2/mesa3d-20.3.2-release-msvc.7z
+        #working-directory: ${{github.workspace}}\build
       - name: Install Mesa3D on Windows
         if: matrix.os == 'windows-latest'
         shell: cmd
