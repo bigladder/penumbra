@@ -7,7 +7,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest] #, macos-latest]
+        os: [ubuntu-latest] #, windows-latest] #, macos-latest]
     defaults:
       run:
         shell: bash
@@ -33,6 +33,7 @@ jobs:
           "C:\Program Files\7-Zip\7z.exe" x mesa.7z
           mklink opengl32.dll "x64\opengl32.dll"
           mklink libglapi.dll "x64\libglapi.dll"
+        working-directory: ${{github.workspace}}/build
       - name: Configure CMake
         run: cmake -S . -B ${{github.workspace}}/build -DBUILD_PENUMBRA_TESTING="ON"
       - name: Build
