@@ -33,8 +33,7 @@ TEST(PenumbraTest, check_azimuth) {
 
   if (!Pumbra::Penumbra::isValidContext())
   {
-    EXPECT_TRUE(true) << invalid_context_str << std::endl;
-    return;
+    GTEST_SKIP() << invalid_context_str << std::endl;
   }
 
   Pumbra::Penumbra pumbra;
@@ -50,8 +49,7 @@ TEST(PenumbraTest, check_azimuth) {
 TEST(PenumbraTest, check_altitude) {
   if (!Pumbra::Penumbra::isValidContext())
   {
-    EXPECT_TRUE(true) << invalid_context_str << std::endl;
-    return;
+    GTEST_SKIP() << invalid_context_str << std::endl;
   }
   Pumbra::Penumbra pumbra;
 
@@ -66,8 +64,7 @@ TEST(PenumbraTest, check_altitude) {
 TEST(PenumbraTest, azimuth) {
   if (!Pumbra::Penumbra::isValidContext())
   {
-    EXPECT_TRUE(true) << invalid_context_str << std::endl;
-    return;
+    GTEST_SKIP() << invalid_context_str << std::endl;
   }
   Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
   Pumbra::Surface wall(wallVerts);
@@ -86,8 +83,7 @@ TEST(PenumbraTest, azimuth) {
 TEST(PenumbraTest, interior) {
   if (!Pumbra::Penumbra::isValidContext())
   {
-    EXPECT_TRUE(true) << invalid_context_str << std::endl;
-    return;
+    GTEST_SKIP() << invalid_context_str << std::endl;
   }
   float const r_W = 2., r_D = 1., r_H = 1.; // Overall dimensions
   float const w_W = 1., w_H = .5;           // Window dimensions
@@ -187,8 +183,7 @@ TEST(PenumbraTest, interior) {
 TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
   if (!Pumbra::Penumbra::isValidContext())
   {
-    EXPECT_TRUE(true) << invalid_context_str << std::endl;
-    return;
+    GTEST_SKIP() << invalid_context_str << std::endl;
   }
   //create a cube
   float const r_W = 1.f, r_D = 1.f, r_H = 1.f; // Overall dimensions
@@ -318,8 +313,7 @@ TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
 TEST(PenumbraTest, vendor_name) {
   if (!Pumbra::Penumbra::isValidContext())
   {
-    EXPECT_TRUE(true) << invalid_context_str << std::endl;
-    return;
+    GTEST_SKIP() << invalid_context_str << std::endl;
   }
 
   Pumbra::Penumbra pumbra;
@@ -349,8 +343,7 @@ TEST(PenumbraTest, vendor_name) {
 TEST(PenumbraTest, side_count_check) {
   if (!Pumbra::Penumbra::isValidContext())
   {
-    EXPECT_TRUE(true) << invalid_context_str << std::endl;
-    return;
+    GTEST_SKIP() << invalid_context_str << std::endl;
   }
 
   Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
@@ -386,8 +379,7 @@ TEST(PenumbraTest, side_count_check) {
 TEST(PenumbraTest, bad_surface_input_errors) {
   if (!Pumbra::Penumbra::isValidContext())
   {
-    EXPECT_TRUE(true) << invalid_context_str << std::endl;
-    return;
+    GTEST_SKIP() << invalid_context_str << std::endl;
   }
 
   const std::vector<unsigned> bad_test_cube{5, 6, 7, 8, 9, 10};
