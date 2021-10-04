@@ -20,6 +20,10 @@ jobs:
       - name: Install Linux Libraries
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get -y install xorg-dev libgl1-mesa-dev
+      - name: Configure CMake
+        run: cmake -S . -B build -DBUILD_PENUMBRA_TESTING="ON"
+      - name: Build
+        run: cmake --build build --config Release
       - name: Download Mesa3D on Windows
         if: matrix.os == 'windows-latest'
         shell: cmd
@@ -33,10 +37,6 @@ jobs:
           mklink opengl32.dll "x64\opengl32.dll"
           mklink libglapi.dll "x64\libglapi.dll"
         working-directory: build
-      - name: Configure CMake
-        run: cmake -S . -B build -DBUILD_PENUMBRA_TESTING="ON"
-      - name: Build
-        run: cmake --build build --config Release
       - name: Test
         run: ctest -C Release --output-on-failure
         working-directory: build
