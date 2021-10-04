@@ -7,7 +7,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-        os: [ubuntu-latest] #, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest] #, macos-latest]
     defaults:
       run:
         shell: bash
@@ -16,12 +16,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install Linux Libraries
-        run: sudo apt-get -y install xorg-dev libgl1-mesa-dev
         if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get -y install xorg-dev libgl1-mesa-dev
+      - name: Install Mesa3D on Windows
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: |
+          curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/20.3.2/mesa3d-20.3.2-release-msvc.7z
+          "C:\Program Files\7-Zip\7z.exe" x mesa.7z
+          mklink opengl32.dll "x64\opengl32.dll"
+          mklink libglapi.dll "x64\libglapi.dll"
+        working-directory: build
       - name: Create Build Directory
         run: cmake -E make_directory ${{github.workspace}}/build
       - name: Configure CMake
-        run: cmake -S . -B build
+        run: cmake -S . -B build -DBUILD_PENUMBRA_TESTING="ON"
       - name: Build
         run: cmake --build ./build --config Release
       - name: Test
