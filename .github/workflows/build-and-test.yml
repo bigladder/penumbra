@@ -20,10 +20,10 @@ jobs:
             config: Release
             static_lib: ON
             coverage: OFF
-          - os: ubuntu-latest
-            config: Debug
-            static_lib: OFF
-            coverage: ON
+          #- os: ubuntu-latest
+          #  config: Debug
+          #  static_lib: OFF
+          #  coverage: ON
     defaults:
       run:
         shell: bash
