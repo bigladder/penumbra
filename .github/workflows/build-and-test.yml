@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-18.04
             config: Release
             static_lib: ON
             coverage: OFF
@@ -20,7 +20,7 @@ jobs:
             config: Release
             static_lib: ON
             coverage: OFF
-          - os: ubuntu-latest
+          - os: ubuntu-18.04
             config: Debug
             static_lib: OFF
             coverage: ON
