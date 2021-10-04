@@ -7,7 +7,23 @@ jobs:
     name: Build
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            config: Release
+            static_lib: ON
+            coverage: OFF
+          - os: windows-latest
+            config: Release
+            static_lib: ON
+            coverage: OFF
+          - os: macos-latest
+            config: Release
+            static_lib: ON
+            coverage: OFF
+          - os: ubuntu-latest
+            config: Debug
+            static_lib: OFF
+            coverage: ON
     defaults:
       run:
         shell: bash
@@ -21,9 +37,9 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get -y install xorg-dev libgl1-mesa-dev
       - name: Configure CMake
-        run: cmake -S . -B build -DBUILD_PENUMBRA_TESTING="ON"
+        run: cmake -S . -B build -DBUILD_PENUMBRA_TESTING="ON" -DPENUMBRA_STATIC_LIB="${{ matrix.static_lib }}" -DPENUMBRA_COVERAGE="${{ matrix.coverage }}" -DCMAKE_BUILD_TYPE="${{ matrix.config }}"
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config ${{ matrix.config }}
       - name: Download Mesa3D on Windows
         if: matrix.os == 'windows-latest'
         shell: cmd
@@ -38,5 +54,12 @@ jobs:
           mklink libglapi.dll "x64\libglapi.dll"
         working-directory: build
       - name: Test
-        run: ctest -C Release --output-on-failure
+        run: ctest -C ${{ matrix.config }} --output-on-failure
         working-directory: build
+      - name: Code Coverage Analysis
+        if: matrix.coverage == 'ON'
+        run: make gcov
+        working-directory: build
+      - name: Upload Code Coverage Report
+        if: matrix.coverage == 'ON'
+        uses: codecov/codecov-action@v2
