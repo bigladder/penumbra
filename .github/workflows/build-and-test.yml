@@ -20,10 +20,10 @@ jobs:
             config: Release
             static_lib: ON
             coverage: OFF
-          #- os: ubuntu-latest
-          #  config: Debug
-          #  static_lib: OFF
-          #  coverage: ON
+          - os: ubuntu-latest
+            config: Debug
+            static_lib: OFF
+            coverage: ON
     defaults:
       run:
         shell: bash
@@ -54,8 +54,10 @@ jobs:
           mklink libglapi.dll "x64\libglapi.dll"
         working-directory: build
       - name: Test
-        run: ctest -C ${{ matrix.config }} --output-on-failure --extra-verbose
-        working-directory: build
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: ctest -C ${{ matrix.config }} --output-on-failure
+          working-directory: build
       - name: Code Coverage Analysis
         if: matrix.coverage == 'ON'
         run: make gcov
