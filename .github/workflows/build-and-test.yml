@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Create Build Directory
+        run: cmake -E make_directory ${{github.workspace}}/build
       - name: Install Linux Libraries
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get -y install xorg-dev libgl1-mesa-dev
@@ -27,8 +29,6 @@ jobs:
           mklink opengl32.dll "x64\opengl32.dll"
           mklink libglapi.dll "x64\libglapi.dll"
         working-directory: build
-      - name: Create Build Directory
-        run: cmake -E make_directory ${{github.workspace}}/build
       - name: Configure CMake
         run: cmake -S . -B build -DBUILD_PENUMBRA_TESTING="ON"
       - name: Build
