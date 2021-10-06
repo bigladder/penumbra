@@ -24,6 +24,10 @@ jobs:
             config: Debug
             static_lib: OFF
             coverage: ON
+          - os: ubuntu-latest
+            config: Release
+            static_lib: ON
+            coverage: OFF
     defaults:
       run:
         shell: bash
@@ -34,19 +38,19 @@ jobs:
       - name: Create Build Directory
         run: cmake -E make_directory ${{github.workspace}}/build
       - name: Install Linux Libraries
-        if: matrix.os == 'ubuntu-18.04'
+        if: runner.os == 'Linux'
         run: sudo apt-get -y install xorg-dev libgl1-mesa-dev
       - name: Configure CMake
         run: cmake -S . -B build -DBUILD_PENUMBRA_TESTING="ON" -DPENUMBRA_STATIC_LIB="${{ matrix.static_lib }}" -DPENUMBRA_COVERAGE="${{ matrix.coverage }}" -DCMAKE_BUILD_TYPE="${{ matrix.config }}"
       - name: Build
         run: cmake --build build --config ${{ matrix.config }}
       - name: Download Mesa3D on Windows
-        if: matrix.os == 'windows-latest'
+        if: runner.os == 'Windows'
         shell: cmd
         run: curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/20.3.2/mesa3d-20.3.2-release-msvc.7z
         working-directory: build\test\${{ matrix.config }}
       - name: Install Mesa3D on Windows
-        if: matrix.os == 'windows-latest'
+        if: runner.os == 'Windows'
         shell: cmd
         run: |
           "C:\Program Files\7-Zip\7z.exe" x mesa.7z
