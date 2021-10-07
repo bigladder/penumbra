@@ -17,17 +17,18 @@ find_package(OpenGL)
 
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
-set (CMAKE_MODULE_PATH "${penumbra_SOURCE_DIR}/cmake")
+set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 include(compiler-flags)
 
-option( BUILD_PENUMBRA_TESTING "Build Penumbra testing targets" OFF )
-option( PENUMBRA_COVERAGE "Add coverage reports" OFF)
+option( ${PROJECT_NAME}_BUILD_TESTING "Build ${PROJECT_NAME} testing targets" OFF )
+option( ${PROJECT_NAME}_COVERAGE "Add ${PROJECT_NAME} coverage reports" OFF)
+option( ${PROJECT_NAME}_BUILD_EXAMPLES "Build ${PROJECT_NAME} examples" OFF )
 
 # Set up testing/coverage
-if (BUILD_PENUMBRA_TESTING)
+if (${PROJECT_NAME}_BUILD_TESTING)
   enable_testing()
-  if (PENUMBRA_COVERAGE)
+  if (${PROJECT_NAME}_COVERAGE)
     set(ENABLE_COVERAGE ON CACHE BOOL "" FORCE)
     find_package(codecov)
   endif()
@@ -38,11 +39,14 @@ endif()
 add_subdirectory(vendor)
 
 add_subdirectory(src)
-add_subdirectory(examples)
 
-if (BUILD_PENUMBRA_TESTING)
+if (${PROJECT_NAME}_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
+
+if (${PROJECT_NAME}_BUILD_TESTING)
   add_subdirectory(test)
-  if (PENUMBRA_COVERAGE)
+  if (${PROJECT_NAME}_COVERAGE)
     coverage_evaluate()
   endif()
 endif()

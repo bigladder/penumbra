@@ -1,36 +1,28 @@
+include(initialize-submodules)
+initialize_submodules()
+
 # GLAD
 add_subdirectory(glad)
-
-set(${PROJECT_NAME}_submodules
-  glfw
-  googletest
-  libtess2
-)
-
-if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-  # Initialize submodules
-  foreach(submodule ${${PROJECT_NAME}_submodules})
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${submodule}/.git")
-      message(STATUS "Initialize ${submodule} submodule")
-      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive "${CMAKE_CURRENT_SOURCE_DIR}/${submodule}"
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        RESULT_VARIABLE GIT_SUBMOD_RESULT)
-      if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-        message(FATAL_ERROR "git submodule update --init --recursive ${CMAKE_CURRENT_SOURCE_DIR}/${submodule} failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
-      endif()
-    endif()
-  endforeach()
-endif()
 
 # GLFW library
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
-
 if (APPLE)
   set(GLFW_USE_MENUBAR OFF CACHE BOOL "" FORCE)
 endif()
+
+mark_as_advanced(
+  GLFW_BUILD_DOCS
+  GLFW_BUILD_TESTS
+  GLFW_BUILD_EXAMPLES
+  GLFW_INSTALL
+  GLFW_USE_MENUBAR
+  GLFW_USE_OSMESA
+  GLFW_VULKAN_STATIC
+  BUILD_SHARED_LIBS
+)
 
 add_subdirectory(glfw)
 
@@ -48,13 +40,16 @@ target_include_directories(tess2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/So
 
 
 # googletest library
-if (BUILD_PENUMBRA_TESTING AND NOT TARGET gtest)
+if (${PROJECT_NAME}_BUILD_TESTING AND NOT TARGET gtest)
 
   # Prevent GoogleTest from overriding our compiler/linker options
   # when building with Visual Studio
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-  set(BUILD_GTEST ON CACHE BOOL "" FORCE)
+  set(BUILD_GTEST ON CACHE BOOL "" FORCE MARK)
+  set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
+  set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+  mark_as_advanced(BUILD_GTEST BUILD_GMOCK INSTALL_GTEST)
 
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/googletest ${googletest_BINARY_DIR})
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/googletest)
 
 endif()
