@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/bigladder/penumbra.svg?branch=develop)](https://travis-ci.org/bigladder/penumbra)
+[![Build and Test](https://github.com/bigladder/penumbra/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/bigladder/penumbra/actions/workflows/build-and-test.yml)
 [![codecov](https://codecov.io/gh/bigladder/penumbra/branch/develop/graph/badge.svg)](https://codecov.io/gh/bigladder/penumbra)
 
 # Penumbra

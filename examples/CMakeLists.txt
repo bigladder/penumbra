@@ -1,4 +1,4 @@
-include_directories("${penumbra_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/include")
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -12,9 +12,9 @@ elseif (APPLE)
         MAXOSX_PACKAGE_LOCATION "Resources")
 endif()
 
-link_libraries(penumbra)
-
 add_executable(awning WIN32 MACOSX_BUNDLE awning.cpp ${ICON})
+
+target_link_libraries(awning ${PROJECT_NAME})
 
 set(EXE_BINARIES awning)
 

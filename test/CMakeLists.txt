@@ -1,18 +1,19 @@
-include_directories("${penumbra_SOURCE_DIR}/src"
-  "${penumbra_SOURCE_DIR}/include"
+include_directories("${PROJECT_SOURCE_DIR}/src"
+  "${PROJECT_SOURCE_DIR}/include"
   "${gtest_SOURCE_DIR}/include")
 
 set(test_sources
-  penumbra_test.cpp)
+  ${PROJECT_NAME}_test.cpp)
 
-link_libraries(penumbra gtest)
 
-add_executable(penumbra_tests ${test_sources})
+add_executable(${PROJECT_NAME}_tests ${test_sources})
+
+target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME} gtest)
 
 include(GoogleTest)
 
 if (OPENGL_FOUND)
-  gtest_discover_tests(penumbra_tests)
+  gtest_discover_tests(${PROJECT_NAME}_tests)
 else()
   message("Penumbra: OpenGL not found. Relevant unit tests will not be executed.")
 endif()

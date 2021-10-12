@@ -413,14 +413,14 @@ void Context::drawModel() {
 #endif
 #endif
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glDepthFunc(GL_LESS);
+  model.drawAll();
+  glDepthFunc(GL_EQUAL);
 #ifndef NDEBUG
 #ifdef __unix__
   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
 #endif
-  glDepthFunc(GL_LESS);
-  model.drawAll();
-  glDepthFunc(GL_EQUAL);
 }
 
 void Context::drawExcept(const std::vector<SurfaceBuffer> &hiddenSurfaces) {
@@ -432,14 +432,14 @@ void Context::drawExcept(const std::vector<SurfaceBuffer> &hiddenSurfaces) {
 #endif
 #endif
   glClear(GL_DEPTH_BUFFER_BIT);
+  glDepthFunc(GL_LESS);
+  model.drawExcept(hiddenSurfaces);
+  glDepthFunc(GL_EQUAL);
 #ifndef NDEBUG
 #ifdef __unix__
   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
 #endif
-  glDepthFunc(GL_LESS);
-  model.drawExcept(hiddenSurfaces);
-  glDepthFunc(GL_EQUAL);
 }
 
 void Context::showRendering(const unsigned surfaceIndex, mat4x4 sunView) {

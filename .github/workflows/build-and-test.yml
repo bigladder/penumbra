@@ -1,0 +1,73 @@
+name: Build and Test
+
+on: push
+
+jobs:
+  build-and-test:
+    name: Build
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-18.04
+            config: Release
+            static_lib: ON
+            coverage: OFF
+          - os: windows-latest
+            config: Release
+            static_lib: ON
+            coverage: OFF
+          - os: macos-latest
+            config: Release
+            static_lib: ON
+            coverage: OFF
+          - os: ubuntu-18.04
+            config: Debug
+            static_lib: OFF
+            coverage: ON
+          - os: ubuntu-latest
+            config: Release
+            static_lib: ON
+            coverage: OFF
+    defaults:
+      run:
+        shell: bash
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set Project Name
+        run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+      - name: Create Build Directory
+        run: cmake -E make_directory ${{github.workspace}}/build
+      - name: Install Linux Libraries
+        if: runner.os == 'Linux'
+        run: sudo apt-get -y install xorg-dev libgl1-mesa-dev
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_BUILD_TESTING="ON" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}"
+      - name: Build
+        run: cmake --build build --config ${{ matrix.config }}
+      - name: Download Mesa3D on Windows
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/20.3.2/mesa3d-20.3.2-release-msvc.7z
+        working-directory: build\test\${{ matrix.config }}
+      - name: Install Mesa3D on Windows
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          "C:\Program Files\7-Zip\7z.exe" x mesa.7z
+          mklink opengl32.dll "x64\opengl32.dll"
+          mklink libglapi.dll "x64\libglapi.dll"
+        working-directory: build\test\${{ matrix.config }}
+      - name: Test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: ctest -C ${{ matrix.config }} --output-on-failure
+          working-directory: build
+      - name: Code Coverage Analysis
+        if: matrix.coverage == 'ON'
+        run: make gcov
+        working-directory: build
+      - name: Upload Code Coverage Report
+        if: matrix.coverage == 'ON'
+        uses: codecov/codecov-action@v2
