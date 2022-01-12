@@ -12,11 +12,12 @@ elseif (APPLE)
         MAXOSX_PACKAGE_LOCATION "Resources")
 endif()
 
-link_libraries(penumbra)
 
 add_executable(awning WIN32 MACOSX_BUNDLE awning.cpp ${ICON})
 
 set(EXE_BINARIES awning)
+
+target_link_libraries(awning penumbra)
 
 if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables

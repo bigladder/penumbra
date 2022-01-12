@@ -9,6 +9,7 @@ set(library_sources
   ${private_headers}
 )
 
+include_directories(${penumbra_SOURCE_DIR}/build/src)
 include_directories(${penumbra_SOURCE_DIR}/include)
 include_directories(${penumbra_SOURCE_DIR}/src)
 include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glad/include)
@@ -16,14 +17,18 @@ include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw/include)
 include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/glfw/deps)
 include_directories(SYSTEM ${penumbra_SOURCE_DIR}/vendor/libtess2/Include)
 
-option( PENUMBRA_STATIC_LIB "Make penumbra a static library" ON )
+option( PENUMBRA_STATIC_LIB "Make penumbra a static library" OFF )
+include(GenerateExportHeader)
 
 if (PENUMBRA_STATIC_LIB)
   add_library(penumbra STATIC ${library_sources})
   set_target_properties(penumbra PROPERTIES COMPILE_FLAGS "-DPENUMBRA_STATIC_DEFINE")
+  message(STATUS "Static library")
 else()
   set(CMAKE_MACOSX_RPATH 1)
-  add_library(penumbra SHARED ${library_sources})
+  message(STATUS "Dynamic library")
+  add_library(penumbra SHARED ${library_sources} penumbra_export.h)
+    
   if(UNIX)
     set_target_properties(tess2 PROPERTIES COMPILE_FLAGS "-fPIC")
   endif()
