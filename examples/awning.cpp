@@ -6,6 +6,7 @@
 
 // Penumbra
 #include <penumbra/penumbra.h>
+#include <fakestate.h>
 
 void errorCallback(const int messageType, const std::string &message, void * /*contextPtr*/
 ) {
@@ -19,7 +20,8 @@ void errorCallback(const int messageType, const std::string &message, void * /*c
   }
 }
 
-int main(void) {
+int run_main(fakestate &state) {
+
   Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
 
   Pumbra::Polygon windowVerts = {0.25f, 0.f, 0.25f, 0.75f, 0.f, 0.25f,
@@ -34,44 +36,46 @@ int main(void) {
   Pumbra::Surface window(windowVerts);
   Pumbra::Surface awning(awningVerts);
 
-  Pumbra::Penumbra::isValidContext();
+  unsigned wallId = state.pumbra->addSurface(wall);
+  unsigned windowId = state.pumbra->addSurface(window);
+  unsigned awningId = state.pumbra->addSurface(awning);
 
-  Pumbra::Penumbra pumbra(errorCallback);
-
-  unsigned wallId = pumbra.addSurface(wall);
-  unsigned windowId = pumbra.addSurface(window);
-  unsigned awningId = pumbra.addSurface(awning);
-
-  pumbra.setModel();
-  pumbra.setSunPosition(2.50f, 0.3f);
-  // pumbra.setSunPosition(3.14f, 0.0f);
-  pumbra.renderScene(wallId);
-  float wallPSSA = pumbra.calculatePSSA(wallId);
+  state.pumbra->setModel();
+  state.pumbra->setSunPosition(2.50f, 0.3f);
+  // state.pumbra.setSunPosition(3.14f, 0.0f);
+  state.pumbra->renderScene(wallId);
+  float wallPSSA = state.pumbra->calculatePSSA(wallId);
 
   std::cout << "Wall PSSA: " << wallPSSA << std::endl;
 
-  pumbra.renderScene(windowId);
-  float windowPSSA = pumbra.calculatePSSA(windowId);
+  state.pumbra->renderScene(windowId);
+  float windowPSSA = state.pumbra->calculatePSSA(windowId);
 
   std::cout << "Window PSSA: " << windowPSSA << std::endl;
 
-  pumbra.clearModel();
+  state.pumbra->clearModel();
 
   Pumbra::Polygon finVerts = {0.75f, -0.25f, 0.5f,  0.75f, -0.25f, 0.25f,
                               0.75f, 0.0f,   0.25f, 0.75f, 0.0f,   0.5f};
 
   Pumbra::Surface fin(finVerts);
 
-  windowId = pumbra.addSurface(window);
-  awningId = pumbra.addSurface(awning);
-  /*unsigned finID = */ pumbra.addSurface(fin);
+  windowId = state.pumbra->addSurface(window);
+  awningId = state.pumbra->addSurface(awning);
+  /*unsigned finID = */ state.pumbra->addSurface(fin);
 
-  pumbra.setModel();
+  state.pumbra->setModel();
 
-  pumbra.renderScene(windowId);
-  windowPSSA = pumbra.calculatePSSA(windowId);
+  state.pumbra->renderScene(windowId);
+  windowPSSA = state.pumbra->calculatePSSA(windowId);
 
   std::cout << "Window PSSA with fin: " << windowPSSA << std::endl;
 
   return 0;
+}
+
+int main(void)
+{
+    fakestate f;
+    return run_main(f);
 }

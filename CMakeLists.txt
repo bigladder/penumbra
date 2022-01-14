@@ -23,7 +23,7 @@ include(compiler-flags)
 
 option( ${PROJECT_NAME}_BUILD_TESTING "Build ${PROJECT_NAME} testing targets" OFF )
 option( ${PROJECT_NAME}_COVERAGE "Add ${PROJECT_NAME} coverage reports" OFF)
-option( ${PROJECT_NAME}_BUILD_EXAMPLES "Build ${PROJECT_NAME} examples" OFF )
+option( ${PROJECT_NAME}_BUILD_EXAMPLES "Build ${PROJECT_NAME} examples" ON )
 
 # Set up testing/coverage
 if (${PROJECT_NAME}_BUILD_TESTING)
