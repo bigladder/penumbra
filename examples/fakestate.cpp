@@ -1,6 +1,6 @@
 #include <fakestate.h>
 #include <iostream>
-#include <GLFW/glfw3.h>
+#include <memory>
 
 void errorCallback(const int messageType, const std::string &message, void * /*contextPtr*/
 ) {
@@ -16,6 +16,7 @@ void errorCallback(const int messageType, const std::string &message, void * /*c
 
 fakestate::fakestate() {
     if (Pumbra::Penumbra::isValidContext()) {
+        std::cout << "Penumbra valid context; init called.\n";
         pumbra = std::make_unique<Pumbra::Penumbra>(errorCallback);
     }
 }

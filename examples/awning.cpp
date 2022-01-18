@@ -20,7 +20,9 @@ void errorCallback(const int messageType, const std::string &message, void * /*c
   }
 }
 
-int run_main(fakestate &state) {
+int run_main() {
+
+    fakestate state;
 
   Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
 
@@ -76,6 +78,5 @@ int run_main(fakestate &state) {
 
 int main(void)
 {
-    fakestate f;
-    return run_main(f);
+    return run_main();
 }
