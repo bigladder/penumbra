@@ -19,6 +19,9 @@ void errorCallback(const int messageType, const std::string &message, void * /*c
   }
 }
 
+std::unique_ptr<Pumbra::Penumbra> pumbra = nullptr;
+
+
 int main(void) {
   Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
 
@@ -34,42 +37,44 @@ int main(void) {
   Pumbra::Surface window(windowVerts);
   Pumbra::Surface awning(awningVerts);
 
-  Pumbra::Penumbra::isValidContext();
+  if (Pumbra::Penumbra::isValidContext())
+  {
+    pumbra = std::make_unique<Pumbra::Penumbra>(errorCallback);
+  }
 
-  Pumbra::Penumbra pumbra(errorCallback);
 
-  unsigned wallId = pumbra.addSurface(wall);
-  unsigned windowId = pumbra.addSurface(window);
-  unsigned awningId = pumbra.addSurface(awning);
+  unsigned wallId = pumbra->addSurface(wall);
+  unsigned windowId = pumbra->addSurface(window);
+  unsigned awningId = pumbra->addSurface(awning);
 
-  pumbra.setModel();
-  pumbra.setSunPosition(2.50f, 0.3f);
-  // pumbra.setSunPosition(3.14f, 0.0f);
-  pumbra.renderScene(wallId);
-  float wallPSSA = pumbra.calculatePSSA(wallId);
+  pumbra->setModel();
+  pumbra->setSunPosition(2.50f, 0.3f);
+  // pumbra->setSunPosition(3.14f, 0.0f);
+  pumbra->renderScene(wallId);
+  float wallPSSA = pumbra->calculatePSSA(wallId);
 
   std::cout << "Wall PSSA: " << wallPSSA << std::endl;
 
-  pumbra.renderScene(windowId);
-  float windowPSSA = pumbra.calculatePSSA(windowId);
+  pumbra->renderScene(windowId);
+  float windowPSSA = pumbra->calculatePSSA(windowId);
 
   std::cout << "Window PSSA: " << windowPSSA << std::endl;
 
-  pumbra.clearModel();
+  pumbra->clearModel();
 
   Pumbra::Polygon finVerts = {0.75f, -0.25f, 0.5f,  0.75f, -0.25f, 0.25f,
                               0.75f, 0.0f,   0.25f, 0.75f, 0.0f,   0.5f};
 
   Pumbra::Surface fin(finVerts);
 
-  windowId = pumbra.addSurface(window);
-  awningId = pumbra.addSurface(awning);
-  /*unsigned finID = */ pumbra.addSurface(fin);
+  windowId = pumbra->addSurface(window);
+  awningId = pumbra->addSurface(awning);
+  /*unsigned finID = */ pumbra->addSurface(fin);
 
-  pumbra.setModel();
+  pumbra->setModel();
 
-  pumbra.renderScene(windowId);
-  windowPSSA = pumbra.calculatePSSA(windowId);
+  pumbra->renderScene(windowId);
+  windowPSSA = pumbra->calculatePSSA(windowId);
 
   std::cout << "Window PSSA with fin: " << windowPSSA << std::endl;
 
