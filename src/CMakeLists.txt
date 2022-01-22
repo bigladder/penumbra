@@ -15,8 +15,9 @@ include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glad/include)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/include)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/deps)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/libtess2/Include)
+include_directories(${PROJECT_SOURCE_DIR}/build/src)
 
-option( ${PROJECT_NAME}_STATIC_LIB "Make ${PROJECT_NAME} a static library" ON )
+option( ${PROJECT_NAME}_STATIC_LIB "Make ${PROJECT_NAME} a static library" OFF )
 
 if (${PROJECT_NAME}_STATIC_LIB)
   add_library(${PROJECT_NAME} STATIC ${library_sources})

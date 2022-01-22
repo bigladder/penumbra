@@ -1,6 +1,7 @@
 include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories("${PROJECT_SOURCE_DIR}/examples")
 include_directories("${PROJECT_SOURCE_DIR}/build/examples")
+include_directories("${PROJECT_SOURCE_DIR}/build/src")
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)

@@ -13,6 +13,7 @@
 
 // Penumbra
 #include <penumbra/surface.h>
+#include "penumbra_export.h"
 
 namespace Pumbra {
 
@@ -38,7 +39,7 @@ class PenumbraPrivate;
 void penumbraTerminate(); // Call once before exiting calling program to ensure safe cleanup of
                           // OpenGL memory
 
-class Penumbra {
+class PENUMBRA_EXPORT Penumbra {
 public:
   Penumbra(unsigned size = 512u);
 

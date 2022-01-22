@@ -8,6 +8,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include "penumbra_export.h"
 
 namespace Pumbra {
 
@@ -15,7 +16,7 @@ typedef std::vector<float> Polygon; // Implicit list of 3D coordinates
 
 class SurfacePrivate;
 
-class Surface {
+class PENUMBRA_EXPORT Surface {
   friend class PenumbraPrivate;
 
 public:
