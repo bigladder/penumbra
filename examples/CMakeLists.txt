@@ -19,6 +19,7 @@ message(STATUS "Dynamic library")
 add_library(fakestate SHARED fakestate.h fakestate.cpp fakestate_export.h)
 
 target_link_libraries(fakestate ${PROJECT_NAME})
+target_compile_features(fakestate PRIVATE cxx_std_17)
 include(GenerateExportHeader)
 generate_export_header(fakestate)
 
