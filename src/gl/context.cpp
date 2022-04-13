@@ -127,7 +127,7 @@ Context::Context(unsigned size)
   };
 
   auto scroll_callback = [](GLFWwindow *w, double /*xOffset*/, double yOffset) {
-    glfwWPtr(w)->viewScale += 0.1f * static_cast<float>(yOffset);
+    glfwWPtr(w)->viewScale += static_cast<float>(0.1 * yOffset);
 
     if (glfwWPtr(w)->isCameraMode) {
       glfwWPtr(w)->setCameraMVP();
