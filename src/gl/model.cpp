@@ -53,8 +53,8 @@ void GLModel::setVertices(const std::vector<float> &vertices) {
   objectsSet = true;
 }
 
-void GLModel::setSurfaceBuffers(const std::vector<SurfaceBuffer> &surfaceBuffers) {
-  this->surfaceBuffers = surfaceBuffers;
+void GLModel::setSurfaceBuffers(const std::vector<SurfaceBuffer> &m_surfaceBuffers) {
+  this->surfaceBuffers = m_surfaceBuffers;
 }
 
 void GLModel::drawSurface(SurfaceBuffer surfaceBuffer) {
