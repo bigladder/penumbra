@@ -36,7 +36,7 @@ void GLModel::clearModel() {
 void GLModel::setVertices(const std::vector<float> &vertices) {
 
   vertexArray = vertices;
-  numPoints = vertices.size() / vertexSize;
+  numPoints = static_cast<unsigned int>(vertices.size()) / vertexSize;
   // Set up vertex array object
   glGenVertexArraysX(1, &vao);
   glBindVertexArrayX(vao);

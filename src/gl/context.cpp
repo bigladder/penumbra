@@ -127,7 +127,7 @@ Context::Context(unsigned size)
   };
 
   auto scroll_callback = [](GLFWwindow *w, double /*xOffset*/, double yOffset) {
-    glfwWPtr(w)->viewScale += 0.1f * yOffset;
+    glfwWPtr(w)->viewScale += 0.1f * static_cast<float>(yOffset);
 
     if (glfwWPtr(w)->isCameraMode) {
       glfwWPtr(w)->setCameraMVP();
@@ -156,10 +156,10 @@ Context::Context(unsigned size)
 
       static const double rotationSpeed = 1. / 300.;
 
-      glfwWPtr(w)->cameraRotAngleX =
-          -(yPos - glfwWPtr(w)->prevPosY) * rotationSpeed; // Y motion should produce x rotation
-      glfwWPtr(w)->cameraRotAngleY =
-          (xPos - glfwWPtr(w)->prevPosX) * rotationSpeed; // X motion should produce -y rotation
+      glfwWPtr(w)->cameraRotAngleX = static_cast<float>(
+          -(yPos - glfwWPtr(w)->prevPosY) * rotationSpeed); // Y motion should produce x rotation
+      glfwWPtr(w)->cameraRotAngleY = static_cast<float>(
+          (xPos - glfwWPtr(w)->prevPosX) * rotationSpeed); // X motion should produce -y rotation
 
       glfwWPtr(w)->prevPosX = xPos;
       glfwWPtr(w)->prevPosY = yPos;
@@ -381,8 +381,8 @@ void Context::setCameraMVP() {
   float cNear = near_;
   float cFar = far_;
 
-  deltaW = (cRight - cLeft) / 2.;
-  deltaH = (cTop - cBottom) / 2.;
+  deltaW = (cRight - cLeft) / 2.f;
+  deltaH = (cTop - cBottom) / 2.f;
 
   if (deltaW > deltaH) {
     cTop += (deltaW - deltaH);
