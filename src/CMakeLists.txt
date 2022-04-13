@@ -33,6 +33,7 @@ include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} glad glfw tess2)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 if (${PROJECT_NAME}_COVERAGE)
   add_coverage(${PROJECT_NAME})
