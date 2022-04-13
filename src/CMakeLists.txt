@@ -32,6 +32,12 @@ endif()
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME})
 
+target_compile_options(${PROJECT_NAME} PRIVATE
+  $<$<CXX_COMPILER_ID:MSVC>:/W4>
+  $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+  -Wall -Wextra -Wpedantic>
+)
+
 target_link_libraries(${PROJECT_NAME} glad glfw tess2)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
