@@ -127,7 +127,7 @@ Context::Context(unsigned size)
   };
 
   auto scroll_callback = [](GLFWwindow *w, double /*xOffset*/, double yOffset) {
-    glfwWPtr(w)->viewScale += 0.1f * yOffset;
+    glfwWPtr(w)->viewScale += static_cast<float>(0.1 * yOffset);
 
     if (glfwWPtr(w)->isCameraMode) {
       glfwWPtr(w)->setCameraMVP();
@@ -156,10 +156,10 @@ Context::Context(unsigned size)
 
       static const double rotationSpeed = 1. / 300.;
 
-      glfwWPtr(w)->cameraRotAngleX =
-          -(yPos - glfwWPtr(w)->prevPosY) * rotationSpeed; // Y motion should produce x rotation
-      glfwWPtr(w)->cameraRotAngleY =
-          (xPos - glfwWPtr(w)->prevPosX) * rotationSpeed; // X motion should produce -y rotation
+      glfwWPtr(w)->cameraRotAngleX = static_cast<float>(
+          -(yPos - glfwWPtr(w)->prevPosY) * rotationSpeed); // Y motion should produce x rotation
+      glfwWPtr(w)->cameraRotAngleY = static_cast<float>(
+          (xPos - glfwWPtr(w)->prevPosX) * rotationSpeed); // X motion should produce -y rotation
 
       glfwWPtr(w)->prevPosX = xPos;
       glfwWPtr(w)->prevPosY = yPos;
@@ -200,7 +200,7 @@ Context::Context(unsigned size)
 }
 
 Context::~Context() {
-  glDeleteQueries(queries.size(), queries.data());
+  glDeleteQueries(static_cast<GLsizei>(queries.size()), queries.data());
   glDeleteFramebuffersEXT(1, &fbo);
   glDeleteRenderbuffersEXT(1, &rbo);
   glDeleteProgram(calcProgram->getInt());
@@ -234,7 +234,7 @@ std::string Context::vendorName() {
 
 void Context::clearModel() {
   model.clearModel();
-  glDeleteQueries(queries.size(), queries.data());
+  glDeleteQueries(static_cast<GLsizei>(queries.size()), queries.data());
   modelSet = false;
 }
 
@@ -252,7 +252,7 @@ void Context::setModel(const std::vector<float> &vertices, const std::vector<Sur
   pixelAreas.resize(surfaceBuffers.size());
   pixelCounts = std::vector<GLint>(surfaceBuffers.size(), -1);
 
-  glGenQueries(queries.size(), queries.data());
+  glGenQueries(static_cast<GLsizei>(queries.size()), queries.data());
 
   float bLeft = MAX_FLOAT, bBottom = MAX_FLOAT, bFront = MAX_FLOAT;
   float bRight = -MAX_FLOAT, bTop = -MAX_FLOAT, bBack = -MAX_FLOAT;
@@ -302,7 +302,7 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer, bool
 
   // If surface buffer has not been set use entire model instead.
   GLuint beg = surfaceBuffer ? surfaceBuffer->begin * model.vertexSize : 0;
-  GLuint end = surfaceBuffer ? surfaceBuffer->begin * model.vertexSize + surfaceBuffer->count * model.vertexSize : model.vertexArray.size();
+  GLuint end = surfaceBuffer ? surfaceBuffer->begin * model.vertexSize + surfaceBuffer->count * model.vertexSize : static_cast<GLuint>(model.vertexArray.size());
 
   for (GLuint i = beg; i < end; i += model.vertexSize) {
     vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
@@ -381,8 +381,8 @@ void Context::setCameraMVP() {
   float cNear = near_;
   float cFar = far_;
 
-  deltaW = (cRight - cLeft) / 2.;
-  deltaH = (cTop - cBottom) / 2.;
+  deltaW = (cRight - cLeft) / 2.f;
+  deltaH = (cTop - cBottom) / 2.f;
 
   if (deltaW > deltaH) {
     cTop += (deltaW - deltaH);
@@ -627,7 +627,7 @@ Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndice
   std::vector<GLuint> pssasQueries(interiorSurfaceIndices.size());
   std::map<unsigned, float> pssas;
 
-  glGenQueries(pssasQueries.size(), pssasQueries.data());
+  glGenQueries(static_cast<GLsizei>(pssasQueries.size()), pssasQueries.data());
 
   auto const pixelArea = setScene( sunView, &model.surfaceBuffers[hiddenSurfaceIndices.at(0)], false);
 
@@ -656,7 +656,7 @@ Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndice
     pssas[interiorSurfaces[i].index] = pixelCount * pixelArea;
   }
 
-  glDeleteQueries(pssasQueries.size(), pssasQueries.data());
+  glDeleteQueries(static_cast<GLsizei>(pssasQueries.size()), pssasQueries.data());
   return pssas;
 }
 

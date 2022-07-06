@@ -82,11 +82,11 @@ VendorName Penumbra::getVendorName() {
 
 unsigned Penumbra::addSurface(const Surface &surface) {
   penumbra->addSurface(surface);
-  return penumbra->surfaces.size() - 1u;
+  return static_cast<unsigned int>(penumbra->surfaces.size()) - 1u;
 }
 
 unsigned Penumbra::getNumSurfaces() {
-  return penumbra->surfaces.size();
+  return static_cast<unsigned int>(penumbra->surfaces.size());
 }
 
 int Penumbra::setModel() {

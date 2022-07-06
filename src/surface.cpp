@@ -90,7 +90,7 @@ TessData SurfacePrivate::tessellate() {
     }
   }
 
-  TessData data(&vertexArray[0], vertexArray.size());
+  TessData data(&vertexArray[0], static_cast<unsigned int>(vertexArray.size()));
 
   tessDeleteTess(tess);
 
