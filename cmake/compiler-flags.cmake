@@ -1,11 +1,20 @@
+message("ASUBASIBASVBASVBASVBASVB")
+message("CMAKE C Flags:\t${CMAKE_C_FLAGS}" )
+message("CXX Flags: \t\t${CMAKE_CXX_FLAGS} ")
+message("CXX Release Flags:${CMAKE_CXX_FLAGS_RELEASE} ")
+message("$CXX Debug Flags:\t${CMAKE_CXX_FLAGS_DEBUG} ")
+message("${CMAKE_EXE_LINKER_FLAGS} ")
+message("${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+message("${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+
 # Empty default flags
-#set(CMAKE_C_FLAGS "")
-#set(CMAKE_CXX_FLAGS "")
-#set(CMAKE_CXX_FLAGS_RELEASE "")
-#set(CMAKE_CXX_FLAGS_DEBUG "")
-#set(CMAKE_EXE_LINKER_FLAGS "")
-#set(CMAKE_EXE_LINKER_FLAGS_RELEASE "")
-#set(CMAKE_EXE_LINKER_FLAGS_DEBUG "")
+set(CMAKE_C_FLAGS "")
+set(CMAKE_CXX_FLAGS "")
+set(CMAKE_CXX_FLAGS_RELEASE "")
+set(CMAKE_CXX_FLAGS_DEBUG "")
+set(CMAKE_EXE_LINKER_FLAGS "")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "")
 
 add_library(penumbra_common_interface INTERFACE)
 
@@ -38,25 +47,41 @@ target_compile_options(penumbra_common_interface INTERFACE
       /Zi
     >
   >
-  $<$<OR:   `   # GCC and Clang
-    $<CXX_COMPILER_ID:GNU>,
-    $<CXX_COMPILER_ID:Clang>>:
+  # GCC
+  $<$<CXX_COMPILER_ID:GNU>:
+    -pthread
     -pipe       # Faster compiler processing
     -std=c++11  # Enable C++11 features in g++
     -pedantic   # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     -Wall       # Turn on warnings
     -Wextra     # Turn on warnings
     -Wno-unknown-pragmas
-    $<$<CXX_COMPILER_ID:GNU>:
-      -Wno-unused-but-set-parameter   # Suppress unused-but-set warnings until more serious ones are addressed
-      -Wno-unused-but-set-variable    # Suppress unused-but-set warnings until more serious ones are addressed
-      -Wno-maybe-uninitialized
-    >
-    $<$<CXX_COMPILER_ID:Clang>:
-      -Wno-invalid-source-encoding
+    -ggdb
+    -fno-stack-protector  # Produces debugging information specifically for gdb
+    -Wno-unused-but-set-parameter   # Suppress unused-but-set warnings until more serious ones are addressed
+    -Wno-unused-but-set-variable    # Suppress unused-but-set warnings until more serious ones are addressed
+    -Wno-maybe-uninitialized
+    -ffloat-store     # Improve debug run solution stability
+    -fsignaling-nans  # Disable optimizations that may have concealed NaN behavior
+    -D_GLIBCXX_DEBUG  # Standard container debug mode (bounds checking, ...)
+    # -finline-limit=2000 # More aggressive inlining   This is causing unit test failures on Ubuntu 14.04
+    $<UNIX:
+      -fPIC
     >
   >
-  $<$<AND: WIN32, $<CXX_COMPILER_ID:Intel>:
+  $<$<CXX_COMPILER_ID:Clang>:
+    -pipe       # Faster compiler processing
+    -std=c++11  # Enable C++11 features in g++
+    -pedantic   # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
+    -Wall       # Turn on warnings
+    -Wextra     # Turn on warnings
+    -Wno-unknown-pragmas
+    -ggdb
+    -fno-stack-protector  # Produces debugging information specifically for gdb
+    -Wno-invalid-source-encoding
+  >
+
+  $<$<BOOL:${WIN32}>: $<$<CXX_COMPILER_ID:Intel>:
       # Disabled Warnings: Enable some of these as more serious warnings are addressed
       #   161 Unrecognized pragma
       #   177 Variable declared but never referenced
@@ -93,8 +118,9 @@ target_compile_options(penumbra_common_interface INTERFACE
       /Qfp-stack-check  # Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
       /traceback      # Enables traceback on error
       >
+    >
   >
-  $<$<AND: UNIX, $<CXX_COMPILER_ID:Intel>>:
+  $<$<BOOL: UNIX>: $<$<CXX_COMPILER_ID:Intel>:
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
     #   161 Unrecognized pragma
     #   177 Variable declared but never referenced
@@ -133,6 +159,14 @@ target_compile_options(penumbra_common_interface INTERFACE
 
     >
   >
+  >
+)
+
+target_link_options(penumbra_common_interface INTERFACE 
+  $<$<CXX_COMPILER_ID:GNU>:
+    -pthread
+  >
+
 )
 
 # IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++ (VS 2013)
