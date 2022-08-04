@@ -1,12 +1,3 @@
-message("ASUBASIBASVBASVBASVBASVB")
-message("CMAKE C Flags:\t${CMAKE_C_FLAGS}" )
-message("CXX Flags: \t\t${CMAKE_CXX_FLAGS} ")
-message("CXX Release Flags:${CMAKE_CXX_FLAGS_RELEASE} ")
-message("$CXX Debug Flags:\t${CMAKE_CXX_FLAGS_DEBUG} ")
-message("${CMAKE_EXE_LINKER_FLAGS} ")
-message("${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
-message("${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
-
 # Empty default flags
 set(CMAKE_C_FLAGS "")
 set(CMAKE_CXX_FLAGS "")
@@ -44,14 +35,18 @@ target_compile_options(penumbra_common_interface INTERFACE
     -Wall       # Turn on warnings
     -Wextra     # Turn on warnings
     -Wno-unknown-pragmas
-    -ggdb
-    -fno-stack-protector  # Produces debugging information specifically for gdb
     -Wno-unused-but-set-parameter   # Suppress unused-but-set warnings until more serious ones are addressed
     -Wno-unused-but-set-variable    # Suppress unused-but-set warnings until more serious ones are addressed
     -Wno-maybe-uninitialized
-    -ffloat-store     # Improve debug run solution stability
-    -fsignaling-nans  # Disable optimizations that may have concealed NaN behavior
-    -D_GLIBCXX_DEBUG  # Standard container debug mode (bounds checking, ...)
+    $<$<CONFIG:Release>:
+      -fno-stack-protector  # Produces debugging information specifically for gdb
+    >
+    $<$<CONFIG:Debug>:
+      -ggdb
+      -ffloat-store     # Improve debug run solution stability
+      -fsignaling-nans  # Disable optimizations that may have concealed NaN behavior
+      -D_GLIBCXX_DEBUG  # Standard container debug mode (bounds checking, ...)
+    >
     # -finline-limit=2000 # More aggressive inlining   This is causing unit test failures on Ubuntu 14.04
     $<$<BOOL:UNIX>:
       -fPIC
@@ -64,9 +59,16 @@ target_compile_options(penumbra_common_interface INTERFACE
     -Wall       # Turn on warnings
     -Wextra     # Turn on warnings
     -Wno-unknown-pragmas
-    -ggdb
-    -fno-stack-protector  # Produces debugging information specifically for gdb
     -Wno-invalid-source-encoding
+    $<$<CONFIG:Release>:
+      -fno-stack-protector  # Produces debugging information specifically for gdb
+    >
+    $<$<CONFIG:Debug>:
+      -ggdb
+      -ffloat-store     # Improve debug run solution stability
+      -fsignaling-nans  # Disable optimizations that may have concealed NaN behavior
+      -D_GLIBCXX_DEBUG  # Standard container debug mode (bounds checking, ...)
+    >
   >
 
   $<$<BOOL:${WIN32}>: $<$<CXX_COMPILER_ID:Intel>:
@@ -98,13 +100,13 @@ target_compile_options(penumbra_common_interface INTERFACE
         # /fp:fast=2  # Aggressive optimizations on floating-point data
       >
       $<$<CONFIG:Debug>:  # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-      /fp:source      # Use source-specified floating point precision
-      /Qtrapuv        # Initialize local variables to unusual values to help detect use uninitialized
-      /check:stack,uninit # Enables runtime checking of the stack (buffer over and underruns; pointer verification) and uninitialized variables
-      /Gs0            # Enable stack checking for all functions
-      /GS             # Buffer overrun detection
-      /Qfp-stack-check  # Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
-      /traceback      # Enables traceback on error
+        /fp:source      # Use source-specified floating point precision
+        /Qtrapuv        # Initialize local variables to unusual values to help detect use uninitialized
+        /check:stack,uninit # Enables runtime checking of the stack (buffer over and underruns; pointer verification) and uninitialized variables
+        /Gs0            # Enable stack checking for all functions
+        /GS             # Buffer overrun detection
+        /Qfp-stack-check  # Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
+        /traceback      # Enables traceback on error
       >
     >
   >
