@@ -38,6 +38,9 @@ target_compile_options(${PROJECT_NAME} PRIVATE
   -Wall -Wextra -Wpedantic>
 )
 
+target_link_libraries(tess2 PRIVATE penumbra_common_interface)
+target_link_libraries(glad PRIVATE penumbra_common_interface)
+target_link_libraries(glfw PRIVATE penumbra_common_interface)
 target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw tess2 penumbra_common_interface)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 

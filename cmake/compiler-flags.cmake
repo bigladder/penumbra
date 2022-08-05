@@ -21,9 +21,10 @@ target_compile_options(penumbra_common_interface INTERFACE
       /GS-    # Disable buffer overrun checks for performance in release mode
     >
     $<$<CONFIG:Debug>:
+      /Zi     #
       /Ob0    # Disable inlining
-      /RTCsu  # Runtime checks
-      /Zi
+      /Od     # Turns off all optimizations in the program and speeds compilation
+      /RTC1   # Runtime checks
     >
   >
   # GCC
@@ -151,6 +152,10 @@ target_compile_options(penumbra_common_interface INTERFACE
   >
   >
 )
+
+  #================#
+  #  Linker flags  #
+  #================#
 
 target_link_options(penumbra_common_interface INTERFACE 
   $<$<CXX_COMPILER_ID:GNU>:
