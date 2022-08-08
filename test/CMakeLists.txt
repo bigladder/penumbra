@@ -8,6 +8,7 @@ set(test_sources
 
 add_executable(${PROJECT_NAME}_tests ${test_sources})
 
+target_link_libraries(gtest PRIVATE penumbra_common_interface)
 target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME} gtest penumbra_common_interface)
 
 include(GoogleTest)
