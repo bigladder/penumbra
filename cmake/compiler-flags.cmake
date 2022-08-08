@@ -100,7 +100,11 @@ target_compile_options(penumbra_common_interface INTERFACE
 
     # COMPILER FLAGS
     -Wall       # Enable "all" warnings
+
     # Not apple
+    $<$<NOT:"${APPLE}">:
+      -pthreat
+    >
     
     $<$<CONFIG:Release>:    # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
       -O3           # Agressive optimization
