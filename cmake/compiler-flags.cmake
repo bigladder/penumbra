@@ -18,6 +18,8 @@ target_compile_options(penumbra_common_interface INTERFACE
     /nologo
     /EHsc
     /MT
+    /W3
+    /WX
     $<$<CONFIG:Release>:
       /GS-    # Disable buffer overrun checks for performance in release mode
     >
