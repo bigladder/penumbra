@@ -59,6 +59,7 @@ target_compile_options(penumbra_common_interface INTERFACE
     -pedantic   # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     -Wall       # Turn on warnings
     -Wextra     # Turn on warnings
+    -Werror     # Turn warnings into errors
     $<$<CONFIG:Release>:
       -fno-stack-protector  # Produces debugging information specifically for gdb
     >
