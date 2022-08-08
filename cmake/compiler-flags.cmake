@@ -34,9 +34,12 @@ target_compile_options(penumbra_common_interface INTERFACE
   $<$<CXX_COMPILER_ID:GNU>:
     -pthread
     -pipe       # Faster compiler processing
-    -pedantic   # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
+    $<$<COMPILE_LANG_AND_ID:CXX,GNU>: # Adds flag only to C++
+      -pedantic   # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
+    >
     -Wall       # Turn on warnings
     -Wextra     # Turn on warnings
+    -Werror     # Turn warnings into errors
     $<$<CONFIG:Release>:
       -fno-stack-protector  # Produces debugging information specifically for gdb
     >
