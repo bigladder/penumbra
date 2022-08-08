@@ -17,6 +17,7 @@ target_compile_options(penumbra_common_interface INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>: # Visual C++ (VS 2013)
     /nologo
     /EHsc
+    /MT
     $<$<CONFIG:Release>:
       /GS-    # Disable buffer overrun checks for performance in release mode
     >
@@ -31,14 +32,9 @@ target_compile_options(penumbra_common_interface INTERFACE
   $<$<CXX_COMPILER_ID:GNU>:
     -pthread
     -pipe       # Faster compiler processing
-    -std=c++11  # Enable C++11 features in g++
     -pedantic   # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     -Wall       # Turn on warnings
     -Wextra     # Turn on warnings
-    -Wno-unknown-pragmas
-    -Wno-unused-but-set-parameter   # Suppress unused-but-set warnings until more serious ones are addressed
-    -Wno-unused-but-set-variable    # Suppress unused-but-set warnings until more serious ones are addressed
-    -Wno-maybe-uninitialized
     $<$<CONFIG:Release>:
       -fno-stack-protector  # Produces debugging information specifically for gdb
     >
@@ -55,12 +51,9 @@ target_compile_options(penumbra_common_interface INTERFACE
   >
   $<$<CXX_COMPILER_ID:Clang>:
     -pipe       # Faster compiler processing
-    -std=c++11  # Enable C++11 features in g++
     -pedantic   # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
     -Wall       # Turn on warnings
     -Wextra     # Turn on warnings
-    -Wno-unknown-pragmas
-    -Wno-invalid-source-encoding
     $<$<CONFIG:Release>:
       -fno-stack-protector  # Produces debugging information specifically for gdb
     >
@@ -73,23 +66,9 @@ target_compile_options(penumbra_common_interface INTERFACE
   >
 
   $<$<BOOL:${WIN32}>: $<$<CXX_COMPILER_ID:Intel>:
-      # Disabled Warnings: Enable some of these as more serious warnings are addressed
-      #   161 Unrecognized pragma
-      #   177 Variable declared but never referenced
-      #   488 Template parameter not used ...
-      #   809 Exception specification consistency warnings that fire in gtest code
-      #   869 Parameter never referenced
-      #  1786 Use of deprecated items
-      #  2259 Non-pointer conversions may lose significant bits
-      #  3280 Declaration hides variable
-      # 10382 xHOST remark
-      # 11074 Inlining inhibited
-      # 11075 Inlining inhibited
       /nologo         # Skip banner text
-      /Qstd=c++11     # Specify C++11 language
       /Qcxx-features  # Enables standard C++ features without disabling Microsoft extensions
       /Wall           # Enable "all" warnings
-      /Qdiag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075 # Disable warnings listed above
       /DNOMINMAX      # Avoid build errors due to STL/Windows min-max conflicts
       /DWIN32_LEAN_AND_MEAN # Excludes rarely used services and headers from compilation
       $<$<CONFIG:Release>: # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
@@ -112,23 +91,9 @@ target_compile_options(penumbra_common_interface INTERFACE
     >
   >
   $<$<BOOL: UNIX>: $<$<CXX_COMPILER_ID:Intel>:
-    # Disabled Warnings: Enable some of these as more serious warnings are addressed
-    #   161 Unrecognized pragma
-    #   177 Variable declared but never referenced
-    #   488 Template parameter not used ...
-    #   809 Exception specification consistency warnings that fire in gtest code
-    #   869 Parameter never referenced
-    #  1786 Use of deprecated items
-    #  2259 Non-pointer conversions may lose significant bits
-    #  3280 Declaration hides variable
-    # 10382 xHOST remark
-    # 11074 Inlining inhibited
-    # 11075 Inlining inhibited
 
     # COMPILER FLAGS
-    -std=c++11  # Specify C++11 language
     -Wall       # Enable "all" warnings
-    -diag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075 # Disable warnings listed above
     # Not apple
     
     $<$<CONFIG:Release>:    # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
