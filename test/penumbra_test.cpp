@@ -8,6 +8,7 @@
 
 #include <penumbra/penumbra.h>
 
+// Float definitions for PI from math header
 constexpr float m_pi_f = static_cast<float>(M_PI);
 constexpr float m_pi_2_f = static_cast<float>(M_PI_2);
 constexpr float m_pi_4_f = static_cast<float>(M_PI_4);
