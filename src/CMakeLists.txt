@@ -20,8 +20,8 @@ else()
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-  "${PROJECT_SOURCE_DIR}/include"
-  "${PROJECT_SOURCE_DIR}/src"
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/src
   SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glad/include
   SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/include
   SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/deps
