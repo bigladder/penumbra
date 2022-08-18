@@ -8,30 +8,49 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-18.04
+          - os: ubuntu-22.04
             config: Release
             static_lib: ON
             coverage: OFF
-          - os: windows-latest
+            cc: gcc-11
+            cxx: gcc-11
+          - os: ubuntu-20.04
             config: Release
             static_lib: ON
             coverage: OFF
-          - os: macos-latest
+            cc: gcc-10
+            cxx: gcc-10
+          - os: windows-2022
             config: Release
             static_lib: ON
             coverage: OFF
-          - os: ubuntu-18.04
+            cc: cl
+            cxx: cl
+          - os: macos-12
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            cc: clang
+            cxx: clang++
+          - os: macos-11
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            cc: clang
+            cxx: clang++
+          - os: ubuntu-20.04
             config: Debug
             static_lib: OFF
             coverage: ON
-          - os: ubuntu-latest
-            config: Release
-            static_lib: ON
-            coverage: OFF
+            cc: gcc-10
+            cxx: gcc-10
       fail-fast: false
     defaults:
       run:
         shell: bash
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
