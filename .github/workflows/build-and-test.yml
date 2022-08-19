@@ -8,17 +8,18 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: [ubuntu-20.04, ubuntu-22.04]
+          - os: ubuntu-22.04
             config: Release
             static_lib: ON
             coverage: OFF
-            include:
-              - os: ubuntu-20.04
-                cc: gcc-10
-                cxx: g++-10
-              - os: ubuntu-22.04
-                cc: gcc-11
-                cxx: g++-11
+            cc: gcc-11
+            cxx: g++-11
+          - os: ubuntu-20.04
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            cc: gcc-10
+            cxx: g++-10
           - os: windows-2022
             config: Release
             static_lib: ON
