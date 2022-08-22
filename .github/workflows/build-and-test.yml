@@ -8,25 +8,29 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-22.04
+          - os: ubuntu
+            os_ver: "22.04"
             config: Release
             static_lib: ON
             coverage: OFF
             cc: gcc-11
             cxx: g++-11
-          - os: ubuntu-20.04
+          - os: ubuntu
+            os_ver: "20.04"
             config: Release
             static_lib: ON
             coverage: OFF
             cc: gcc-10
             cxx: g++-10
-          - os: windows-2022
+          - os: windows
+            os_ver: "2022"
             config: Release
             static_lib: ON
             coverage: OFF
             cc: cl
             cxx: cl
-          - os: macos-12
+          - os: macos
+            os_ver: "12"
             config: Release
             static_lib: ON
             coverage: OFF
@@ -38,7 +42,8 @@ jobs:
             coverage: OFF
             cc: clang
             cxx: clang++
-          - os: ubuntu-20.04
+          - os: ubuntu
+            os_ver: "20.04"
             config: Debug
             static_lib: OFF
             coverage: ON
@@ -51,7 +56,7 @@ jobs:
     env:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-${{ matrix.os_ver }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -60,19 +65,19 @@ jobs:
       - name: Create Build Directory
         run: cmake -E make_directory ${{github.workspace}}/build
       - name: Install Linux Libraries
-        if: runner.os == 'Linux'
+        if: runner.os == 'ubuntu'
         run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev
       - name: Configure CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_BUILD_TESTING="ON" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}"
       - name: Build
         run: cmake --build build --config ${{ matrix.config }}
       - name: Download Mesa3D on Windows
-        if: runner.os == 'Windows'
+        if: runner.os == 'windows'
         shell: cmd
         run: curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/20.3.2/mesa3d-20.3.2-release-msvc.7z
         working-directory: build\test\${{ matrix.config }}
       - name: Install Mesa3D on Windows
-        if: runner.os == 'Windows'
+        if: runner.os == 'windows'
         shell: cmd
         run: |
           "C:\Program Files\7-Zip\7z.exe" x mesa.7z
