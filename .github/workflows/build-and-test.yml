@@ -22,6 +22,13 @@ jobs:
             coverage: OFF
             cc: gcc-10
             cxx: g++-10
+          - os: ubuntu
+            os_ver: "18.04"
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            cc: gcc-9
+            cxx: g++-9
           - os: windows
             os_ver: "2022"
             config: Release
@@ -65,19 +72,19 @@ jobs:
       - name: Create Build Directory
         run: cmake -E make_directory ${{github.workspace}}/build
       - name: Install Linux Libraries
-        if: runner.os == 'ubuntu'
+        if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev
       - name: Configure CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_BUILD_TESTING="ON" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}"
       - name: Build
         run: cmake --build build --config ${{ matrix.config }}
       - name: Download Mesa3D on Windows
-        if: runner.os == 'windows'
+        if: runner.os == 'Windows'
         shell: cmd
         run: curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/20.3.2/mesa3d-20.3.2-release-msvc.7z
         working-directory: build\test\${{ matrix.config }}
       - name: Install Mesa3D on Windows
-        if: runner.os == 'windows'
+        if: runner.os == 'Windows'
         shell: cmd
         run: |
           "C:\Program Files\7-Zip\7z.exe" x mesa.7z
