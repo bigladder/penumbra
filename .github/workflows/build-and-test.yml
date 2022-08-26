@@ -43,7 +43,8 @@ jobs:
             coverage: OFF
             cc: clang
             cxx: clang++
-          - os: macos-11
+          - os: macos
+            os_ver: "11"
             config: Release
             static_lib: ON
             coverage: OFF
