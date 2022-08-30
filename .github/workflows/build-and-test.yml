@@ -22,13 +22,6 @@ jobs:
             coverage: OFF
             cc: gcc-10
             cxx: g++-10
-          - os: ubuntu
-            os_ver: "18.04"
-            config: Release
-            static_lib: ON
-            coverage: OFF
-            cc: gcc-9
-            cxx: g++-9
           - os: windows
             os_ver: "2022"
             config: Release
