@@ -12,7 +12,7 @@ Penumbra is a free and open source library for GPU accelerated solar shading cal
 
 ## Building penumbra from source
 
-1. Clone the git repository, or download and extract the source code ([tar.gz](https://github.com/bigladder/penumbra/archive/refs/tags/v0.3.3.tar.gz) or [zip](https://github.com/bigladder/penumbra/archive/refs/tags/v0.3.3.zip)).
+1. Clone the git repository.
 2. Make a directory called `build` inside the top level of your source.
 3. Open a console in the `build` directory.
 4. Type `cmake ..`.
