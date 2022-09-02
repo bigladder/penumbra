@@ -9,13 +9,6 @@ set(library_sources
   ${private_headers}
 )
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_SOURCE_DIR}/src)
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glad/include)
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/include)
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/deps)
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/libtess2/Include)
-
 option( ${PROJECT_NAME}_STATIC_LIB "Make ${PROJECT_NAME} a static library" ON )
 
 if (${PROJECT_NAME}_STATIC_LIB)
@@ -26,14 +19,17 @@ else()
   add_library(${PROJECT_NAME} SHARED ${library_sources})
 endif()
 
+target_include_directories(${PROJECT_NAME} PRIVATE
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/src
+  SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glad/include
+  SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/include
+  SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/deps
+  SYSTEM ${PROJECT_SOURCE_DIR}/vendor/libtess2/Include
+)
+
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME})
-
-#target_compile_options(${PROJECT_NAME} PRIVATE
-#  $<$<CXX_COMPILER_ID:MSVC>:/W4>
-#  $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-#  -Wall -Wextra -Wpedantic>
-#)
 
 target_link_libraries(tess2 PRIVATE penumbra_common_interface)
 target_link_libraries(glad PRIVATE penumbra_common_interface)

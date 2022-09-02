@@ -1,13 +1,15 @@
-include_directories("${PROJECT_SOURCE_DIR}/src"
-  "${PROJECT_SOURCE_DIR}/include"
-  "${gtest_SOURCE_DIR}/include")
-
 set(test_sources
   ${PROJECT_NAME}_test.cpp)
 
 
 add_executable(${PROJECT_NAME}_tests ${test_sources})
 
+
+target_include_directories(${PROJECT_NAME}_tests PRIVATE
+  ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_SOURCE_DIR}/include
+  ${gtest_SOURCE_DIR}/include
+)
 target_link_libraries(gtest PRIVATE penumbra_common_interface)
 target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME} gtest penumbra_common_interface)
 
