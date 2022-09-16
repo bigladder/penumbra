@@ -3,6 +3,7 @@ initialize_submodules()
 
 # GLAD
 add_subdirectory(glad)
+target_include_directories(glad PUBLIC ${PROJECT_SOURCE_DIR}/vendor/glad/include)
 
 # GLFW library
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -25,6 +26,10 @@ mark_as_advanced(
 )
 
 add_subdirectory(glfw)
+target_include_directories(glfw PUBLIC
+ ${PROJECT_SOURCE_DIR}/vendor/glfw/include
+ ${PROJECT_SOURCE_DIR}/vendor/glfw/deps
+)
 
 # tess2 library
 file(GLOB libtess2_sources "${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source/[a-zA-Z]*.c")

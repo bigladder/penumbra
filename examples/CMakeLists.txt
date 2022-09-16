@@ -12,7 +12,6 @@ endif()
 
 add_executable(awning WIN32 MACOSX_BUNDLE awning.cpp ${ICON})
 
-target_include_directories(awning PRIVATE ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(awning ${PROJECT_NAME})
 
 set(EXE_BINARIES awning)

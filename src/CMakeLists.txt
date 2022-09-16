@@ -19,13 +19,9 @@ else()
   add_library(${PROJECT_NAME} SHARED ${library_sources})
 endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE
+target_include_directories(${PROJECT_NAME} PUBLIC
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_SOURCE_DIR}/src
-  SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glad/include
-  SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/include
-  SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/deps
-  SYSTEM ${PROJECT_SOURCE_DIR}/vendor/libtess2/Include
 )
 
 include(GenerateExportHeader)

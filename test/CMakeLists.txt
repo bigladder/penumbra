@@ -6,8 +6,6 @@ add_executable(${PROJECT_NAME}_tests ${test_sources})
 
 
 target_include_directories(${PROJECT_NAME}_tests PRIVATE
-  ${PROJECT_SOURCE_DIR}/src
-  ${PROJECT_SOURCE_DIR}/include
   ${gtest_SOURCE_DIR}/include
 )
 target_link_libraries(gtest PRIVATE penumbra_common_interface)
