@@ -3,6 +3,7 @@ initialize_submodules()
 
 # GLAD
 add_subdirectory(glad)
+target_include_directories(glad PUBLIC ${PROJECT_SOURCE_DIR}/vendor/glad/include)
 
 # GLFW library
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -25,19 +26,26 @@ mark_as_advanced(
 )
 
 add_subdirectory(glfw)
+target_include_directories(glfw PUBLIC
+ ${PROJECT_SOURCE_DIR}/vendor/glfw/include
+ ${PROJECT_SOURCE_DIR}/vendor/glfw/deps
+)
 
 # tess2 library
 file(GLOB libtess2_sources "${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source/[a-zA-Z]*.c")
-
-if (UNIX)
-  ADD_DEFINITIONS("-fPIC")
-endif()
 
 add_library(tess2 ${libtess2_sources})
 
 target_include_directories(tess2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Include)
 target_include_directories(tess2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source)
 
+target_compile_options(tess2 PRIVATE
+          $<$<CXX_COMPILER_ID:GNU>: # supresses the following warnings for tess2
+            -Wno-clobbered>)
+
+target_compile_options(glfw PRIVATE
+          $<$<CXX_COMPILER_ID:GNU>: # supresses the following warnings for glfw
+            -Wno-unused-parameter -Wno-missing-field-initializers -Wno-sign-compare>)
 
 # googletest library
 if (${PROJECT_NAME}_BUILD_TESTING AND NOT TARGET gtest)

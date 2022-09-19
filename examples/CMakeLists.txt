@@ -1,5 +1,3 @@
-include_directories("${PROJECT_SOURCE_DIR}/include")
-
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
@@ -36,3 +34,4 @@ if (APPLE)
                           MACOSX_BUNDLE_LONG_VERSION_STRING "0"
                           MACOSX_BUNDLE_ICON_FILE glfw.icns )
 endif()
+target_link_libraries(awning PRIVATE penumbra_common_interface)

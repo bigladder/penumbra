@@ -8,6 +8,11 @@
 
 #include <penumbra/penumbra.h>
 
+// Float definitions for PI from math header
+constexpr float m_pi_f = static_cast<float>(M_PI);
+constexpr float m_pi_2_f = static_cast<float>(M_PI_2);
+constexpr float m_pi_4_f = static_cast<float>(M_PI_4);
+
 float calculate_surface_exposure(float azimuth, float altitude){
 
     // Due to the one sided nature of shaded surfaces, we will revert
@@ -39,7 +44,7 @@ TEST(PenumbraTest, check_azimuth) {
   Pumbra::Penumbra pumbra;
 
   // Loop azimuth (with zero altitude).
-  for (float azm = 0.0f; azm <= 2 * M_PI; azm += M_PI_4) {
+  for (float azm = 0.0f; azm <= 2 * m_pi_f; azm += m_pi_4_f) {
     pumbra.setSunPosition(azm, 0.0f);
     float check_azimuth = pumbra.getSunAzimuth();
     EXPECT_FLOAT_EQ(azm, check_azimuth);
@@ -54,7 +59,7 @@ TEST(PenumbraTest, check_altitude) {
   Pumbra::Penumbra pumbra;
 
   // Loop altitude around the axis (with zero azimuth).
-  for (float alt = 0.0f; alt <= 2 * M_PI; alt += M_PI_4) {
+  for (float alt = 0.0f; alt <= 2 * m_pi_f; alt += m_pi_4_f) {
     pumbra.setSunPosition(0.0f, alt);
     float check_altitude = pumbra.getSunAltitude();
     EXPECT_FLOAT_EQ(alt, check_altitude);
@@ -72,7 +77,7 @@ TEST(PenumbraTest, azimuth) {
   unsigned wallId = pumbra.addSurface(wall);
   pumbra.setModel();
   // Loop azimuth around the surface (with zero altitude).
-  for (float azm = 0.0f; azm <= 2 * M_PI; azm += M_PI_4) {
+  for (float azm = 0.0f; azm <= 2 * m_pi_f; azm += m_pi_4_f) {
     pumbra.setSunPosition(azm, 0.0f);
     float wallPSSA = pumbra.calculatePSSA(wallId);
     EXPECT_NEAR(wallPSSA, std::abs(cos(azm)), 0.01) << "azm evaluates to " << azm;
@@ -253,17 +258,17 @@ TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
   pumbra.setSunPosition(0.0f, 0.0f);
   std::vector<float> results = pumbra.calculatePSSA(test_cube);
 
-  float M_PI_3_4 = M_PI_4+M_PI_2;
+  float m_pi_3_4 = m_pi_4_f+m_pi_2_f;
 
   const std::vector<std::pair<float, float>> angular_test_data{
-          { 0.0f,       0.0f },   // wallFront full shade
-          { M_PI_4,     0.0f },   // wallFront half shade, sideWallRightId half shade
-          { M_PI_2,     0.0f },   // sideWallRight full shade  !!
-          { M_PI_3_4,   0.0f },   // wallBack half shade, sideWallRight half shade
-          { -M_PI_2,    0.0f },   // sideWallLeft full shade  !!
-          { M_PI,       0.0f },   // wallBack full shade
-          { 0.0f,     M_PI_2 },   // roof full shade  !!
-          { 0.0f,    -M_PI_2 },   // floor full shade !!
+          { 0.0f,         0.0f },   // wallFront full shade
+          { m_pi_4_f,     0.0f },   // wallFront half shade, sideWallRightId half shade
+          { m_pi_2_f,     0.0f },   // sideWallRight full shade  !!
+          { m_pi_3_4,     0.0f },   // wallBack half shade, sideWallRight half shade
+          { -m_pi_2_f,    0.0f },   // sideWallLeft full shade  !!
+          { m_pi_f,       0.0f },   // wallBack full shade
+          { 0.0f,     m_pi_2_f },   // roof full shade  !!
+          { 0.0f,    -m_pi_2_f },   // floor full shade !!
   };
 
   for( auto const& sunPosition : angular_test_data )
@@ -278,23 +283,23 @@ TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
           altitude = sunPosition.second;
           break;
         case 1: //wallBackId
-          azimuth = sunPosition.first + M_PI;
+          azimuth = sunPosition.first + m_pi_f;
           altitude = sunPosition.second;
           break;
         case 2: //roofId
           azimuth = sunPosition.first;
-          altitude = sunPosition.second - M_PI_2;
+          altitude = sunPosition.second - m_pi_2_f;
           break;
         case 3: //floorId
           azimuth = sunPosition.first;
-          altitude = sunPosition.second + M_PI_2;
+          altitude = sunPosition.second + m_pi_2_f;
           break;
         case 4: //sideWallLeftId
-          azimuth = sunPosition.first + M_PI_2;
+          azimuth = sunPosition.first + m_pi_2_f;
           altitude = sunPosition.second;
           break;
         case 5: //sideWallRightId
-          azimuth = sunPosition.first - M_PI_2;
+          azimuth = sunPosition.first - m_pi_2_f;
           altitude = sunPosition.second;
           break;
         default:

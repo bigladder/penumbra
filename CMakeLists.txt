@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
 project(penumbra)
 
+cmake_policy(SET CMP0079 NEW) # target_link_libraries() allows use with targets in other directories.
+
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'Release' as none was specified.")

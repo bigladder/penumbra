@@ -9,13 +9,6 @@ set(library_sources
   ${private_headers}
 )
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_SOURCE_DIR}/src)
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glad/include)
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/include)
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/glfw/deps)
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/vendor/libtess2/Include)
-
 option( ${PROJECT_NAME}_STATIC_LIB "Make ${PROJECT_NAME} a static library" ON )
 
 if (${PROJECT_NAME}_STATIC_LIB)
@@ -24,21 +17,20 @@ if (${PROJECT_NAME}_STATIC_LIB)
 else()
   set(CMAKE_MACOSX_RPATH 1)
   add_library(${PROJECT_NAME} SHARED ${library_sources})
-  if(UNIX)
-    set_target_properties(tess2 PROPERTIES COMPILE_FLAGS "-fPIC")
-  endif()
 endif()
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/src
+)
 
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME})
 
-target_compile_options(${PROJECT_NAME} PRIVATE
-  $<$<CXX_COMPILER_ID:MSVC>:/W4>
-  $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-  -Wall -Wextra -Wpedantic>
-)
-
-target_link_libraries(${PROJECT_NAME} glad glfw tess2)
+target_link_libraries(tess2 PRIVATE penumbra_common_interface)
+target_link_libraries(glad PRIVATE penumbra_common_interface)
+target_link_libraries(glfw PRIVATE penumbra_common_interface)
+target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw tess2 penumbra_common_interface)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 if (${PROJECT_NAME}_COVERAGE)
