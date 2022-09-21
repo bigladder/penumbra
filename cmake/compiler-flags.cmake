@@ -17,17 +17,18 @@ target_compile_options(penumbra_common_interface INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>: # Visual C++ (VS 2013)
     /nologo
     /EHsc
-    /MT
     /W3
     /WX
     $<$<CONFIG:Release>:
       /GS-    # Disable buffer overrun checks for performance in release mode
+      /MT     # Causes the application to use the multithread, static version of the run-time library, using LIBCMT.lib.
     >
     $<$<CONFIG:Debug>:
       /Zi     #
       /Ob0    # Disable inlining
       /Od     # Turns off all optimizations in the program and speeds compilation
       /RTC1   # Runtime checks
+      /MTd    # Debug multithreaded executable file using LIBCMTD.lib.
     >
   >
   # GCC
