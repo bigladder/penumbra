@@ -17,7 +17,7 @@ target_compile_options(penumbra_common_interface INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>: # Visual C++ (VS 2013)
     /nologo
     /EHsc
-    /W3
+    /W4
     /WX
     $<$<CONFIG:Release>:
       /GS-    # Disable buffer overrun checks for performance in release mode
