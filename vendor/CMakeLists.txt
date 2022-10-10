@@ -40,10 +40,6 @@ target_include_directories(tess2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Inc
 target_include_directories(tess2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source)
 
 target_compile_options(tess2 PRIVATE    # supresses the following warnings for tess2
-          $<$<CXX_COMPILER_ID:MSVC>:
-            /wd4100   # Unreferenced formal paramenter
-            /wd4324   # structure was padded due to alignment specifier
-          >
           $<$<CXX_COMPILER_ID:GNU>:
             -Wno-clobbered
           >
@@ -57,7 +53,9 @@ target_compile_options(glfw PRIVATE   # supresses the following warnings for glf
             /wd4244   # Conversion creates possible loss of data
           >
           $<$<CXX_COMPILER_ID:GNU>:
-            -Wno-unused-parameter -Wno-missing-field-initializers -Wno-sign-compare
+            -Wno-unused-parameter
+            -Wno-missing-field-initializers
+            -Wno-sign-compare
           >
           )
 
