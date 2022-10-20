@@ -86,7 +86,7 @@ jobs:
           mklink libglapi.dll "x64\libglapi.dll"
         working-directory: build\test\${{ matrix.config }}
       - name: Test
-        uses: GabrielBB/xvfb-action@v1
+        uses: GabrielBB/xvfb-action@v1.6
         with:
           run: ctest -C ${{ matrix.config }} --output-on-failure
           working-directory: build
