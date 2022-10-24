@@ -31,7 +31,7 @@ target_compile_options(penumbra_common_interface INTERFACE
     >
   >
   # GCC
-  $<$<CXX_COMPILER_ID:GNU>:
+  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
     -pthread
     -pipe       # Faster compiler processing
     $<$<COMPILE_LANG_AND_ID:CXX,GNU>: # Adds flag only to C++
@@ -54,23 +54,6 @@ target_compile_options(penumbra_common_interface INTERFACE
       -fPIC
     >
   >
-  $<$<CXX_COMPILER_ID:Clang>:
-    -pipe       # Faster compiler processing
-    -pedantic   # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
-    -Wall       # Turn on warnings
-    -Wextra     # Turn on warnings
-    -Werror     # Turn warnings into errors
-    $<$<CONFIG:Release>:
-      -fno-stack-protector  # Produces debugging information specifically for gdb
-    >
-    $<$<CONFIG:Debug>:
-      -ggdb
-      -ffloat-store     # Improve debug run solution stability
-      -fsignaling-nans  # Disable optimizations that may have concealed NaN behavior
-      -D_GLIBCXX_DEBUG  # Standard container debug mode (bounds checking, ...)
-    >
-  >
-
   $<$<BOOL:${WIN32}>: $<$<CXX_COMPILER_ID:Intel>:
       /nologo         # Skip banner text
       /Qcxx-features  # Enables standard C++ features without disabling Microsoft extensions
@@ -105,7 +88,7 @@ target_compile_options(penumbra_common_interface INTERFACE
     $<$<NOT:"${APPLE}">:
       -pthreat
     >
-    
+
     $<$<CONFIG:Release>:    # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
       -O3           # Agressive optimization
       # -Ofast # More aggressive optimizations (instead of -O3) (enables -no-prec-div and -fp-model fast=2)
@@ -132,7 +115,7 @@ target_compile_options(penumbra_common_interface INTERFACE
   #  Linker flags  #
   #================#
 
-target_link_options(penumbra_common_interface INTERFACE 
+target_link_options(penumbra_common_interface INTERFACE
   $<$<CXX_COMPILER_ID:GNU>:
     -pthread
   >

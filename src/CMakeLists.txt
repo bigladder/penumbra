@@ -19,17 +19,16 @@ else()
   add_library(${PROJECT_NAME} SHARED ${library_sources})
 endif()
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
   ${PROJECT_SOURCE_DIR}/include
+  PRIVATE
   ${PROJECT_SOURCE_DIR}/src
 )
 
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME})
 
-target_link_libraries(tess2 PRIVATE penumbra_common_interface)
-target_link_libraries(glad PRIVATE penumbra_common_interface)
-target_link_libraries(glfw PRIVATE penumbra_common_interface)
 target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw tess2 penumbra_common_interface)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
