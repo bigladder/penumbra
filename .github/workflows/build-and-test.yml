@@ -7,11 +7,12 @@ jobs:
     name: Build
     strategy:
       matrix:
-        config: [Release]
-        static_lib: [ON]
-        coverage: [OFF]
-        examples: [ON]
+        os: [ubuntu, windows, macos]
         include:
+          - config: Release
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: ubuntu
             os_ver: "22.04"
             cc: gcc-11
