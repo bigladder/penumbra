@@ -7,40 +7,52 @@ jobs:
     name: Build
     strategy:
       matrix:
-        os: []
-        os_ver: []
-        cc: []
-        cxx: []
         include:
-          - config: Release
-            static_lib: ON
-            coverage: OFF
-            examples: ON
           - os: ubuntu
             os_ver: "22.04"
             cc: gcc-11
             cxx: g++-11
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: ubuntu
             os_ver: "20.04"
             cc: gcc-10
             cxx: g++-10
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: windows
             os_ver: "2022"
             cc: cl
             cxx: cl
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: macos
             os_ver: "12"
             cc: clang
             cxx: clang++
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: macos
             os_ver: "11"
             cc: clang
             cxx: clang++
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: ubuntu
             os_ver: "20.04"
-            config: Debug
             cc: gcc-10
             cxx: g++-10
+            config: Debug
             static_lib: OFF
             coverage: ON
             examples: OFF
