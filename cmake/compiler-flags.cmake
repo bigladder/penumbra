@@ -21,14 +21,12 @@ target_compile_options(penumbra_common_interface INTERFACE
     /WX
     $<$<CONFIG:Release>:
       /GS-    # Disable buffer overrun checks for performance in release mode
-      /MT
     >
     $<$<CONFIG:Debug>:
       /Zi     #
       /Ob0    # Disable inlining
       /Od     # Turns off all optimizations in the program and speeds compilation
       /RTC1   # Runtime checks
-      /MTd
     >
   >
   # GCC
