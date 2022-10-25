@@ -29,7 +29,7 @@ target_compile_options(penumbra_common_interface INTERFACE
       /RTC1   # Runtime checks
     >
   >
-  # GCC
+  # GCC And Clang
   $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
     -pthread
     -pipe       # Faster compiler processing
@@ -52,61 +52,6 @@ target_compile_options(penumbra_common_interface INTERFACE
     $<$<BOOL:UNIX>:
       -fPIC
     >
-  >
-  $<$<BOOL:${WIN32}>: $<$<CXX_COMPILER_ID:Intel>:
-      /nologo         # Skip banner text
-      /Qcxx-features  # Enables standard C++ features without disabling Microsoft extensions
-      /Wall           # Enable "all" warnings
-      /DNOMINMAX      # Avoid build errors due to STL/Windows min-max conflicts
-      /DWIN32_LEAN_AND_MEAN # Excludes rarely used services and headers from compilation
-      $<$<CONFIG:Release>: # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-        /O3           # Agressive optimization
-        /Qprec-div-   # Faster division
-        /Qansi-alias  # Better optimization via strict aliasing rules
-        /Qip          # Inter-procedural optimnization within a single file
-        /Qinline-factor:225 # Aggressive inlining
-        # /fp:fast=2  # Aggressive optimizations on floating-point data
-      >
-      $<$<CONFIG:Debug>:  # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-        /fp:source      # Use source-specified floating point precision
-        /Qtrapuv        # Initialize local variables to unusual values to help detect use uninitialized
-        /check:stack,uninit # Enables runtime checking of the stack (buffer over and underruns; pointer verification) and uninitialized variables
-        /Gs0            # Enable stack checking for all functions
-        /GS             # Buffer overrun detection
-        /Qfp-stack-check  # Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
-        /traceback      # Enables traceback on error
-      >
-    >
-  >
-  $<$<BOOL: UNIX>: $<$<CXX_COMPILER_ID:Intel>:
-
-    # COMPILER FLAGS
-    -Wall       # Enable "all" warnings
-
-    # Not apple
-    $<$<NOT:"${APPLE}">:
-      -pthreat
-    >
-
-    $<$<CONFIG:Release>:    # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-      -O3           # Agressive optimization
-      # -Ofast # More aggressive optimizations (instead of -O3) (enables -no-prec-div and -fp-model fast=2)
-      -no-prec-div  # Faster division (enabled by -Ofast)
-      -ansi-alias   # Enables more aggressive optimizations on floating-point data
-      -ip           # Enables inter-procedural optimnization within a single file
-      -inline-factor=225 # Enables more aggressive inlining
-    >
-    $<$<CONFIG:Debug>:    # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-      -strict-ansi      # Strict language conformance: Performance impact so limit to debug build
-      -fp-model source  # Use source-specified floating point precision
-      -ftrapuv          # Initialize local variables to unusual values to help detect use uninitialized
-      -check=stack,uninit # Enables runtime checking of the stack (buffer over and underruns; pointer verification) and uninitialized variables
-      -fstack-security-check # Buffer overrun detection
-      -fp-stack-check   # Check the floating point stack after every function call
-      -traceback        # Enables traceback on error
-
-    >
-  >
   >
 )
 
