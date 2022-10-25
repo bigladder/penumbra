@@ -85,7 +85,7 @@ target_compile_options(penumbra_common_interface INTERFACE
 
     # Not apple
     $<$<NOT:"${APPLE}">:
-      -pthreat
+      -pthread
     >
 
     $<$<CONFIG:Release>:    # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
