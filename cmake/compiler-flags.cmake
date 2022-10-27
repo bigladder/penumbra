@@ -15,12 +15,18 @@ add_library(penumbra_common_interface INTERFACE)
 
 target_compile_options(penumbra_common_interface INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>: # Visual C++ (VS 2013)
+    /DWIN32
+    /D_WINDOWS
+    /GR
     /nologo
     /EHsc
     /W3
     /WX
     $<$<CONFIG:Release>:
       /GS-    # Disable buffer overrun checks for performance in release mode
+      /O2
+      /Ob2
+      /DNDEBUG
     >
     $<$<CONFIG:Debug>:
       /Zi     #
@@ -41,6 +47,8 @@ target_compile_options(penumbra_common_interface INTERFACE
     -Werror     # Turn warnings into errors
     $<$<CONFIG:Release>:
       -fno-stack-protector  # Produces debugging information specifically for gdb
+      -O3
+      -DNDEBUG
     >
     $<$<CONFIG:Debug>:
       -ggdb
