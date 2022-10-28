@@ -31,6 +31,10 @@ generate_export_header(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw tess2 penumbra_common_interface)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+get_target_property(RTL ${PROJECT_NAME} MSVC_RUNTIME_LIBRARY)
+if ("${RTL}" STREQUAL "RTL-NOTFOUND")
+  set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
 
 if (${PROJECT_NAME}_COVERAGE)
   add_coverage(${PROJECT_NAME})
