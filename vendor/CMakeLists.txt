@@ -30,11 +30,11 @@ target_include_directories(glfw PUBLIC
  ${PROJECT_SOURCE_DIR}/vendor/glfw/include
  ${PROJECT_SOURCE_DIR}/vendor/glfw/deps
 )
-target_compile_options(glfw PRIVATE
-  $<$<C_COMPILER_ID:GNU>: # suppresses the following warnings for glfw
-    -Wno-unused-parameter -Wno-missing-field-initializers -Wno-sign-compare
-  >
-)
+#target_compile_options(glfw PRIVATE
+#  $<$<C_COMPILER_ID:GNU>: # suppresses the following warnings for glfw
+#    -Wno-unused-parameter -Wno-missing-field-initializers -Wno-sign-compare
+#  >
+#)
 
 # tess2 library
 file(GLOB libtess2_sources "${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source/[a-zA-Z]*.c")
@@ -43,11 +43,11 @@ add_library(tess2 ${libtess2_sources})
 
 target_include_directories(tess2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Include)
 target_include_directories(tess2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source)
-target_compile_options(tess2 PRIVATE
-  $<$<C_COMPILER_ID:GNU>: # suppresses the following warnings for tess2
-    -Wno-clobbered
-  >
-)
+#target_compile_options(tess2 PRIVATE
+#  $<$<C_COMPILER_ID:GNU>: # suppresses the following warnings for tess2
+#    -Wno-clobbered
+#  >
+#)
 
 # googletest library
 if (${PROJECT_NAME}_BUILD_TESTING AND NOT TARGET gtest)
