@@ -1,22 +1,17 @@
 # Empty default flags
-set(CMAKE_C_FLAGS "")
 set(CMAKE_CXX_FLAGS "")
 set(CMAKE_CXX_FLAGS_RELEASE "")
 set(CMAKE_CXX_FLAGS_DEBUG "")
-set(CMAKE_EXE_LINKER_FLAGS "")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "")
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "")
+
 
 add_library(penumbra_common_interface INTERFACE)
 
-  #================#
-  # Compiler flags #
-  #================#
+  #==================#
+  # Compiler options #
+  #==================#
 
 target_compile_options(penumbra_common_interface INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>: # Visual C++ (VS 2013)
-    /DWIN32
-    /D_WINDOWS
     /GR
     /nologo
     /EHsc
@@ -48,13 +43,13 @@ target_compile_options(penumbra_common_interface INTERFACE
     $<$<CONFIG:Release>:
       -fno-stack-protector  # Produces debugging information specifically for gdb
       -O3
-      -DNDEBUG
     >
-    $<$<CONFIG:Debug>:
-      -ggdb
-      -ffloat-store     # Improve debug run solution stability
-      -fsignaling-nans  # Disable optimizations that may have concealed NaN behavior
-      -D_GLIBCXX_DEBUG  # Standard container debug mode (bounds checking, ...)
+    $<$<CXX_COMPILER_ID:GNU>:
+      $<$<CONFIG:Debug>:
+        -ggdb
+        -ffloat-store     # Improve debug run solution stability
+        -fsignaling-nans  # Disable optimizations that may have concealed NaN behavior
+      >
     >
     # -finline-limit=2000 # More aggressive inlining   This is causing unit test failures on Ubuntu 14.04
     $<$<BOOL:UNIX>:
@@ -63,9 +58,29 @@ target_compile_options(penumbra_common_interface INTERFACE
   >
 )
 
-  #================#
-  #  Linker flags  #
-  #================#
+#======================#
+# Compiler definitions #
+#======================#
+
+target_compile_definitions(penumbra_common_interface INTERFACE
+  $<$<CXX_COMPILER_ID:MSVC>: # Visual C++ (VS 2013)
+    WIN32
+    _WINDOWS
+  >
+  $<$<CONFIG:Release>:
+    NDEBUG
+  >
+  # GCC
+  $<$<CXX_COMPILER_ID:GNU>:
+    $<$<CONFIG:Debug>:
+      _GLIBCXX_DEBUG  # Standard container debug mode (bounds checking, ...)
+    >
+  >
+)
+
+#==================#
+#  Linker options  #
+#==================#
 
 target_link_options(penumbra_common_interface INTERFACE
   $<$<CXX_COMPILER_ID:GNU>:
