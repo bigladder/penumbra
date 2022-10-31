@@ -82,7 +82,7 @@ jobs:
     runs-on: ${{ matrix.os }}-${{ matrix.os_ver }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.5
       - name: Set Project Name
         run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
       - name: Create Build Directory
@@ -108,7 +108,7 @@ jobs:
           mklink libglapi.dll "x64\libglapi.dll"
         working-directory: build\test\${{ matrix.config }}
       - name: Test
-        uses: GabrielBB/xvfb-action@v1
+        uses: GabrielBB/xvfb-action@v1.6
         with:
           run: ctest -C ${{ matrix.config }} --output-on-failure
           working-directory: build
@@ -118,4 +118,4 @@ jobs:
         working-directory: build
       - name: Upload Code Coverage Report
         if: matrix.coverage == 'ON'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
