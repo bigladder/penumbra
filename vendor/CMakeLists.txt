@@ -39,14 +39,6 @@ add_library(tess2 ${libtess2_sources})
 target_include_directories(tess2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Include)
 target_include_directories(tess2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source)
 
-target_compile_options(tess2 PRIVATE
-          $<$<CXX_COMPILER_ID:GNU>: # supresses the following warnings for tess2
-            -Wno-clobbered>)
-
-target_compile_options(glfw PRIVATE
-          $<$<CXX_COMPILER_ID:GNU>: # supresses the following warnings for glfw
-            -Wno-unused-parameter -Wno-missing-field-initializers -Wno-sign-compare>)
-
 # googletest library
 if (${PROJECT_NAME}_BUILD_TESTING AND NOT TARGET gtest)
 

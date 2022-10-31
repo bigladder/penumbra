@@ -10,46 +10,68 @@ jobs:
         include:
           - os: ubuntu
             os_ver: "22.04"
-            config: Release
-            static_lib: ON
-            coverage: OFF
             cc: gcc-11
             cxx: g++-11
-          - os: ubuntu
-            os_ver: "20.04"
             config: Release
             static_lib: ON
             coverage: OFF
+            examples: ON
+          - os: ubuntu
+            os_ver: "20.04"
             cc: gcc-10
             cxx: g++-10
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: windows
             os_ver: "2022"
-            config: Release
-            static_lib: ON
-            coverage: OFF
             cc: cl
             cxx: cl
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            examples: ON
+          - os: windows
+            os_ver: "2022"
+            cc: cl
+            cxx: cl
+            config: Debug
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: macos
             os_ver: "12"
+            cc: clang
+            cxx: clang++
             config: Release
             static_lib: ON
             coverage: OFF
+            examples: ON
+          - os: macos
+            os_ver: "12"
             cc: clang
             cxx: clang++
+            config: Debug
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: macos
             os_ver: "11"
+            cc: clang
+            cxx: clang++
             config: Release
             static_lib: ON
             coverage: OFF
-            cc: clang
-            cxx: clang++
+            examples: ON
           - os: ubuntu
             os_ver: "20.04"
+            cc: gcc-10
+            cxx: g++-10
             config: Debug
             static_lib: OFF
             coverage: ON
-            cc: gcc-10
-            cxx: g++-10
+            examples: OFF
       fail-fast: false
     defaults:
       run:
@@ -60,7 +82,7 @@ jobs:
     runs-on: ${{ matrix.os }}-${{ matrix.os_ver }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set Project Name
         run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
       - name: Create Build Directory
@@ -69,7 +91,7 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev
       - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_BUILD_TESTING="ON" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}"
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_BUILD_TESTING="ON" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}" -D${{ env.REPOSITORY_NAME }}_BUILD_EXAMPLES="${{ matrix.examples }}"
       - name: Build
         run: cmake --build build --config ${{ matrix.config }}
       - name: Download Mesa3D on Windows
@@ -86,7 +108,7 @@ jobs:
           mklink libglapi.dll "x64\libglapi.dll"
         working-directory: build\test\${{ matrix.config }}
       - name: Test
-        uses: GabrielBB/xvfb-action@v1
+        uses: GabrielBB/xvfb-action@v1.6
         with:
           run: ctest -C ${{ matrix.config }} --output-on-failure
           working-directory: build
@@ -96,4 +118,4 @@ jobs:
         working-directory: build
       - name: Upload Code Coverage Report
         if: matrix.coverage == 'ON'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3

@@ -11,8 +11,8 @@ elseif (APPLE)
 endif()
 
 add_executable(awning WIN32 MACOSX_BUNDLE awning.cpp ${ICON})
-
-target_link_libraries(awning ${PROJECT_NAME})
+target_link_libraries(awning PRIVATE ${PROJECT_NAME} penumbra_common_interface)
+target_compile_features(awning PRIVATE cxx_std_17)
 
 set(EXE_BINARIES awning)
 
@@ -34,4 +34,3 @@ if (APPLE)
                           MACOSX_BUNDLE_LONG_VERSION_STRING "0"
                           MACOSX_BUNDLE_ICON_FILE glfw.icns )
 endif()
-target_link_libraries(awning PRIVATE penumbra_common_interface)
