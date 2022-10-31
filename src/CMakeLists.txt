@@ -31,6 +31,10 @@ generate_export_header(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw tess2 penumbra_common_interface)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+
+# If MSVC_RUNTIME_LIBRARY is not by a parent project use the default.
+# It's not clear why this is needed, since documentation indicates it
+#   should be happening with the CMP0091 policy set to NEW.
 get_target_property(RTL ${PROJECT_NAME} MSVC_RUNTIME_LIBRARY)
 if ("${RTL}" STREQUAL "RTL-NOTFOUND")
   set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
