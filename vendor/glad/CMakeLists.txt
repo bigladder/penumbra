@@ -1,4 +1,4 @@
-project(GLAD)
+project(GLAD LANGUAGES C)
 
 include_directories(include)
 
