@@ -32,11 +32,27 @@ jobs:
             static_lib: ON
             coverage: OFF
             examples: ON
+          - os: windows
+            os_ver: "2022"
+            cc: cl
+            cxx: cl
+            config: Debug
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: macos
             os_ver: "12"
             cc: clang
             cxx: clang++
             config: Release
+            static_lib: ON
+            coverage: OFF
+            examples: ON
+          - os: macos
+            os_ver: "12"
+            cc: clang
+            cxx: clang++
+            config: Debug
             static_lib: ON
             coverage: OFF
             examples: ON
