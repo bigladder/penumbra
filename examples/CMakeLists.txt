@@ -1,6 +1,41 @@
+# '*' indicates CMake default option
+# '+' indicates default compiler behavior
+
+# Remove unwanted CMake defaults from global flags
 if (MSVC)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    # See https://gitlab.kitware.com/cmake/cmake/-/blob/master/Modules/Platform/Windows-MSVC.cmake
+    set(CMAKE_CXX_FLAGS
+        /EHsc         #*Specifies the model of exception handling (sc options).
+        /DWIN32       #*Windows Platform (regardless of architecture)
+        /D_WINDOWS    #*
+        )
+    set(CMAKE_CXX_FLAGS_RELEASE
+        /O2           #*Creates fast code (Og+Oi+Ot+Oy+Ob2+GF+Gy).
+        # /Ob2        #*Controls inline expansion (level 2). (part of O2)
+        /DNDEBUG      #*Enables or disables compilation of assertions
+        )
+    set(CMAKE_CXX_FLAGS_DEBUG
+        /Ob0          #*Controls inline expansion (level 0 -- disabled).
+        /Od           #*Disables optimization.
+        /Zi           #*Generates complete debugging information.
+        /RTC1         #*Enables run-time error checking.
+        )
+else () # GCC or Clang or AppleClang
+    # See https://gitlab.kitware.com/cmake/cmake/-/blob/master/Modules/Compiler/GNU.cmake
+    set(CMAKE_CXX_FLAGS "")
+    set(CMAKE_CXX_FLAGS_RELEASE
+        -O3           #*Maximum optimization (see https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#Optimize-Options).
+        -DNDEBUG      #*Enables or disables compilation of assertions
+        )
+    set(CMAKE_CXX_FLAGS_DEBUG
+        -g            #*Produce debugging information in the operating system’s native format.
+        )
 endif()
+
+# Convert lists to space-separated strings
+list(JOIN CMAKE_CXX_FLAGS " " CMAKE_CXX_FLAGS)
+list(JOIN CMAKE_CXX_FLAGS_RELEASE " " CMAKE_CXX_FLAGS_RELEASE)
+list(JOIN CMAKE_CXX_FLAGS_DEBUG " " CMAKE_CXX_FLAGS_DEBUG)
 
 if (WIN32)
     set(ICON glfw.rc)
@@ -13,6 +48,7 @@ endif()
 add_executable(awning WIN32 MACOSX_BUNDLE awning.cpp ${ICON})
 target_link_libraries(awning PRIVATE ${PROJECT_NAME} penumbra_common_interface)
 target_compile_features(awning PRIVATE cxx_std_17)
+target_compile_definitions(awning PRIVATE $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>)
 
 set(EXE_BINARIES awning)
 

@@ -1,9 +1,3 @@
-# Empty default flags
-set(CMAKE_CXX_FLAGS "")
-set(CMAKE_CXX_FLAGS_RELEASE "")
-set(CMAKE_CXX_FLAGS_DEBUG "")
-
-
 add_library(penumbra_common_interface INTERFACE)
 
   #==================#
@@ -14,20 +8,10 @@ target_compile_options(penumbra_common_interface INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>: # Visual C++ (VS 2013)
     /GR
     /nologo
-    /EHsc
     /W4
     /WX
     $<$<CONFIG:Release>:
       /GS-    # Disable buffer overrun checks for performance in release mode
-      /O2
-      /Ob2
-      /DNDEBUG
-    >
-    $<$<CONFIG:Debug>:
-      /Zi     #
-      /Ob0    # Disable inlining
-      /Od     # Turns off all optimizations in the program and speeds compilation
-      /RTC1   # Runtime checks
     >
   >
   # GCC And Clang
@@ -42,11 +26,9 @@ target_compile_options(penumbra_common_interface INTERFACE
     -Werror     # Turn warnings into errors
     $<$<CONFIG:Release>:
       -fno-stack-protector  # Produces debugging information specifically for gdb
-      -O3
     >
     $<$<CXX_COMPILER_ID:GNU>:
       $<$<CONFIG:Debug>:
-        -ggdb
         -ffloat-store     # Improve debug run solution stability
         -fsignaling-nans  # Disable optimizations that may have concealed NaN behavior
       >
@@ -63,13 +45,6 @@ target_compile_options(penumbra_common_interface INTERFACE
 #======================#
 
 target_compile_definitions(penumbra_common_interface INTERFACE
-  $<$<CXX_COMPILER_ID:MSVC>: # Visual C++ (VS 2013)
-    WIN32
-    _WINDOWS
-  >
-  $<$<CONFIG:Release>:
-    NDEBUG
-  >
   # GCC
   $<$<CXX_COMPILER_ID:GNU>:
     $<$<CONFIG:Debug>:

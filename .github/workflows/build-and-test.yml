@@ -4,7 +4,6 @@ on: push
 
 jobs:
   build-and-test:
-    name: Build
     strategy:
       matrix:
         include:
@@ -80,6 +79,7 @@ jobs:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
     runs-on: ${{ matrix.os }}-${{ matrix.os_ver }}
+    name: ${{ matrix.os }}-${{ matrix.os_ver }} ${{ matrix.cxx }} ${{ matrix.config }} coverage=${{ matrix.coverage }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -94,21 +94,12 @@ jobs:
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_BUILD_TESTING="ON" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}" -D${{ env.REPOSITORY_NAME }}_BUILD_EXAMPLES="${{ matrix.examples }}"
       - name: Build
         run: cmake --build build --config ${{ matrix.config }}
-      - name: Download Mesa3D on Windows
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/20.3.2/mesa3d-20.3.2-release-msvc.7z
-        working-directory: build\test\${{ matrix.config }}
-      - name: Install Mesa3D on Windows
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          "C:\Program Files\7-Zip\7z.exe" x mesa.7z
-          mklink opengl32.dll "x64\opengl32.dll"
-          mklink libglapi.dll "x64\libglapi.dll"
-        working-directory: build\test\${{ matrix.config }}
+      - name: Setup Mesa3D
+        uses: bigladder/github-actions/setup-mesa3d@main
+        with:
+          install-directory: build\test\${{ matrix.config }}
       - name: Test
-        uses: GabrielBB/xvfb-action@v1.6
+        uses: coactions/setup-xvfb@v1
         with:
           run: ctest -C ${{ matrix.config }} --output-on-failure
           working-directory: build
