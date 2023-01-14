@@ -4,7 +4,6 @@ on: push
 
 jobs:
   build-and-test:
-    name: Build
     strategy:
       matrix:
         include:
@@ -80,6 +79,7 @@ jobs:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
     runs-on: ${{ matrix.os }}-${{ matrix.os_ver }}
+    name: ${{ matrix.os }}-${{ matrix.os_ver }} ${{ matrix.cxx }} ${{ matrix.config }} coverage=${{ matrix.coverage }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -99,7 +99,7 @@ jobs:
         with:
           install-directory: build\test\${{ matrix.config }}
       - name: Test
-        uses: GabrielBB/xvfb-action@v1.6
+        uses: coactions/setup-xvfb@v1
         with:
           run: ctest -C ${{ matrix.config }} --output-on-failure
           working-directory: build
