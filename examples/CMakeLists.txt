@@ -9,8 +9,6 @@ elseif (APPLE)
         MAXOSX_PACKAGE_LOCATION "Resources")
 endif()
 
-# Sets the MT flag for Release or Debug config
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 add_executable(awning WIN32 MACOSX_BUNDLE awning.cpp ${ICON})
 target_link_libraries(awning PRIVATE ${PROJECT_NAME} penumbra_common_interface)
 target_compile_features(awning PRIVATE cxx_std_17)

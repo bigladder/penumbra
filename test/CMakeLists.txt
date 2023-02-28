@@ -4,8 +4,7 @@ SET_CXX_FLAGS()
 set(test_sources
   ${PROJECT_NAME}_test.cpp)
 
-# Sets the MT flag for Release or Debug config
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 add_executable(${PROJECT_NAME}_tests ${test_sources})
 
 
