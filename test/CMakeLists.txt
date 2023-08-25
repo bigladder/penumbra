@@ -1,41 +1,5 @@
-# '*' indicates CMake default option
-# '+' indicates default compiler behavior
-
-# Remove unwanted CMake defaults from global flags
-if (MSVC)
-  # See https://gitlab.kitware.com/cmake/cmake/-/blob/master/Modules/Platform/Windows-MSVC.cmake
-  set(CMAKE_CXX_FLAGS
-      /EHsc         #*Specifies the model of exception handling (sc options).
-      /DWIN32       #*Windows Platform (regardless of architecture)
-      /D_WINDOWS    #*
-      )
-  set(CMAKE_CXX_FLAGS_RELEASE
-      /O2           #*Creates fast code (Og+Oi+Ot+Oy+Ob2+GF+Gy).
-      # /Ob2        #*Controls inline expansion (level 2). (part of O2)
-      /DNDEBUG      #*Enables or disables compilation of assertions
-      )
-  set(CMAKE_CXX_FLAGS_DEBUG
-      /Ob0          #*Controls inline expansion (level 0 -- disabled).
-      /Od           #*Disables optimization.
-      /Zi           #*Generates complete debugging information.
-      /RTC1         #*Enables run-time error checking.
-      )
-else () # GCC or Clang or AppleClang
-  # See https://gitlab.kitware.com/cmake/cmake/-/blob/master/Modules/Compiler/GNU.cmake
-  set(CMAKE_CXX_FLAGS "")
-  set(CMAKE_CXX_FLAGS_RELEASE
-      -O3           #*Maximum optimization (see https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#Optimize-Options).
-      -DNDEBUG      #*Enables or disables compilation of assertions
-      )
-  set(CMAKE_CXX_FLAGS_DEBUG
-      -g            #*Produce debugging information in the operating system’s native format.
-      )
-endif()
-
-# Convert lists to space-separated strings
-list(JOIN CMAKE_CXX_FLAGS " " CMAKE_CXX_FLAGS)
-list(JOIN CMAKE_CXX_FLAGS_RELEASE " " CMAKE_CXX_FLAGS_RELEASE)
-list(JOIN CMAKE_CXX_FLAGS_DEBUG " " CMAKE_CXX_FLAGS_DEBUG)
+# Set CMAKE flags for executable
+SET_CXX_FLAGS()
 
 set(test_sources
   ${PROJECT_NAME}_test.cpp)
