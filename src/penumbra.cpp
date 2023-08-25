@@ -194,10 +194,10 @@ std::vector<float> Penumbra::calculatePSSA() {
   return fetchPSSA();
 }
 
-std::map<unsigned, float>
+std::unordered_map<unsigned, float>
 Penumbra::calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurfaceIndices,
                                  const std::vector<unsigned> &interiorSurfaceIndices) {
-  std::map<unsigned, float> pssas;
+  std::unordered_map<unsigned, float> pssas;
   if (transparentSurfaceIndices.size() > 0) {
     if (penumbra->checkSurface(transparentSurfaceIndices[0])) {
       for (auto const transSurf : transparentSurfaceIndices) {

@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include <array>
-#include <map>
+#include <unordered_map>
 
 // Penumbra
 #include <penumbra/surface.h>
@@ -57,7 +57,7 @@ public:
   float calculatePSSA(unsigned surfaceIndex);
   std::vector<float> calculatePSSA(const std::vector<unsigned> &surfaceIndices);
   std::vector<float> calculatePSSA();
-  std::map<unsigned, float>
+  std::unordered_map<unsigned, float>
   calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurfaceIndices,
                          const std::vector<unsigned> &interiorSurfaceIndices);
   int renderScene(unsigned surfaceIndex); // Primarily for debug purposes

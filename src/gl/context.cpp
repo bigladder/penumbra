@@ -633,7 +633,7 @@ std::vector<float> Context::calculatePSSA() {
   return results;
 }
 
-std::map<unsigned, float>
+std::unordered_map<unsigned, float>
 Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndices,
                                 const std::vector<unsigned> &interiorSurfaceIndices,
                                 mat4x4 sunView) {
@@ -644,7 +644,7 @@ Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndice
   }
 
   std::vector<GLuint> pssasQueries(interiorSurfaceIndices.size());
-  std::map<unsigned, float> pssas;
+  std::unordered_map<unsigned, float> pssas;
 
   glGenQueries(static_cast<GLsizei>(pssasQueries.size()), pssasQueries.data());
 

@@ -165,7 +165,7 @@ TEST(PenumbraTest, interior) {
   // pumbra2.renderScene(wallFrontId);
 
   pumbra2.setSunPosition(0.5f, 0.5f);
-  std::map<unsigned, float> intPSSAs = pumbra2.calculateInteriorPSSAs(
+  std::unordered_map<unsigned, float> intPSSAs = pumbra2.calculateInteriorPSSAs(
       {windowId}, {wallBackId, floorId, sideWallLeftId, sideWallRightId});
   backWallInteriorPSSA = intPSSAs[wallBackId];
   float floorInteriorPSSA = intPSSAs[floorId];
