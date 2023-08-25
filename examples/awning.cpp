@@ -36,7 +36,7 @@ int main(void) {
 
   Pumbra::Penumbra::isValidContext();
 
-  Pumbra::Penumbra pumbra(errorCallback);
+  Pumbra::Penumbra pumbra;
 
   unsigned wallId = pumbra.addSurface(wall);
   unsigned windowId = pumbra.addSurface(window);
@@ -48,12 +48,12 @@ int main(void) {
   pumbra.renderScene(wallId);
   float wallPSSA = pumbra.calculatePSSA(wallId);
 
-  std::cout << "Wall PSSA: " << wallPSSA << std::endl;
+  std::cout << fmt::format("Wall PSSA: {}", wallPSSA) << std::endl;
 
   pumbra.renderScene(windowId);
   float windowPSSA = pumbra.calculatePSSA(windowId);
 
-  std::cout << "Window PSSA: " << windowPSSA << std::endl;
+  std::cout << fmt::format("Window PSSA: {}", windowPSSA) << std::endl;
 
   pumbra.clearModel();
 
@@ -71,7 +71,7 @@ int main(void) {
   pumbra.renderScene(windowId);
   windowPSSA = pumbra.calculatePSSA(windowId);
 
-  std::cout << "Window PSSA with fin: " << windowPSSA << std::endl;
+  std::cout << fmt::format("Window PSSA with fin: {}", windowPSSA) << std::endl;
 
   return 0;
 }

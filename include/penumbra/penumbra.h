@@ -13,6 +13,7 @@
 
 // Penumbra
 #include <penumbra/surface.h>
+#include <penumbra/logging.h>
 
 namespace Pumbra {
 
@@ -22,16 +23,7 @@ const int MSG_INFO = 0;
 const int MSG_WARN = 1;
 const int MSG_ERR = 2;
 
-enum class VendorName {
-  None,
-  NVIDIA,
-  AMD,
-  Intel,
-  VMware
-};
-
-typedef void (*PenumbraCallbackFunction)(const int messageType, const std::string &message,
-                                         void *contextPtr);
+enum class VendorName { None, NVIDIA, AMD, Intel, VMware };
 
 class PenumbraPrivate;
 
@@ -40,11 +32,8 @@ void penumbraTerminate(); // Call once before exiting calling program to ensure 
 
 class Penumbra {
 public:
-  Penumbra(unsigned size = 512u);
-
-  Penumbra(PenumbraCallbackFunction callbackFunction, unsigned size = 512u);
-
-  Penumbra(PenumbraCallbackFunction callbackFunction, void *contextPtr, unsigned size = 512u);
+  Penumbra(unsigned size = 512u,
+           const std::shared_ptr<Courierr::Courierr> &logger = std::make_shared<PenumbraLogger>());
 
   ~Penumbra();
 
@@ -68,13 +57,13 @@ public:
   float calculatePSSA(unsigned surfaceIndex);
   std::vector<float> calculatePSSA(const std::vector<unsigned> &surfaceIndices);
   std::vector<float> calculatePSSA();
-  std::map<unsigned, float> calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurfaceIndices,
-                                                   const std::vector<unsigned> &interiorSurfaceIndices);
+  std::map<unsigned, float>
+  calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurfaceIndices,
+                         const std::vector<unsigned> &interiorSurfaceIndices);
   int renderScene(unsigned surfaceIndex); // Primarily for debug purposes
   int renderInteriorScene(
       std::vector<unsigned> transparentSurfaceIndices,
       std::vector<unsigned> interiorSurfaceIndices); // Primarily for debug purposes
-  void setMessageCallback(PenumbraCallbackFunction callbackFunction, void *contextPtr);
   VendorName getVendorName();
 
 private:

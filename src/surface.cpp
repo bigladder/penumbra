@@ -8,7 +8,7 @@
 // Penumbra
 #include <penumbra/surface.h>
 #include <surface-private.h>
-#include "error.h"
+#include <penumbra/logging.h>
 
 namespace Pumbra {
 
@@ -32,11 +32,18 @@ TessData::TessData(const float *array, unsigned numVerts) : numVerts(numVerts) {
   vertices.insert(vertices.end(), (const float *)array, (const float *)array + numVerts);
 }
 
-Surface::Surface() { surface = std::make_shared<SurfacePrivate>(); }
+Surface::Surface() {
+  surface = std::make_shared<SurfacePrivate>();
+}
 
-Surface::Surface(const Polygon &polygon) { surface = std::make_shared<SurfacePrivate>(polygon); }
+Surface::Surface(const Polygon &polygon, const std::string &name_in) {
+  surface = std::make_shared<SurfacePrivate>(polygon);
+  surface->name = name_in;
+}
 
-Surface::Surface(const Surface &srf) { surface = srf.surface; }
+Surface::Surface(const Surface &srf) {
+  surface = srf.surface;
+}
 
 Surface::~Surface() {}
 
@@ -59,7 +66,8 @@ TessData SurfacePrivate::tessellate() {
   tess = tessNewTess(nullptr);
 
   if (!tess) {
-    showMessage(MSG_ERR, "Unable to create tessellator.");
+    throw PenumbraException(fmt::format("Unable to create tessellator for surface, \"{}\".", name),
+                            *logger);
   }
 
   // Add primary polygon
@@ -74,7 +82,7 @@ TessData SurfacePrivate::tessellate() {
 
   if (!tessTesselate(tess, TESS_WINDING_ODD, TESS_POLYGONS, TessData::polySize,
                      TessData::vertexSize, nullptr)) {
-    showMessage(MSG_ERR, "Unable to tessellate surface.");
+    throw PenumbraException(fmt::format("Unable to tessellate surface, \"{}\".", name), *logger);
   }
 
   // For now convert to glDrawArrays() style of vertices, sometime may change to glDrawElements

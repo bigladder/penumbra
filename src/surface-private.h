@@ -6,6 +6,7 @@
 
 // Vendor
 #include <tesselator.h>
+#include <courierr/courierr.h>
 
 // Standard
 #include <vector>
@@ -25,9 +26,13 @@ class SurfacePrivate {
 public:
   SurfacePrivate();
   SurfacePrivate(const Polygon &polygon);
+  TessData tessellate();
   Polygon polygon;
   std::vector<Polygon> holes;
-  TessData tessellate();
+  std::shared_ptr<Courierr::Courierr> logger;
+  std::string name;
+
+private:
   std::shared_ptr<float> vertPtr;
 };
 

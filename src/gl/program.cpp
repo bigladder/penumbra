@@ -7,12 +7,13 @@
 
 namespace Pumbra {
 
-GLProgram::GLProgram(const char *vertexSource, const char *fragmentSource) {
+GLProgram::GLProgram(const char *vertexSource, const char *fragmentSource,
+                     const std::shared_ptr<Courierr::Courierr> &logger) {
   program = glCreateProgram();
-  GLShader vertex(GL_VERTEX_SHADER, vertexSource);
+  GLShader vertex(GL_VERTEX_SHADER, vertexSource, logger);
   glAttachShader(program, vertex.getInt());
   if (fragmentSource) {
-    GLShader fragment(GL_FRAGMENT_SHADER, fragmentSource);
+    GLShader fragment(GL_FRAGMENT_SHADER, fragmentSource, logger);
     glAttachShader(program, fragment.getInt());
   }
   glLinkProgram(program);
@@ -20,6 +21,8 @@ GLProgram::GLProgram(const char *vertexSource, const char *fragmentSource) {
 
 GLProgram::~GLProgram() {}
 
-GLuint GLProgram::getInt() { return program; }
+GLuint GLProgram::getInt() {
+  return program;
+}
 
 } // namespace Pumbra

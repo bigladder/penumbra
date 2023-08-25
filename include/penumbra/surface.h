@@ -8,6 +8,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include <string>
 
 namespace Pumbra {
 
@@ -20,7 +21,7 @@ class Surface {
 
 public:
   Surface();
-  Surface(const Polygon &polygon);
+  Surface(const Polygon &polygon, const std::string &name = "");
   Surface(const Surface &srf);
   ~Surface();
   int setOuterPolygon(

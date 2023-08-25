@@ -7,17 +7,19 @@
 // Vendor
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <courierr/courierr.h>
 
 namespace Pumbra {
 
 class GLShader {
 public:
-  GLShader(GLenum type, const char *source);
+  GLShader(GLenum type, const char *source, const std::shared_ptr<Courierr::Courierr> &logger);
   ~GLShader();
   GLuint getInt();
 
 private:
   GLuint shader;
+  std::shared_ptr<Courierr::Courierr> logger;
 };
 
 } // namespace Pumbra

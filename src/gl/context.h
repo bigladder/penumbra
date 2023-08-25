@@ -4,10 +4,6 @@
 #ifndef CONTEXT_H_
 #define CONTEXT_H_
 
-// Vendor
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 // Standard
 #include <vector>
 #include <array>
@@ -15,6 +11,11 @@
 #include <map>
 #include <memory>
 #include <string>
+
+// Vendor
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <courierr/courierr.h>
 
 // Penumbra
 #include <sun.h>
@@ -29,11 +30,12 @@ namespace Pumbra {
 class Context {
 
 public:
-  Context(unsigned size = 512);
+  Context(unsigned size, const std::shared_ptr<Courierr::Courierr> &logger);
   ~Context();
   void showRendering(const unsigned surfaceIndex, mat4x4 sunView);
-  void setModel(const std::vector<float> &vertices, const std::vector<SurfaceBuffer> &surfaceBuffers);
-  float setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer=nullptr, bool clipFar = true);
+  void setModel(const std::vector<float> &vertices,
+                const std::vector<SurfaceBuffer> &surfaceBuffers);
+  float setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer = nullptr, bool clipFar = true);
   void bufferedQuery(const unsigned surfaceIndex);
   void bufferedQuery(const SurfaceBuffer &surfaceBuffer);
   void submitPSSA(const unsigned surfaceIndex, mat4x4 sunView);
@@ -42,12 +44,11 @@ public:
   float calculatePSSA(const unsigned surfaceIndex);
   std::vector<float> calculatePSSA(const std::vector<unsigned> &surfaceIndices);
   std::vector<float> calculatePSSA();
-  std::map<unsigned, float>
-  calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaces,
-                         const std::vector<unsigned> &interiorSurfaces, mat4x4 sunView);
+  std::map<unsigned, float> calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaces,
+                                                   const std::vector<unsigned> &interiorSurfaces,
+                                                   mat4x4 sunView);
   void showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIndices,
-                             const unsigned interiorSurfaceIndex,
-                             mat4x4 sunView);
+                             const unsigned interiorSurfaceIndex, mat4x4 sunView);
   void clearModel();
   std::string vendorName();
 
@@ -80,6 +81,7 @@ private:
   std::vector<int> indexBuffer;
   int currentBufferIndex = 0;
   int bufferSize = 16;
+  std::shared_ptr<Courierr::Courierr> logger;
 
   void drawModel();
   void drawExcept(const std::vector<SurfaceBuffer> &hiddenSurfaces);

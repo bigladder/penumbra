@@ -7,12 +7,14 @@
 // Vendor
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <courierr/courierr.h>
 
 namespace Pumbra {
 
 class GLProgram {
 public:
-  GLProgram(const char *vertexSource, const char *fragmentSource);
+  GLProgram(const char *vertexSource, const char *fragmentSource,
+            const std::shared_ptr<Courierr::Courierr> &logger);
   ~GLProgram();
   GLuint getInt();
 
