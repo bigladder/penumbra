@@ -82,7 +82,7 @@ unsigned Penumbra::getNumSurfaces() {
   return static_cast<unsigned int>(penumbra->surfaces.size());
 }
 
-int Penumbra::setModel() {
+void Penumbra::setModel() {
   if (penumbra->surfaces.size() > 0) {
 
     // Tesselate each surface into triangles
@@ -103,21 +103,18 @@ int Penumbra::setModel() {
   } else {
     penumbra->logger->warning("No surfaces added to Penumbra before calling setModel().");
   }
-  return PN_SUCCESS;
 }
 
-int Penumbra::clearModel() {
+void Penumbra::clearModel() {
   penumbra->surfaces.clear();
   penumbra->model.clear();
   penumbra->context.clearModel();
-  return PN_SUCCESS;
 }
 
-int Penumbra::setSunPosition(const float azm, // in radians, clockwise, north = 0
-                             const float alt  // in radians, horizon = 0, vertical = pi/2
+void Penumbra::setSunPosition(const float azm, // in radians, clockwise, north = 0
+                              const float alt  // in radians, horizon = 0, vertical = pi/2
 ) {
   penumbra->sun.setView(azm, alt);
-  return PN_SUCCESS;
 }
 
 float Penumbra::getSunAzimuth() {
@@ -232,10 +229,9 @@ Penumbra::calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurface
   return pssas;
 }
 
-int Penumbra::renderScene(unsigned surfaceIndex) {
+void Penumbra::renderScene(unsigned surfaceIndex) {
   if (penumbra->checkSurface(surfaceIndex)) {
     penumbra->context.showRendering(surfaceIndex, penumbra->sun.getView());
-    return PN_SUCCESS;
   } else {
     throw PenumbraException(
         fmt::format("Surface index, {}, does not exist. Cannot render scene.", surfaceIndex),
@@ -243,8 +239,8 @@ int Penumbra::renderScene(unsigned surfaceIndex) {
   }
 }
 
-int Penumbra::renderInteriorScene(std::vector<unsigned> transparentSurfaceIndices,
-                                  std::vector<unsigned> interiorSurfaceIndices) {
+void Penumbra::renderInteriorScene(std::vector<unsigned> transparentSurfaceIndices,
+                                   std::vector<unsigned> interiorSurfaceIndices) {
   if (transparentSurfaceIndices.size() > 0) {
     if (penumbra->checkSurface(transparentSurfaceIndices[0])) {
       for (auto &transSurf : transparentSurfaceIndices) {
@@ -266,7 +262,6 @@ int Penumbra::renderInteriorScene(std::vector<unsigned> transparentSurfaceIndice
               *(penumbra->logger));
         }
       }
-      return PN_SUCCESS;
     } else {
       throw PenumbraException(
           fmt::format("Transparent surface index, {}, does not exist. Cannot render scene.",
