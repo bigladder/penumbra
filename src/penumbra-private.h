@@ -31,7 +31,7 @@ public:
   std::vector<float> model;
   std::vector<SurfacePrivate> surfaces;
   std::shared_ptr<Courierr::Courierr> logger;
-  bool checkSurface(const unsigned index);
+  bool checkSurface(unsigned index);
 };
 
 } // namespace Pumbra
