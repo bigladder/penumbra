@@ -1,9 +1,10 @@
 project(GLAD LANGUAGES C)
 
-include_directories(include)
+add_library(glad src/glad.c)
+
+target_include_directories(glad PUBLIC include)
 
 if (UNIX)
-    add_definitions("-fPIC")
+    target_compile_options(glad PUBLIC "-fPIC")
 endif()
 
-add_library(glad src/glad.c)
