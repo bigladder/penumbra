@@ -37,11 +37,11 @@ mat4x4_ptr Sun::getView() {
   return view;
 }
 
-float Sun::getAzimuth() {
+float Sun::getAzimuth() const {
   return azimuth;
 }
 
-float Sun::getAltitude() {
+float Sun::getAltitude() const {
   return altitude;
 }
 } // namespace Pumbra

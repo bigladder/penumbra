@@ -41,29 +41,20 @@ Surface::Surface(const Polygon &polygon, const std::string &name_in) {
   surface->name = name_in;
 }
 
-Surface::Surface(const Surface &srf) {
-  surface = srf.surface;
+Surface::Surface(const Surface &surface_in) {
+  surface = surface_in.surface;
 }
 
-Surface::~Surface() {}
+Surface::~Surface() = default;
 
-int Surface::setOuterPolygon(const Polygon &polygon) {
-  surface->polygon = polygon;
-  return 0;
-}
-
-int Surface::addHole(const Polygon &hole) {
+void Surface::addHole(const Polygon &hole) {
   surface->holes.push_back(hole);
-  return 0;
 }
 
-SurfacePrivate::SurfacePrivate() {}
-
-SurfacePrivate::SurfacePrivate(const Polygon &polygon) : polygon(polygon) {}
+SurfacePrivate::SurfacePrivate(Polygon polygon) : polygon(std::move(polygon)) {}
 
 TessData SurfacePrivate::tessellate() {
-  TESStesselator *tess = 0;
-  tess = tessNewTess(nullptr);
+  TESStesselator *tess = tessNewTess(nullptr);
 
   if (!tess) {
     throw PenumbraException(fmt::format("Unable to create tessellator for surface, \"{}\".", name),

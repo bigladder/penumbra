@@ -16,7 +16,7 @@ public:
   GLProgram(const char *vertexSource, const char *fragmentSource,
             const std::shared_ptr<Courierr::Courierr> &logger);
   ~GLProgram();
-  GLuint getInt();
+  [[nodiscard]] GLuint getInt() const;
 
 private:
   GLuint program;

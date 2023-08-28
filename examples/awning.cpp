@@ -57,5 +57,7 @@ int main() {
 
   logger->info(fmt::format("Window PSSA with fin: {}", windowPSSA));
 
+  Pumbra::penumbraTerminate();
+  
   return 0;
 }

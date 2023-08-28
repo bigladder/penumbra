@@ -18,14 +18,14 @@ struct TessData {
   TessData(const float *array, unsigned numVerts);
   std::vector<float> vertices;
   unsigned numVerts;
-  static const int polySize = 3;   // making triangles
-  static const int vertexSize = 3; // i.e., 3D
+  static const int polySize{3};   // making triangles
+  static const int vertexSize{3}; // i.e., 3D
 };
 
 class SurfacePrivate {
 public:
-  SurfacePrivate();
-  SurfacePrivate(const Polygon &polygon);
+  SurfacePrivate() = default;
+  explicit SurfacePrivate(Polygon polygon);
   TessData tessellate();
   Polygon polygon;
   std::vector<Polygon> holes;

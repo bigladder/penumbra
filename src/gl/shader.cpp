@@ -18,7 +18,7 @@ GLShader::GLShader(GLenum type, const char *source,
 
   shader = glCreateShader(type);
   if (shader != 0) {
-    glShaderSource(shader, 1, (const GLchar **)&source, NULL);
+    glShaderSource(shader, 1, (const GLchar **)&source, nullptr);
     glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
     if (shader_ok != GL_TRUE) {
@@ -32,9 +32,7 @@ GLShader::GLShader(GLenum type, const char *source,
   }
 }
 
-GLShader::~GLShader() {}
-
-GLuint GLShader::getInt() {
+GLuint GLShader::getInt() const {
   return shader;
 }
 

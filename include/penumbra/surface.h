@@ -21,12 +21,10 @@ class Surface {
 
 public:
   Surface();
-  Surface(const Polygon &polygon, const std::string &name = "");
+  explicit Surface(const Polygon &polygon, const std::string &name = "");
   Surface(const Surface &srf);
   ~Surface();
-  int setOuterPolygon(
-      const Polygon &polygon);      // Defined in counter-clockwise order when facing front
-  int addHole(const Polygon &hole); // Defined in counter-clockwise order when facing front
+  void addHole(const Polygon &hole); // Defined in counter-clockwise order when facing front
 
 private:
   std::shared_ptr<SurfacePrivate> surface;

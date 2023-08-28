@@ -14,8 +14,8 @@ namespace Pumbra {
 class GLShader {
 public:
   GLShader(GLenum type, const char *source, const std::shared_ptr<Courierr::Courierr> &logger);
-  ~GLShader();
-  GLuint getInt();
+  ~GLShader() = default;
+  [[nodiscard]] GLuint getInt() const;
 
 private:
   GLuint shader;

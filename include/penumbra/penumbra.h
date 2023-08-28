@@ -26,8 +26,10 @@ void penumbraTerminate(); // Call once before exiting calling program to ensure 
 
 class Penumbra {
 public:
-  Penumbra(unsigned size = 512u,
-           const std::shared_ptr<Courierr::Courierr> &logger = std::make_shared<PenumbraLogger>());
+  explicit Penumbra(unsigned int size = 512u, const std::shared_ptr<Courierr::Courierr> &logger =
+                                                  std::make_shared<PenumbraLogger>());
+
+  explicit Penumbra(const std::shared_ptr<Courierr::Courierr> &logger);
 
   ~Penumbra();
 
@@ -36,8 +38,8 @@ public:
   unsigned addSurface(const Surface &surface);
   void setModel();
   void clearModel();
-  void setSunPosition(const float azm, // in radians, clockwise, north = 0
-                      const float alt  // in radians, horizon = 0, vertical = pi/2
+  void setSunPosition(float azm, // in radians, clockwise, north = 0
+                      float alt  // in radians, horizon = 0, vertical = pi/2
   );
   float getSunAzimuth();
   float getSunAltitude();

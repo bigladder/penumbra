@@ -19,9 +19,9 @@ GLProgram::GLProgram(const char *vertexSource, const char *fragmentSource,
   glLinkProgram(program);
 }
 
-GLProgram::~GLProgram() {}
+GLProgram::~GLProgram() = default;
 
-GLuint GLProgram::getInt() {
+GLuint GLProgram::getInt() const {
   return program;
 }
 

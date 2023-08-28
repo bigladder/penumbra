@@ -21,10 +21,13 @@ void penumbraTerminate() {
   glfwTerminate();
 }
 
-Penumbra::Penumbra(unsigned size, const std::shared_ptr<Courierr::Courierr> &logger)
-    : penumbra(std::make_unique<PenumbraPrivate>(size, logger)) {}
+Penumbra::Penumbra(unsigned int size, const std::shared_ptr<Courierr::Courierr> &logger)
+    : penumbra(std::make_unique<PenumbraPrivate>(static_cast<int>(size), logger)) {}
 
-Penumbra::~Penumbra() {}
+Penumbra::Penumbra(const std::shared_ptr<Courierr::Courierr> &logger)
+    : penumbra(std::make_unique<PenumbraPrivate>(512, logger)) {}
+
+Penumbra::~Penumbra() = default;
 
 bool Penumbra::isValidContext() {
   bool invalid(false);
@@ -41,7 +44,7 @@ bool Penumbra::isValidContext() {
   fedisableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
 #endif
-  GLFWwindow *window = glfwCreateWindow(1, 1, "Penumbra", NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(1, 1, "Penumbra", nullptr, nullptr);
 #ifndef NDEBUG
 #ifdef __unix__
   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
@@ -54,14 +57,14 @@ bool Penumbra::isValidContext() {
 }
 
 VendorName Penumbra::getVendorName() {
-  auto vendorType = VendorName::None;
-  auto vendorName = penumbra->context.vendorName();
+  VendorName vendorType;
+  auto vendorName = Context::vendorName();
   if (vendorName == "NVIDIA") {
     vendorType = VendorName::NVIDIA;
   } else if (vendorName == "AMD" || vendorName == "ATI" || vendorName == "Advanced Micro Devices" ||
              vendorName == "ATI Technologies Inc.") {
     vendorType = VendorName::AMD;
-  } else if (vendorName == "Intel" || vendorName == "INTEL" || "Intel Inc.") {
+  } else if (vendorName == "Intel" || vendorName == "INTEL" || vendorName == "Intel Inc.") {
     vendorType = VendorName::Intel;
   } else if (vendorName == "VMware, Inc.") {
     vendorType = VendorName::VMware;
@@ -83,9 +86,9 @@ unsigned Penumbra::getNumSurfaces() {
 }
 
 void Penumbra::setModel() {
-  if (penumbra->surfaces.size() > 0) {
+  if (!penumbra->surfaces.empty()) {
 
-    // Tesselate each surface into triangles
+    // Tessellate each surface into triangles
     std::vector<SurfaceBuffer> surfaceBuffers;
     unsigned nextStartingIndex = 0;
     unsigned surfNum = 0;
@@ -173,7 +176,6 @@ std::vector<float> Penumbra::fetchPSSA(const std::vector<unsigned> &surfaceIndic
 
 std::vector<float> Penumbra::fetchPSSA() {
   return penumbra->context.calculatePSSA();
-  ;
 }
 
 float Penumbra::calculatePSSA(unsigned surfaceIndex) {
@@ -195,7 +197,7 @@ std::unordered_map<unsigned, float>
 Penumbra::calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurfaceIndices,
                                  const std::vector<unsigned> &interiorSurfaceIndices) {
   std::unordered_map<unsigned, float> pssas;
-  if (transparentSurfaceIndices.size() > 0) {
+  if (!transparentSurfaceIndices.empty()) {
     if (penumbra->checkSurface(transparentSurfaceIndices[0])) {
       for (auto const transSurf : transparentSurfaceIndices) {
         if (!penumbra->checkSurface(transSurf)) {
@@ -241,7 +243,7 @@ void Penumbra::renderScene(unsigned surfaceIndex) {
 
 void Penumbra::renderInteriorScene(std::vector<unsigned> transparentSurfaceIndices,
                                    std::vector<unsigned> interiorSurfaceIndices) {
-  if (transparentSurfaceIndices.size() > 0) {
+  if (!transparentSurfaceIndices.empty()) {
     if (penumbra->checkSurface(transparentSurfaceIndices[0])) {
       for (auto &transSurf : transparentSurfaceIndices) {
         if (!penumbra->checkSurface(transSurf)) {
@@ -275,10 +277,8 @@ void Penumbra::renderInteriorScene(std::vector<unsigned> transparentSurfaceIndic
   }
 }
 
-PenumbraPrivate::PenumbraPrivate(unsigned size, const std::shared_ptr<Courierr::Courierr> &logger)
+PenumbraPrivate::PenumbraPrivate(int size, const std::shared_ptr<Courierr::Courierr> &logger)
     : context(size, logger), logger(logger) {}
-
-PenumbraPrivate::~PenumbraPrivate() {}
 
 void PenumbraPrivate::addSurface(const Surface &surface) {
   surface.surface->logger = logger;
@@ -288,7 +288,7 @@ void PenumbraPrivate::addSurface(const Surface &surface) {
   surfaces.push_back(*surface.surface);
 }
 
-bool PenumbraPrivate::checkSurface(const unsigned index) {
+bool PenumbraPrivate::checkSurface(const unsigned index) const {
   return index < surfaces.size();
 }
 

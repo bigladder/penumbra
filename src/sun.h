@@ -25,8 +25,8 @@ public:
   mat4x4_ptr getView();
   void setView(float azm, float alt);
   // void setView(mat4x4 view);
-  float getAzimuth();
-  float getAltitude();
+  [[nodiscard]] float getAzimuth() const;
+  [[nodiscard]] float getAltitude() const;
 
 private:
   void setView();
@@ -35,7 +35,7 @@ private:
 
   // Data Members
 private:
-  mat4x4 view;
+  mat4x4 view = {};
   float azimuth, altitude;
 };
 

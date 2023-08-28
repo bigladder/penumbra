@@ -21,8 +21,8 @@ namespace Pumbra {
 class PenumbraPrivate {
 
 public:
-  PenumbraPrivate(unsigned size, const std::shared_ptr<Courierr::Courierr> &logger);
-  ~PenumbraPrivate();
+  PenumbraPrivate(int size, const std::shared_ptr<Courierr::Courierr> &logger);
+  ~PenumbraPrivate() = default;
 
 public:
   void addSurface(const Surface &surface);
@@ -31,7 +31,7 @@ public:
   std::vector<float> model;
   std::vector<SurfacePrivate> surfaces;
   std::shared_ptr<Courierr::Courierr> logger;
-  bool checkSurface(unsigned index);
+  [[nodiscard]] bool checkSurface(unsigned index) const;
 };
 
 } // namespace Pumbra
