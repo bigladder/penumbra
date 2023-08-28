@@ -319,6 +319,9 @@ TEST(PenumbraTest, vendor_name) {
   case Pumbra::VendorName::vmware:
     SUCCEED();
     break;
+  case Pumbra::VendorName::mesa:
+    SUCCEED();
+    break;
   default:
     FAIL() << "Vendor Name not found.";
   }

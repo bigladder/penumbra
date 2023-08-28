@@ -68,7 +68,7 @@ VendorName Penumbra::getVendorName() {
     vendorType = VendorName::intel;
   } else if (vendorName == "VMware, Inc.") {
     vendorType = VendorName::vmware;
-  } else if (vendorName == "Mesa") {
+  } else if (vendorName == "Mesa" || vendorName == "Mesa/X.org") {
     vendorType = VendorName::mesa;
   } else {
     throw PenumbraException(
