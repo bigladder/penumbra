@@ -17,7 +17,7 @@
 
 namespace Pumbra {
 
-enum class VendorName { None, NVIDIA, AMD, Intel, VMware };
+enum class VendorName { unknown, nvidia, amd, intel, vmware, mesa };
 
 class PenumbraPrivate;
 

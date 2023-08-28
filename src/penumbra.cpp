@@ -60,14 +60,16 @@ VendorName Penumbra::getVendorName() {
   VendorName vendorType;
   auto vendorName = Context::vendorName();
   if (vendorName == "NVIDIA") {
-    vendorType = VendorName::NVIDIA;
+    vendorType = VendorName::nvidia;
   } else if (vendorName == "AMD" || vendorName == "ATI" || vendorName == "Advanced Micro Devices" ||
              vendorName == "ATI Technologies Inc.") {
-    vendorType = VendorName::AMD;
+    vendorType = VendorName::amd;
   } else if (vendorName == "Intel" || vendorName == "INTEL" || vendorName == "Intel Inc.") {
-    vendorType = VendorName::Intel;
+    vendorType = VendorName::intel;
   } else if (vendorName == "VMware, Inc.") {
-    vendorType = VendorName::VMware;
+    vendorType = VendorName::vmware;
+  } else if (vendorName == "Mesa") {
+    vendorType = VendorName::mesa;
   } else {
     throw PenumbraException(
         fmt::format("Failed to find GPU or vendor name ({}) is not in list.", vendorName),

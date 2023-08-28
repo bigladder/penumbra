@@ -304,19 +304,19 @@ TEST(PenumbraTest, vendor_name) {
   Pumbra::VendorName vname = pumbra.getVendorName();
 
   switch (vname) {
-  case Pumbra::VendorName::None:
+  case Pumbra::VendorName::unknown:
     SUCCEED();
     break;
-  case Pumbra::VendorName::NVIDIA:
+  case Pumbra::VendorName::nvidia:
     SUCCEED();
     break;
-  case Pumbra::VendorName::AMD:
+  case Pumbra::VendorName::amd:
     SUCCEED();
     break;
-  case Pumbra::VendorName::Intel:
+  case Pumbra::VendorName::intel:
     SUCCEED();
     break;
-  case Pumbra::VendorName::VMware:
+  case Pumbra::VendorName::vmware:
     SUCCEED();
     break;
   default:
