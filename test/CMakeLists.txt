@@ -13,6 +13,7 @@ target_include_directories(${PROJECT_NAME}_tests PRIVATE
 )
 target_link_libraries(gtest PRIVATE penumbra_common_interface)
 target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME} gtest penumbra_common_interface)
+target_compile_features(${PROJECT_NAME}_tests PRIVATE cxx_std_17)
 
 include(GoogleTest)
 
