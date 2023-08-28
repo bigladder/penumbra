@@ -48,7 +48,7 @@ const char *Context::calculationVertexShaderSource =
   }
 )src";
 
-thread_local static std::shared_ptr<Courierr::Courierr> glfw_logger{nullptr};
+thread_local static Courierr::Courierr *glfw_logger{nullptr};
 
 static void glfw_error_callback(int, const char *description) {
   if (glfw_logger) {
@@ -56,7 +56,7 @@ static void glfw_error_callback(int, const char *description) {
   }
 }
 
-Context::Context(GLint size_in, const std::shared_ptr<Courierr::Courierr> &logger_in)
+Context::Context(GLint size_in, Courierr::Courierr *logger_in)
     : size(size_in), modelSet(false), isWireFrame(false), isCameraMode(false), viewScale(1.f),
       cameraRotAngleX(0.f), cameraRotAngleY(0.f), lbutton_down(true), isRenderMode(false),
       logger(logger_in) {
@@ -109,8 +109,6 @@ Context::Context(GLint size_in, const std::shared_ptr<Courierr::Courierr> &logge
                             *logger);
   }
 
-  // std::string glVersion = (char*)glGetString(GL_VERSION);
-  // showMessage(MSG_INFO, "OpenGL version = " + glVersion);
   GLint max_view_size[2];
   glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &max_view_size[0]);
   GLint max_res = std::min(GL_MAX_RENDERBUFFER_SIZE_EXT, max_view_size[0]);
@@ -219,7 +217,7 @@ Context::~Context() {
   glDeleteRenderbuffersEXT(1, &rbo);
   glDeleteProgram(calcProgram->getInt());
   glDeleteProgram(renderProgram->getInt());
-  glfwDestroyWindow(window);
+  glfwTerminate();
 }
 void Context::toggleWireFrame() {
   isWireFrame = !isWireFrame;
@@ -521,38 +519,6 @@ void Context::submitPSSA(const unsigned surfaceIndex, mat4x4 sunView) {
   glEndQuery(GL_SAMPLES_PASSED);
   pixelAreas.at(surfaceBuffer.index) = pixelArea;
 }
-
-/*
-void Context::bufferedQuery(const unsigned surfaceIndex) {
-  int i = 0;
-  for (; i < bufferSize; ++i) {
-    if (indexBuffer[i] == static_cast<int>(surfaceIndex))
-      break;
-  }
-  if (i == bufferSize)
-    return;
-
-  glGetQueryObjectiv(queries[i], GL_QUERY_RESULT, &(pixelCounts.at(indexBuffer[i])));
-  indexBuffer[i] = -1;
-}
-
-void Context::bufferedQuery(const SurfaceBuffer &surfaceBuffer) {
-  if (indexBuffer[currentBufferIndex] > -1) {
-    glGetQueryObjectiv(queries[currentBufferIndex], GL_QUERY_RESULT,
-                       &(pixelCounts.at(indexBuffer[currentBufferIndex])));
-  }
-
-  glBeginQuery(GL_SAMPLES_PASSED, queries[currentBufferIndex]);
-  model.drawSurface(surfaceBuffer);
-  glEndQuery(GL_SAMPLES_PASSED);
-  pixelCounts.at(surfaceBuffer.index) = -1;
-  indexBuffer[currentBufferIndex] = surfaceBuffer.index;
-  currentBufferIndex++;
-  if (currentBufferIndex % bufferSize == 0) {
-    currentBufferIndex = 0;
-  }
-}
-*/
 
 void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
   for (auto const surfaceIndex : surfaceIndices) {

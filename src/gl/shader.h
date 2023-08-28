@@ -13,13 +13,13 @@ namespace Pumbra {
 
 class GLShader {
 public:
-  GLShader(GLenum type, const char *source, const std::shared_ptr<Courierr::Courierr> &logger);
+  GLShader(GLenum type, const char *source, Courierr::Courierr *logger);
   ~GLShader() = default;
   [[nodiscard]] GLuint getInt() const;
 
 private:
   GLuint shader;
-  std::shared_ptr<Courierr::Courierr> logger;
+  Courierr::Courierr *logger;
 };
 
 } // namespace Pumbra

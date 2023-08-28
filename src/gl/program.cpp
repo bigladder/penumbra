@@ -8,7 +8,7 @@
 namespace Pumbra {
 
 GLProgram::GLProgram(const char *vertexSource, const char *fragmentSource,
-                     const std::shared_ptr<Courierr::Courierr> &logger) {
+                     Courierr::Courierr *logger) {
   program = glCreateProgram();
   GLShader vertex(GL_VERTEX_SHADER, vertexSource, logger);
   glAttachShader(program, vertex.getInt());

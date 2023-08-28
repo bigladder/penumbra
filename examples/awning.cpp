@@ -7,6 +7,12 @@
 // Penumbra
 #include <penumbra/penumbra.h>
 
+class AwningLogger : public Pumbra::PenumbraLogger {
+  void info(const std::string_view message) override {
+    write_message("Info", message);
+  }
+};
+
 int main() {
 
   Pumbra::Surface wall({0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f}, "Wall");
@@ -57,7 +63,5 @@ int main() {
 
   logger->info(fmt::format("Window PSSA with fin: {}", windowPSSA));
 
-  Pumbra::penumbraTerminate();
-  
   return 0;
 }

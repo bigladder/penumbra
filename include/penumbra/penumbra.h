@@ -21,9 +21,6 @@ enum class VendorName { unknown, nvidia, amd, intel, vmware, mesa };
 
 class PenumbraPrivate;
 
-void penumbraTerminate(); // Call once before exiting calling program to ensure safe cleanup of
-                          // OpenGL memory
-
 class Penumbra {
 public:
   explicit Penumbra(unsigned int size = 512u, const std::shared_ptr<Courierr::Courierr> &logger =
@@ -61,6 +58,7 @@ public:
   renderInteriorScene(std::vector<unsigned> transparentSurfaceIndices,
                       std::vector<unsigned> interiorSurfaceIndices); // Primarily for debug purposes
   VendorName getVendorName();
+  std::shared_ptr<Courierr::Courierr> get_logger();
 
 private:
   std::unique_ptr<PenumbraPrivate> penumbra;

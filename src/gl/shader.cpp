@@ -9,8 +9,7 @@
 #include "shader.h"
 
 namespace Pumbra {
-GLShader::GLShader(GLenum type, const char *source,
-                   const std::shared_ptr<Courierr::Courierr> &logger_in)
+GLShader::GLShader(GLenum type, const char *source, Courierr::Courierr *logger_in)
     : logger(logger_in) {
   GLint shader_ok;
   GLsizei log_length;

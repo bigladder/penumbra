@@ -30,16 +30,12 @@ namespace Pumbra {
 class Context {
 
 public:
-  Context(GLint size, const std::shared_ptr<Courierr::Courierr> &logger);
+  Context(GLint size, Courierr::Courierr *logger);
   ~Context();
   void showRendering(unsigned surfaceIndex, mat4x4 sunView);
   void setModel(const std::vector<float> &vertices,
                 const std::vector<SurfaceBuffer> &surfaceBuffers);
   float setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer = nullptr, bool clipFar = true);
-  /*
-  void bufferedQuery(const unsigned surfaceIndex);
-  void bufferedQuery(const SurfaceBuffer &surfaceBuffer);
-  */
   void submitPSSA(unsigned surfaceIndex, mat4x4 sunView);
   void submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView);
   void submitPSSA(mat4x4 sunView);
@@ -81,11 +77,7 @@ private:
   std::vector<float> pixelAreas;
   std::vector<GLint> pixelCounts;
   std::vector<int> indexBuffer;
-  /*
-  int currentBufferIndex{0};
-  int bufferSize{16};
-  */
-  std::shared_ptr<Courierr::Courierr> logger;
+  Courierr::Courierr *logger;
 
   void drawModel();
   void drawExcept(const std::vector<SurfaceBuffer> &hiddenSurfaces);

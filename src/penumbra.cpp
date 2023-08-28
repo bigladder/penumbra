@@ -17,10 +17,6 @@
 
 namespace Pumbra {
 
-void penumbraTerminate() {
-  glfwTerminate();
-}
-
 Penumbra::Penumbra(unsigned int size, const std::shared_ptr<Courierr::Courierr> &logger)
     : penumbra(std::make_unique<PenumbraPrivate>(static_cast<int>(size), logger)) {}
 
@@ -278,9 +274,12 @@ void Penumbra::renderInteriorScene(std::vector<unsigned> transparentSurfaceIndic
                             *(penumbra->logger));
   }
 }
+std::shared_ptr<Courierr::Courierr> Penumbra::get_logger() {
+  return penumbra->logger;
+}
 
-PenumbraPrivate::PenumbraPrivate(int size, const std::shared_ptr<Courierr::Courierr> &logger)
-    : context(size, logger), logger(logger) {}
+PenumbraPrivate::PenumbraPrivate(int size, const std::shared_ptr<Courierr::Courierr> &logger_in)
+    : context(size, logger_in.get()), logger(logger_in) {}
 
 void PenumbraPrivate::addSurface(const Surface &surface) {
   surface.surface->logger = logger;
