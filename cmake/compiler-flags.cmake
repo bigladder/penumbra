@@ -40,9 +40,6 @@ target_compile_options(penumbra_common_interface INTERFACE
       >
     >
     # -finline-limit=2000 # More aggressive inlining   This is causing unit test failures on Ubuntu 14.04
-    $<$<BOOL:UNIX>:
-      -fPIC
-    >
   >
 )
 
