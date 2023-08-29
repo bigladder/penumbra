@@ -22,10 +22,6 @@ namespace Pumbra {
 SurfaceBuffer::SurfaceBuffer(GLuint begin, GLuint count, GLint index)
     : begin(begin), count(count), index(index) {}
 
-GLModel::~GLModel() {
-  clearModel();
-}
-
 void GLModel::clearModel() {
   if (objectsSet) {
     glDeleteVertexArraysX(1, &vao);

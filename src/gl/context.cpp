@@ -217,6 +217,7 @@ Context::~Context() {
   glDeleteRenderbuffersEXT(1, &rbo);
   glDeleteProgram(calcProgram->getInt());
   glDeleteProgram(renderProgram->getInt());
+  model.clearModel();
   glfwTerminate();
 }
 void Context::toggleWireFrame() {

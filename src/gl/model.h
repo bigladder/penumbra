@@ -24,7 +24,7 @@ public:
 class GLModel {
 public:
   GLModel() : objectsSet(false){};
-  ~GLModel();
+  ~GLModel() = default;
   void setVertices(const std::vector<float> &vertices);
   void setSurfaceBuffers(const std::vector<SurfaceBuffer> &surfaceBuffers);
   static void drawSurface(SurfaceBuffer surfaceBuffer);
