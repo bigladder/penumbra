@@ -411,8 +411,8 @@ void Context::set_camera_mvp() {
   mat4x4 camera_projection;
   mat4x4 camera_mvp;
 
-  mat4x4_ortho(camera_projection, view_scale * camera_left, view_scale * camera_right, view_scale * camera_bottom,
-               view_scale * camera_top, -camera_near, -camera_far);
+  mat4x4_ortho(camera_projection, view_scale * camera_left, view_scale * camera_right,
+               view_scale * camera_bottom, view_scale * camera_top, -camera_near, -camera_far);
   mat4x4_mul(camera_mvp, camera_projection, camera_view);
   glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)camera_mvp);
 }

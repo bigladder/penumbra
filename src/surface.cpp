@@ -28,7 +28,8 @@ void stdFree(void* userData, void* ptr)
 }
 */
 
-TessData::TessData(const float *array, unsigned number_of_vertices) : number_of_vertices(number_of_vertices) {
+TessData::TessData(const float *array, unsigned number_of_vertices)
+    : number_of_vertices(number_of_vertices) {
   vertices.insert(vertices.end(), (const float *)array, (const float *)array + number_of_vertices);
 }
 

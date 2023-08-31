@@ -314,7 +314,7 @@ TEST(PenumbraTest, calculate_pssa_multiple_surfaces) {
   const unsigned int left_wall_id = penumbra.add_surface(left_wall);
   const unsigned int right_wall_id = penumbra.add_surface(right_wall);
 
-  const std::vector<unsigned> test_cube{front_wall_id, back_wall_id,   roof_id,
+  const std::vector<unsigned> test_cube{front_wall_id, back_wall_id, roof_id,
                                         floor_id,      left_wall_id, right_wall_id};
 
   penumbra.set_model();

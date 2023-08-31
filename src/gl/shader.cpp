@@ -26,7 +26,8 @@ GLShader::GLShader(GLenum type, const char *source, Courierr::Courierr *logger_i
       shader = 0;
       std::string shader_type_string = (type == GL_FRAGMENT_SHADER) ? "fragment" : "vertex";
       logger->info(fmt::format("OpenGL {} shader: {}", shader_type_string, info_log));
-      throw PenumbraException(fmt::format("Unable to compile {} shader.", shader_type_string), *logger);
+      throw PenumbraException(fmt::format("Unable to compile {} shader.", shader_type_string),
+                              *logger);
     }
   }
 }

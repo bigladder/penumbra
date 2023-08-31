@@ -57,8 +57,8 @@ VendorType Penumbra::get_vendor_name() {
   auto vendor_name = Context::vendorName();
   if (vendor_name == "NVIDIA") {
     vendor_type = VendorType::nvidia;
-  } else if (vendor_name == "AMD" || vendor_name == "ATI" || vendor_name == "Advanced Micro Devices" ||
-             vendor_name == "ATI Technologies Inc.") {
+  } else if (vendor_name == "AMD" || vendor_name == "ATI" ||
+             vendor_name == "Advanced Micro Devices" || vendor_name == "ATI Technologies Inc.") {
     vendor_type = VendorType::amd;
   } else if (vendor_name == "Intel" || vendor_name == "INTEL" || vendor_name == "Intel Inc.") {
     vendor_type = VendorType::intel;
@@ -93,7 +93,7 @@ void Penumbra::set_model() {
     for (auto &surface : penumbra->surfaces) {
       TessData tess = surface.tessellate();
       surface_buffers.emplace_back(next_starting_index / TessData::vertex_size,
-                                  tess.number_of_vertices / TessData::vertex_size, surface_index);
+                                   tess.number_of_vertices / TessData::vertex_size, surface_index);
       for (unsigned i = 0; i < tess.number_of_vertices; ++i) {
         penumbra->model.push_back(tess.vertices[i]);
       }
@@ -113,7 +113,7 @@ void Penumbra::clear_model() {
 }
 
 void Penumbra::set_sun_position(const float azimuth, // in radians, clockwise, north = 0
-                              const float altitude  // in radians, horizon = 0, vertical = pi/2
+                                const float altitude // in radians, horizon = 0, vertical = pi/2
 ) {
   penumbra->sun.set_view(azimuth, altitude);
 }
@@ -193,7 +193,7 @@ std::vector<float> Penumbra::calculate_pssa() {
 
 std::unordered_map<unsigned, float>
 Penumbra::calculate_interior_pssas(const std::vector<unsigned> &transparent_surface_indices,
-                                 const std::vector<unsigned> &interior_surface_indices) {
+                                   const std::vector<unsigned> &interior_surface_indices) {
   std::unordered_map<unsigned, float> pssas;
   if (!transparent_surface_indices.empty()) {
     if (penumbra->check_surface(transparent_surface_indices[0])) {
@@ -240,7 +240,7 @@ void Penumbra::render_scene(unsigned surface_index) {
 }
 
 void Penumbra::render_interior_scene(std::vector<unsigned> transparent_surface_indices,
-                                   std::vector<unsigned> interior_surface_indices) {
+                                     std::vector<unsigned> interior_surface_indices) {
   if (!transparent_surface_indices.empty()) {
     if (penumbra->check_surface(transparent_surface_indices[0])) {
       for (auto &transparent_surface_index : transparent_surface_indices) {
@@ -253,8 +253,8 @@ void Penumbra::render_interior_scene(std::vector<unsigned> transparent_surface_i
       }
       for (auto &interior_surface_index : interior_surface_indices) {
         if (penumbra->check_surface(interior_surface_index)) {
-          penumbra->context.showInteriorRendering(transparent_surface_indices, interior_surface_index,
-                                                  penumbra->sun.get_view());
+          penumbra->context.showInteriorRendering(transparent_surface_indices,
+                                                  interior_surface_index, penumbra->sun.get_view());
         } else {
           throw PenumbraException(
               fmt::format("Interior surface index, {}, does not exist. Cannot render scene.",

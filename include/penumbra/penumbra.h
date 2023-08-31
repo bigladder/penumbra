@@ -36,7 +36,7 @@ public:
   void set_model();
   void clear_model();
   void set_sun_position(float azimuth, // in radians, clockwise, north = 0
-                      float altitude  // in radians, horizon = 0, vertical = pi/2
+                        float altitude // in radians, horizon = 0, vertical = pi/2
   );
   float get_sun_azimuth();
   float get_sun_altitude();
@@ -52,10 +52,10 @@ public:
   std::vector<float> calculate_pssa();
   std::unordered_map<unsigned, float>
   calculate_interior_pssas(const std::vector<unsigned> &transparent_surface_indices,
-                         const std::vector<unsigned> &interior_surface_indices);
+                           const std::vector<unsigned> &interior_surface_indices);
   void render_scene(unsigned surface_index); // Primarily for debug purposes
-  void
-  render_interior_scene(std::vector<unsigned> transparent_surface_indices,
+  void render_interior_scene(
+      std::vector<unsigned> transparent_surface_indices,
       std::vector<unsigned> interior_surface_indices); // Primarily for debug purposes
   VendorType get_vendor_name();
   std::shared_ptr<Courierr::Courierr> get_logger();

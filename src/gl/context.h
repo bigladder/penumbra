@@ -34,8 +34,9 @@ public:
   ~Context();
   void show_rendering(unsigned surface_index, mat4x4 sun_view);
   void set_model(const std::vector<float> &vertices,
-                const std::vector<SurfaceBuffer> &surface_buffers);
-  float set_scene(mat4x4 sun_view, const SurfaceBuffer *surface_buffer = nullptr, bool clip_far = true);
+                 const std::vector<SurfaceBuffer> &surface_buffers);
+  float set_scene(mat4x4 sun_view, const SurfaceBuffer *surface_buffer = nullptr,
+                  bool clip_far = true);
   void submit_pssa(unsigned surface_index, mat4x4 sun_view);
   void submit_pssa(const std::vector<unsigned> &surface_indices, mat4x4 sun_view);
   void submit_pssa(mat4x4 sun_view);
