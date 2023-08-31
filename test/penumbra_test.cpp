@@ -15,7 +15,7 @@ constexpr float m_pi_4_f = static_cast<float>(M_PI_4);
 
 float calculate_surface_exposure(float azimuth, float altitude) {
 
-  // Due to the one sided nature of shaded surfaces, we will revert
+  // Due to the one-sided nature of shaded surfaces, we will revert
   // negative values to zero, as this indicates that the opposite side
   // of the surface is shaded. This shading should be disregarded.
   auto incident_azimuth = cos(azimuth);

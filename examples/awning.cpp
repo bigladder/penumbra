@@ -8,6 +8,7 @@
 #include <penumbra/penumbra.h>
 
 class AwningLogger : public Penumbra::PenumbraLogger {
+public:
   void info(const std::string_view message) override {
     write_message("Info", message);
   }
@@ -27,7 +28,7 @@ int main() {
 
   Penumbra::Penumbra::is_valid_context();
 
-  std::shared_ptr<Penumbra::PenumbraLogger> logger = std::make_shared<Penumbra::PenumbraLogger>();
+  std::shared_ptr<AwningLogger> logger = std::make_shared<AwningLogger>();
   Penumbra::Penumbra penumbra(512u, logger);
 
   unsigned wall_id = penumbra.add_surface(wall);

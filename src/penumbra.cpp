@@ -278,20 +278,4 @@ std::shared_ptr<Courierr::Courierr> Penumbra::get_logger() {
   return penumbra->logger;
 }
 
-PenumbraImplementation::PenumbraImplementation(int size,
-                                               const std::shared_ptr<Courierr::Courierr> &logger_in)
-    : context(size, logger_in.get()), logger(logger_in) {}
-
-void PenumbraImplementation::add_surface(const Surface &surface) {
-  surface.surface->logger = logger;
-  if (surface.surface->name.empty()) {
-    surface.surface->name = fmt::format("Surface {}", surfaces.size());
-  }
-  surfaces.push_back(*surface.surface);
-}
-
-bool PenumbraImplementation::check_surface(const unsigned index) const {
-  return index < surfaces.size();
-}
-
 } // namespace Penumbra

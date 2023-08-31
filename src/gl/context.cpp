@@ -142,8 +142,8 @@ Context::Context(GLint size_in, Courierr::Courierr *logger_in) : size(size_in), 
   };
 
   auto mouse_callback = [](GLFWwindow *w, int button, int action, int /*mods*/) {
-    // Set a booleon to tell if the left button is down. And at the actual press, initialize the
-    // curosor position.  Note that you only come in here the moments the button is pressed and
+    // Set a boolean to tell if the left button is down. And at the actual press, initialize the
+    // cursor position.  Note that you only come in here the moments the button is pressed and
     // released, not between.
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -305,7 +305,7 @@ float Context::set_scene(mat4x4 sun_view, const SurfaceBuffer *surface_buffer, b
 
   mat4x4_dup(view, sun_view);
 
-  // calculate clipping planes in rendered coorinates
+  // calculate clipping planes in rendered coordinates
   left = MAX_FLOAT;
   right = -MAX_FLOAT;
   bottom = MAX_FLOAT;
