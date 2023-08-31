@@ -14,10 +14,10 @@ namespace Pumbra {
 
 typedef std::vector<float> Polygon; // Implicit list of 3D coordinates
 
-class SurfacePrivate;
+class SurfaceImplementation;
 
 class Surface {
-  friend class PenumbraPrivate;
+  friend class PenumbraImplementation;
 
 public:
   Surface();
@@ -27,7 +27,7 @@ public:
   void add_hole(const Polygon &hole); // Defined in counter-clockwise order when facing front
 
 private:
-  std::shared_ptr<SurfacePrivate> surface;
+  std::shared_ptr<SurfaceImplementation> surface;
 };
 
 } // namespace Pumbra

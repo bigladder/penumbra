@@ -1,8 +1,8 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
-#ifndef SURFACE_PRIVATE_H_
-#define SURFACE_PRIVATE_H_
+#ifndef SURFACE_IMPLEMENTATION_H_
+#define SURFACE_IMPLEMENTATION_H_
 
 // Vendor
 #include <tesselator.h>
@@ -22,10 +22,10 @@ struct TessData {
   static const int vertex_size{3}; // i.e., 3D
 };
 
-class SurfacePrivate {
+class SurfaceImplementation {
 public:
-  SurfacePrivate() = default;
-  explicit SurfacePrivate(Polygon polygon);
+  SurfaceImplementation() = default;
+  explicit SurfaceImplementation(Polygon polygon);
   TessData tessellate();
   Polygon polygon;
   std::vector<Polygon> holes;
@@ -34,4 +34,4 @@ public:
 };
 
 } // namespace Pumbra
-#endif // SURFACE_PRIVATE_H_
+#endif // SURFACE_IMPLEMENTATION_H_

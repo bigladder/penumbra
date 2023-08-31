@@ -7,7 +7,7 @@
 
 // Penumbra
 #include <penumbra/surface.h>
-#include <surface-private.h>
+#include <surface-implementation.h>
 #include <penumbra/logging.h>
 
 namespace Pumbra {
@@ -33,11 +33,11 @@ TessData::TessData(const float *array, unsigned number_of_vertices) : number_of_
 }
 
 Surface::Surface() {
-  surface = std::make_shared<SurfacePrivate>();
+  surface = std::make_shared<SurfaceImplementation>();
 }
 
 Surface::Surface(const Polygon &polygon, const std::string &name_in) {
-  surface = std::make_shared<SurfacePrivate>(polygon);
+  surface = std::make_shared<SurfaceImplementation>(polygon);
   surface->name = name_in;
 }
 
@@ -51,9 +51,9 @@ void Surface::add_hole(const Polygon &hole) {
   surface->holes.push_back(hole);
 }
 
-SurfacePrivate::SurfacePrivate(Polygon polygon) : polygon(std::move(polygon)) {}
+SurfaceImplementation::SurfaceImplementation(Polygon polygon) : polygon(std::move(polygon)) {}
 
-TessData SurfacePrivate::tessellate() {
+TessData SurfaceImplementation::tessellate() {
   TESStesselator *tess = tessNewTess(nullptr);
 
   if (!tess) {

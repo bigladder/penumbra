@@ -19,7 +19,7 @@ namespace Pumbra {
 
 enum class VendorType { unknown, nvidia, amd, intel, vmware, mesa };
 
-class PenumbraPrivate;
+class PenumbraImplementation;
 
 class Penumbra {
 public:
@@ -61,7 +61,7 @@ public:
   std::shared_ptr<Courierr::Courierr> get_logger();
 
 private:
-  std::unique_ptr<PenumbraPrivate> penumbra;
+  std::unique_ptr<PenumbraImplementation> penumbra;
 };
 
 } // namespace Pumbra
