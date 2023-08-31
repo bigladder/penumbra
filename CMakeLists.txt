@@ -25,7 +25,7 @@ set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(CMakeDependentOption)
 
 cmake_dependent_option( ${PROJECT_NAME}_BUILD_TESTING "Build ${PROJECT_NAME} testing targets" ON "${PROJECT_NAME}_IS_TOP_LEVEL" OFF )
-cmake_dependent_option( ${PROJECT_NAME}_COVERAGE "Add ${PROJECT_NAME} coverage reports" ON "${PROJECT_NAME}_IS_TOP_LEVEL" OFF )
+option( ${PROJECT_NAME}_COVERAGE "Add ${PROJECT_NAME} coverage reports" OFF )
 cmake_dependent_option( ${PROJECT_NAME}_BUILD_EXAMPLES "Build ${PROJECT_NAME} examples" ON "${PROJECT_NAME}_IS_TOP_LEVEL" OFF )
 cmake_dependent_option( ${PROJECT_NAME}_WARNINGS_AS_ERRORS "Treat warnings in ${PROJECT_NAME} as errors" ON "${PROJECT_NAME}_IS_TOP_LEVEL" OFF )
 
