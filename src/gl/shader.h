@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 #include <courierr/courierr.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
 class GLShader {
 public:
@@ -22,6 +22,6 @@ private:
   Courierr::Courierr *logger;
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 
 #endif // SHADER_H_

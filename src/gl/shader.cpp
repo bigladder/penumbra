@@ -8,7 +8,7 @@
 #include <penumbra/logging.h>
 #include "shader.h"
 
-namespace Pumbra {
+namespace Penumbra {
 GLShader::GLShader(GLenum type, const char *source, Courierr::Courierr *logger_in)
     : logger(logger_in) {
   GLint shader_ok;
@@ -36,4 +36,4 @@ GLuint GLShader::get() const {
   return shader;
 }
 
-} // namespace Pumbra
+} // namespace Penumbra

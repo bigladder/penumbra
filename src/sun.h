@@ -11,7 +11,7 @@
 // Vendor
 #include <courierr/courierr.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
 typedef float (*mat4x4_ptr)[4];
 
@@ -38,6 +38,6 @@ private:
   float azimuth, altitude;
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 
 #endif // SUN_H_

@@ -4,7 +4,7 @@
 // Penumbra
 #include <sun.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
 Sun::Sun() : azimuth(0.f), altitude(0.f) {}
 
@@ -44,4 +44,4 @@ float Sun::get_azimuth() const {
 float Sun::get_altitude() const {
   return altitude;
 }
-} // namespace Pumbra
+} // namespace Penumbra

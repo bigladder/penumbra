@@ -5,7 +5,7 @@
 #include <gl/program.h>
 #include <gl/shader.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
 GLProgram::GLProgram(const char *vertex_source, const char *fragment_source,
                      Courierr::Courierr *logger) {
@@ -25,4 +25,4 @@ GLuint GLProgram::get() const {
   return program;
 }
 
-} // namespace Pumbra
+} // namespace Penumbra

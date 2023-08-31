@@ -11,7 +11,7 @@
 #include <penumbra/logging.h>
 #include "context.h"
 
-namespace Pumbra {
+namespace Penumbra {
 
 const char *Context::render_vertex_shader_source =
     R"src(
@@ -705,4 +705,4 @@ void Context::initialize_render_mode() {
   glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 
-} // namespace Pumbra
+} // namespace Penumbra

@@ -15,7 +15,7 @@
 #include <penumbra/surface.h>
 #include <penumbra/logging.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
 enum class VendorType { unknown, nvidia, amd, intel, vmware, mesa };
 
@@ -64,6 +64,6 @@ private:
   std::unique_ptr<PenumbraImplementation> penumbra;
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 
 #endif /* PENUMBRA_H_ */

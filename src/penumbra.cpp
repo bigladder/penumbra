@@ -15,7 +15,7 @@
 #include <penumbra/penumbra.h>
 #include <penumbra-implementation.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
 Penumbra::Penumbra(unsigned int size, const std::shared_ptr<Courierr::Courierr> &logger)
     : penumbra(std::make_unique<PenumbraImplementation>(static_cast<int>(size), logger)) {}
@@ -294,4 +294,4 @@ bool PenumbraImplementation::check_surface(const unsigned index) const {
   return index < surfaces.size();
 }
 
-} // namespace Pumbra
+} // namespace Penumbra

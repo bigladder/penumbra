@@ -11,7 +11,7 @@
 // Standard
 #include <vector>
 
-namespace Pumbra {
+namespace Penumbra {
 
 class SurfaceBuffer {
 public:
@@ -40,6 +40,6 @@ private:
   bool objects_set{false};
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 
 #endif // MODEL_H_

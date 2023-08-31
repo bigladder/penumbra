@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 
-namespace Pumbra {
+namespace Penumbra {
 
 typedef std::vector<float> Polygon; // Implicit list of 3D coordinates
 
@@ -30,5 +30,5 @@ private:
   std::shared_ptr<SurfaceImplementation> surface;
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 #endif // SURFACE_H_

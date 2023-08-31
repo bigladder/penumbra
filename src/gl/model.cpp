@@ -17,7 +17,7 @@
 #define glDeleteVertexArraysX glDeleteVertexArrays
 #endif
 
-namespace Pumbra {
+namespace Penumbra {
 
 SurfaceBuffer::SurfaceBuffer(GLuint begin, GLuint count, GLint index)
     : begin(begin), count(count), index(index) {}
@@ -104,4 +104,4 @@ void GLModel::draw_except(std::vector<SurfaceBuffer> hidden_surfaces) const {
   }
 }
 
-} // namespace Pumbra
+} // namespace Penumbra

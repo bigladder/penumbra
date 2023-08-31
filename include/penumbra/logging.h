@@ -6,7 +6,7 @@
 
 #include <courierr/courierr.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
 class PenumbraLogger : public Courierr::Courierr {
 public:
@@ -40,6 +40,6 @@ public:
   explicit PenumbraException(const std::string &message, Courierr::Courierr &logger)
       : CourierrException(message, logger) {}
 };
-} // namespace Pumbra
+} // namespace Penumbra
 
 #endif // define PENUMBRA_LOGGING_H_

@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 #include <courierr/courierr.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
 class GLProgram {
 public:
@@ -21,6 +21,6 @@ private:
   GLuint program;
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 
 #endif // PROGRAM_H_

@@ -16,7 +16,7 @@
 #include <surface-implementation.h>
 #include <gl/context.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
 class PenumbraImplementation {
 
@@ -34,5 +34,5 @@ public:
   [[nodiscard]] bool check_surface(unsigned index) const;
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 #endif // PENUMBRA_IMPLEMENTATION_H_

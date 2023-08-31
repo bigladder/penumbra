@@ -12,7 +12,7 @@
 #include <vector>
 #include <array>
 
-namespace Pumbra {
+namespace Penumbra {
 
 struct TessData {
   TessData(const float *array, unsigned number_of_vertices);
@@ -33,5 +33,5 @@ public:
   std::string name;
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 #endif // SURFACE_IMPLEMENTATION_H_

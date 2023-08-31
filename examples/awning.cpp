@@ -7,7 +7,7 @@
 // Penumbra
 #include <penumbra/penumbra.h>
 
-class AwningLogger : public Pumbra::PenumbraLogger {
+class AwningLogger : public Penumbra::PenumbraLogger {
   void info(const std::string_view message) override {
     write_message("Info", message);
   }
@@ -15,20 +15,20 @@ class AwningLogger : public Pumbra::PenumbraLogger {
 
 int main() {
 
-  Pumbra::Surface wall({0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f}, "Wall");
+  Penumbra::Surface wall({0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f}, "Wall");
 
-  Pumbra::Polygon window_vertices = {0.25f, 0.f, 0.25f, 0.75f, 0.f, 0.25f,
-                                     0.75f, 0.f, 0.5f,  0.25f, 0.f, 0.5f};
-  Pumbra::Surface window(window_vertices, "Window");
+  Penumbra::Polygon window_vertices = {0.25f, 0.f, 0.25f, 0.75f, 0.f, 0.25f,
+                                       0.75f, 0.f, 0.5f,  0.25f, 0.f, 0.5f};
+  Penumbra::Surface window(window_vertices, "Window");
   wall.add_hole(window_vertices);
 
-  Pumbra::Surface awning(
+  Penumbra::Surface awning(
       {0.25f, 0.f, 0.5f, 0.75f, 0.f, 0.5f, 0.75f, -0.5f, 0.5f, 0.25f, -0.5f, 0.5f}, "Awning");
 
-  Pumbra::Penumbra::is_valid_context();
+  Penumbra::Penumbra::is_valid_context();
 
-  std::shared_ptr<Pumbra::PenumbraLogger> logger = std::make_shared<Pumbra::PenumbraLogger>();
-  Pumbra::Penumbra penumbra(512u, logger);
+  std::shared_ptr<Penumbra::PenumbraLogger> logger = std::make_shared<Penumbra::PenumbraLogger>();
+  Penumbra::Penumbra penumbra(512u, logger);
 
   unsigned wall_id = penumbra.add_surface(wall);
   unsigned window_id = penumbra.add_surface(window);
@@ -47,7 +47,7 @@ int main() {
 
   penumbra.clear_model();
 
-  Pumbra::Surface fin(
+  Penumbra::Surface fin(
       {0.75f, -0.25f, 0.5f, 0.75f, -0.25f, 0.25f, 0.75f, 0.0f, 0.25f, 0.75f, 0.0f, 0.5f}, "Fin");
 
   window_id = penumbra.add_surface(window);

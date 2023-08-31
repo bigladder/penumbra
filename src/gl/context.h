@@ -25,7 +25,7 @@
 
 #define MAX_FLOAT std::numeric_limits<float>::max()
 
-namespace Pumbra {
+namespace Penumbra {
 
 class Context {
 
@@ -90,6 +90,6 @@ private:
   void initialize_render_mode();
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 
 #endif // CONTEXT_H_

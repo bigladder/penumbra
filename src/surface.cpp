@@ -10,7 +10,7 @@
 #include <surface-implementation.h>
 #include <penumbra/logging.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
 /*
 void* stdAlloc(void* userData, unsigned size)
@@ -97,4 +97,4 @@ TessData SurfaceImplementation::tessellate() {
   return data;
 }
 
-} // namespace Pumbra
+} // namespace Penumbra
