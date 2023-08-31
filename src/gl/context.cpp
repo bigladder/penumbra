@@ -513,13 +513,13 @@ void Context::showInteriorRendering(const std::vector<unsigned> &hidden_surface_
 }
 
 void Context::submit_pssa(const unsigned surface_index, mat4x4 sun_view) {
-  auto const &surfaceBuffer = model.surface_buffers[surface_index];
-  auto const pixelArea = set_scene(sun_view, &surfaceBuffer);
+  auto const &surface_buffer = model.surface_buffers[surface_index];
+  auto const pixel_area = set_scene(sun_view, &surface_buffer);
   draw_model();
-  glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
-  GLModel::draw_surface(surfaceBuffer);
+  glBeginQuery(GL_SAMPLES_PASSED, queries.at(surface_buffer.index));
+  GLModel::draw_surface(surface_buffer);
   glEndQuery(GL_SAMPLES_PASSED);
-  pixel_areas.at(surfaceBuffer.index) = pixelArea;
+  pixel_areas.at(surface_buffer.index) = pixel_area;
 }
 
 void Context::submit_pssa(const std::vector<unsigned> &surface_indices, mat4x4 sun_view) {
