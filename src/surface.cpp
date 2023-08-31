@@ -28,8 +28,8 @@ void stdFree(void* userData, void* ptr)
 }
 */
 
-TessData::TessData(const float *array, unsigned numVerts) : numVerts(numVerts) {
-  vertices.insert(vertices.end(), (const float *)array, (const float *)array + numVerts);
+TessData::TessData(const float *array, unsigned number_of_vertices) : number_of_vertices(number_of_vertices) {
+  vertices.insert(vertices.end(), (const float *)array, (const float *)array + number_of_vertices);
 }
 
 Surface::Surface() {
@@ -47,7 +47,7 @@ Surface::Surface(const Surface &surface_in) {
 
 Surface::~Surface() = default;
 
-void Surface::addHole(const Polygon &hole) {
+void Surface::add_hole(const Polygon &hole) {
   surface->holes.push_back(hole);
 }
 
@@ -62,34 +62,34 @@ TessData SurfacePrivate::tessellate() {
   }
 
   // Add primary polygon
-  tessAddContour(tess, TessData::polySize, &polygon[0], sizeof(float) * TessData::vertexSize,
-                 (int)polygon.size() / TessData::vertexSize);
+  tessAddContour(tess, TessData::polygon_size, &polygon[0], sizeof(float) * TessData::vertex_size,
+                 (int)polygon.size() / TessData::vertex_size);
 
   // Add holes
   for (auto &hole : holes) {
-    tessAddContour(tess, TessData::polySize, &hole[0], sizeof(float) * TessData::vertexSize,
-                   (int)hole.size() / TessData::vertexSize);
+    tessAddContour(tess, TessData::polygon_size, &hole[0], sizeof(float) * TessData::vertex_size,
+                   (int)hole.size() / TessData::vertex_size);
   }
 
-  if (!tessTesselate(tess, TESS_WINDING_ODD, TESS_POLYGONS, TessData::polySize,
-                     TessData::vertexSize, nullptr)) {
+  if (!tessTesselate(tess, TESS_WINDING_ODD, TESS_POLYGONS, TessData::polygon_size,
+                     TessData::vertex_size, nullptr)) {
     throw PenumbraException(fmt::format("Unable to tessellate surface, \"{}\".", name), *logger);
   }
 
   // For now convert to glDrawArrays() style of vertices, sometime may change to glDrawElements
   // (with element buffers)
-  std::vector<float> vertexArray;
-  const TESSreal *verts = tessGetVertices(tess);
-  const int nelems = tessGetElementCount(tess);
-  const TESSindex *elems = tessGetElements(tess);
-  for (int i = 0; i < nelems * TessData::polySize; ++i) {
-    const int vert = *(elems + i);
-    for (int j = 0; j < TessData::vertexSize; ++j) {
-      vertexArray.push_back(verts[vert * TessData::vertexSize + j]);
+  std::vector<float> vertex_array;
+  const TESSreal *verticies = tessGetVertices(tess);
+  const int number_of_elements = tessGetElementCount(tess);
+  const TESSindex *elements = tessGetElements(tess);
+  for (int i = 0; i < number_of_elements * TessData::polygon_size; ++i) {
+    const int vertex = *(elements + i);
+    for (int j = 0; j < TessData::vertex_size; ++j) {
+      vertex_array.push_back(verticies[vertex * TessData::vertex_size + j]);
     }
   }
 
-  TessData data(&vertexArray[0], static_cast<unsigned int>(vertexArray.size()));
+  TessData data(&vertex_array[0], static_cast<unsigned int>(vertex_array.size()));
 
   tessDeleteTess(tess);
 

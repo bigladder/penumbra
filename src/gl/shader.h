@@ -15,7 +15,7 @@ class GLShader {
 public:
   GLShader(GLenum type, const char *source, Courierr::Courierr *logger);
   ~GLShader() = default;
-  [[nodiscard]] GLuint getInt() const;
+  [[nodiscard]] GLuint get() const;
 
 private:
   GLuint shader;

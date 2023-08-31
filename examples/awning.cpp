@@ -20,48 +20,45 @@ int main() {
   Pumbra::Polygon window_vertices = {0.25f, 0.f, 0.25f, 0.75f, 0.f, 0.25f,
                                      0.75f, 0.f, 0.5f,  0.25f, 0.f, 0.5f};
   Pumbra::Surface window(window_vertices, "Window");
-  wall.addHole(window_vertices);
+  wall.add_hole(window_vertices);
 
   Pumbra::Surface awning(
       {0.25f, 0.f, 0.5f, 0.75f, 0.f, 0.5f, 0.75f, -0.5f, 0.5f, 0.25f, -0.5f, 0.5f}, "Awning");
 
-  Pumbra::Penumbra::isValidContext();
+  Pumbra::Penumbra::is_valid_context();
 
   std::shared_ptr<Pumbra::PenumbraLogger> logger = std::make_shared<Pumbra::PenumbraLogger>();
-  Pumbra::Penumbra pumbra(512u, logger);
+  Pumbra::Penumbra penumbra(512u, logger);
 
-  unsigned wallId = pumbra.addSurface(wall);
-  unsigned windowId = pumbra.addSurface(window);
-  [[maybe_unused]] auto awningId = pumbra.addSurface(awning);
+  unsigned wall_id = penumbra.add_surface(wall);
+  unsigned window_id = penumbra.add_surface(window);
+  [[maybe_unused]] auto awning_id = penumbra.add_surface(awning);
 
-  pumbra.setModel();
-  pumbra.setSunPosition(2.50f, 0.3f);
-  // pumbra.setSunPosition(3.14f, 0.0f);
-  pumbra.renderScene(wallId);
-  float wallPSSA = pumbra.calculatePSSA(wallId);
+  penumbra.set_model();
+  penumbra.set_sun_position(2.50f, 0.3f);
+  // penumbra.set_sun_position(3.14f, 0.0f);
+  penumbra.render_scene(wall_id);
 
-  logger->info(fmt::format("Wall PSSA: {}", wallPSSA));
+  logger->info(fmt::format("Wall PSSA: {}", penumbra.calculate_pssa(wall_id)));
 
-  pumbra.renderScene(windowId);
-  float windowPSSA = pumbra.calculatePSSA(windowId);
+  penumbra.render_scene(window_id);
 
-  logger->info(fmt::format("Window PSSA: {}", windowPSSA));
+  logger->info(fmt::format("Window PSSA: {}", penumbra.calculate_pssa(window_id)));
 
-  pumbra.clearModel();
+  penumbra.clear_model();
 
   Pumbra::Surface fin(
       {0.75f, -0.25f, 0.5f, 0.75f, -0.25f, 0.25f, 0.75f, 0.0f, 0.25f, 0.75f, 0.0f, 0.5f}, "Fin");
 
-  windowId = pumbra.addSurface(window);
-  /* awningId = */ pumbra.addSurface(awning);
-  [[maybe_unused]] auto finID = pumbra.addSurface(fin);
+  window_id = penumbra.add_surface(window);
+  penumbra.add_surface(awning);
+  [[maybe_unused]] auto finID = penumbra.add_surface(fin);
 
-  pumbra.setModel();
+  penumbra.set_model();
 
-  pumbra.renderScene(windowId);
-  windowPSSA = pumbra.calculatePSSA(windowId);
+  penumbra.render_scene(window_id);
 
-  logger->info(fmt::format("Window PSSA with fin: {}", windowPSSA));
+  logger->info(fmt::format("Window PSSA with fin: {}", penumbra.calculate_pssa(window_id)));
 
   return 0;
 }

@@ -17,7 +17,7 @@
 
 namespace Pumbra {
 
-enum class VendorName { unknown, nvidia, amd, intel, vmware, mesa };
+enum class VendorType { unknown, nvidia, amd, intel, vmware, mesa };
 
 class PenumbraPrivate;
 
@@ -31,33 +31,33 @@ public:
   ~Penumbra();
 
 public:
-  static bool isValidContext();
-  unsigned addSurface(const Surface &surface);
-  void setModel();
-  void clearModel();
-  void setSunPosition(float azm, // in radians, clockwise, north = 0
-                      float alt  // in radians, horizon = 0, vertical = pi/2
+  static bool is_valid_context();
+  unsigned add_surface(const Surface &surface);
+  void set_model();
+  void clear_model();
+  void set_sun_position(float azimuth, // in radians, clockwise, north = 0
+                      float altitude  // in radians, horizon = 0, vertical = pi/2
   );
-  float getSunAzimuth();
-  float getSunAltitude();
-  void submitPSSA(unsigned surfaceIndex);
-  void submitPSSA(const std::vector<unsigned> &surfaceIndices);
-  void submitPSSA();
-  unsigned getNumSurfaces();
-  float fetchPSSA(unsigned surfaceIndex);
-  std::vector<float> fetchPSSA(const std::vector<unsigned> &surfaceIndices);
-  std::vector<float> fetchPSSA();
-  float calculatePSSA(unsigned surfaceIndex);
-  std::vector<float> calculatePSSA(const std::vector<unsigned> &surfaceIndices);
-  std::vector<float> calculatePSSA();
+  float get_sun_azimuth();
+  float get_sun_altitude();
+  void submit_pssa(unsigned surface_index);
+  void submit_pssa(const std::vector<unsigned> &surface_indices);
+  void submit_pssa();
+  unsigned get_number_of_surfaces();
+  float fetch_pssa(unsigned surface_index);
+  std::vector<float> fetch_pssa(const std::vector<unsigned> &surface_indices);
+  std::vector<float> fetch_pssa();
+  float calculate_pssa(unsigned surface_index);
+  std::vector<float> calculate_pssa(const std::vector<unsigned> &surface_indices);
+  std::vector<float> calculate_pssa();
   std::unordered_map<unsigned, float>
-  calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurfaceIndices,
-                         const std::vector<unsigned> &interiorSurfaceIndices);
-  void renderScene(unsigned surfaceIndex); // Primarily for debug purposes
+  calculate_interior_pssas(const std::vector<unsigned> &transparent_surface_indices,
+                         const std::vector<unsigned> &interior_surface_indices);
+  void render_scene(unsigned surface_index); // Primarily for debug purposes
   void
-  renderInteriorScene(std::vector<unsigned> transparentSurfaceIndices,
-                      std::vector<unsigned> interiorSurfaceIndices); // Primarily for debug purposes
-  VendorName getVendorName();
+  render_interior_scene(std::vector<unsigned> transparent_surface_indices,
+      std::vector<unsigned> interior_surface_indices); // Primarily for debug purposes
+  VendorType get_vendor_name();
   std::shared_ptr<Courierr::Courierr> get_logger();
 
 private:

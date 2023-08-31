@@ -24,14 +24,14 @@ GLShader::GLShader(GLenum type, const char *source, Courierr::Courierr *logger_i
       glGetShaderInfoLog(shader, 8192, &log_length, info_log);
       glDeleteShader(shader);
       shader = 0;
-      std::string shaderTypeStr = (type == GL_FRAGMENT_SHADER) ? "fragment" : "vertex";
-      logger->info(fmt::format("OpenGL {} shader: {}", shaderTypeStr, info_log));
-      throw PenumbraException(fmt::format("Unable to compile {} shader.", shaderTypeStr), *logger);
+      std::string shader_type_string = (type == GL_FRAGMENT_SHADER) ? "fragment" : "vertex";
+      logger->info(fmt::format("OpenGL {} shader: {}", shader_type_string, info_log));
+      throw PenumbraException(fmt::format("Unable to compile {} shader.", shader_type_string), *logger);
     }
   }
 }
 
-GLuint GLShader::getInt() const {
+GLuint GLShader::get() const {
   return shader;
 }
 

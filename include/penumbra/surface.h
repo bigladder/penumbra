@@ -22,9 +22,9 @@ class Surface {
 public:
   Surface();
   explicit Surface(const Polygon &polygon, const std::string &name = "");
-  Surface(const Surface &srf);
+  Surface(const Surface &surface);
   ~Surface();
-  void addHole(const Polygon &hole); // Defined in counter-clockwise order when facing front
+  void add_hole(const Polygon &hole); // Defined in counter-clockwise order when facing front
 
 private:
   std::shared_ptr<SurfacePrivate> surface;

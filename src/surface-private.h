@@ -15,11 +15,11 @@
 namespace Pumbra {
 
 struct TessData {
-  TessData(const float *array, unsigned numVerts);
+  TessData(const float *array, unsigned number_of_vertices);
   std::vector<float> vertices;
-  unsigned numVerts;
-  static const int polySize{3};   // making triangles
-  static const int vertexSize{3}; // i.e., 3D
+  unsigned number_of_vertices;
+  static const int polygon_size{3};   // making triangles
+  static const int vertex_size{3}; // i.e., 3D
 };
 
 class SurfacePrivate {
@@ -31,9 +31,6 @@ public:
   std::vector<Polygon> holes;
   std::shared_ptr<Courierr::Courierr> logger;
   std::string name;
-
-private:
-  std::shared_ptr<float> vertPtr;
 };
 
 } // namespace Pumbra

@@ -13,9 +13,9 @@ namespace Pumbra {
 
 class GLProgram {
 public:
-  GLProgram(const char *vertexSource, const char *fragmentSource, Courierr::Courierr *logger);
+  GLProgram(const char *vertex_source, const char *fragment_source, Courierr::Courierr *logger);
   ~GLProgram();
-  [[nodiscard]] GLuint getInt() const;
+  [[nodiscard]] GLuint get() const;
 
 private:
   GLuint program;

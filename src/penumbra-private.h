@@ -25,13 +25,13 @@ public:
   ~PenumbraPrivate() = default;
 
 public:
-  void addSurface(const Surface &surface);
+  void add_surface(const Surface &surface);
   Context context;
   Sun sun;
   std::vector<float> model;
   std::vector<SurfacePrivate> surfaces;
   std::shared_ptr<Courierr::Courierr> logger;
-  [[nodiscard]] bool checkSurface(unsigned index) const;
+  [[nodiscard]] bool check_surface(unsigned index) const;
 };
 
 } // namespace Pumbra
