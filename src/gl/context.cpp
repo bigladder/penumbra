@@ -241,7 +241,7 @@ void Context::toggle_camera_mode() {
   }
 }
 
-std::string Context::vendorName() {
+std::string Context::get_vendor_name() {
   return reinterpret_cast<const char *>(glGetString(GL_VENDOR));
 }
 
@@ -479,8 +479,8 @@ void Context::show_rendering(const unsigned surface_index, mat4x4 sun_view) {
   initialize_off_screen_mode();
 }
 
-void Context::showInteriorRendering(const std::vector<unsigned> &hidden_surface_indices,
-                                    const unsigned interior_surface_index, mat4x4 sun_view) {
+void Context::show_interior_rendering(const std::vector<unsigned> &hidden_surface_indices,
+                                      const unsigned interior_surface_index, mat4x4 sun_view) {
   glfwSetWindowSize(window, size, size);
   glfwShowWindow(window);
 
