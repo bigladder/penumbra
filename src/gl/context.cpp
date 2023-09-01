@@ -523,7 +523,7 @@ void Context::submit_pssa(const unsigned int surface_index, mat4x4 sun_view) {
   submit_pssa(model.surface_buffers[surface_index], sun_view);
 }
 
-void Context::submit_pssa(const std::vector<unsigned int> &surface_indices, mat4x4 sun_view) {
+void Context::submit_pssas(const std::vector<unsigned int> &surface_indices, mat4x4 sun_view) {
   for (auto const surface_index : surface_indices) {
     submit_pssa(surface_index, sun_view);
   }
@@ -535,34 +535,27 @@ void Context::submit_pssa(mat4x4 sun_view) {
   }
 }
 
-float Context::calculate_pssa(const unsigned int surface_index) {
-  // retrieve result
+float Context::retrieve_pssa(const unsigned int surface_index) {
   glGetQueryObjectiv(queries[surface_index], GL_QUERY_RESULT, &(pixel_counts.at(surface_index)));
   return static_cast<float>(pixel_counts[surface_index]) * pixel_areas[surface_index];
 }
 
-std::vector<float> Context::calculate_pssa(const std::vector<unsigned int> &surface_indices) {
-
-  // retrieve result
-  std::vector<float> results;
-  results.reserve(surface_indices.size());
+std::vector<float> Context::retrieve_pssas(const std::vector<unsigned int> &surface_indices) {
+  std::vector<float> pssas;
+  pssas.reserve(surface_indices.size());
   for (const unsigned int surface_index : surface_indices) {
-    results.emplace_back(calculate_pssa(surface_index));
+    pssas.emplace_back(retrieve_pssa(surface_index));
   }
-
-  return results;
+  return pssas;
 }
 
-std::vector<float> Context::calculate_pssa() {
-
-  // retrieve result
-  std::vector<float> results;
-  results.reserve(model.surface_buffers.size());
+std::vector<float> Context::retrieve_pssa() {
+  std::vector<float> pssas;
+  pssas.reserve(model.surface_buffers.size());
   for (auto const &surface_buffer : model.surface_buffers) {
-    results.emplace_back(calculate_pssa(surface_buffer.index));
+    pssas.emplace_back(retrieve_pssa(surface_buffer.index));
   }
-
-  return results;
+  return pssas;
 }
 
 std::unordered_map<unsigned int, float>
@@ -570,10 +563,10 @@ Context::calculate_interior_pssas(const std::vector<unsigned int> &hidden_surfac
                                   const std::vector<unsigned int> &interior_surface_indices,
                                   mat4x4 sun_view) {
 
-  std::vector<GLuint> pssas_queries(interior_surface_indices.size());
+  std::vector<GLuint> interior_queries(interior_surface_indices.size());
   std::unordered_map<unsigned int, float> pssas;
 
-  glGenQueries(static_cast<GLsizei>(pssas_queries.size()), pssas_queries.data());
+  glGenQueries(static_cast<GLsizei>(interior_queries.size()), interior_queries.data());
 
   auto const pixel_area =
       set_scene(sun_view, &model.surface_buffers[hidden_surface_indices.at(0)], false);
@@ -592,20 +585,19 @@ Context::calculate_interior_pssas(const std::vector<unsigned int> &hidden_surfac
   draw_except(hidden_surfaces);
 
   for (size_t i = 0; i < interior_surfaces.size(); ++i) {
-    glBeginQuery(GL_SAMPLES_PASSED, pssas_queries[i]);
+    glBeginQuery(GL_SAMPLES_PASSED, interior_queries[i]);
     GLModel::draw_surface(interior_surfaces[i]);
     glEndQuery(GL_SAMPLES_PASSED);
   }
 
   for (size_t i = 0; i < interior_surfaces.size(); ++i) {
-    // retrieve result
     GLint pixel_count;
-    glGetQueryObjectiv(pssas_queries[i], GL_QUERY_RESULT, &pixel_count);
+    glGetQueryObjectiv(interior_queries[i], GL_QUERY_RESULT, &pixel_count);
 
     pssas[interior_surfaces[i].index] = static_cast<float>(pixel_count) * pixel_area;
   }
 
-  glDeleteQueries(static_cast<GLsizei>(pssas_queries.size()), pssas_queries.data());
+  glDeleteQueries(static_cast<GLsizei>(interior_queries.size()), interior_queries.data());
   return pssas;
 }
 

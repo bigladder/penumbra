@@ -44,9 +44,9 @@ public:
   void submit_pssa(const std::vector<unsigned int> &surface_indices);
   void submit_pssa();
   unsigned int get_number_of_surfaces();
-  float fetch_pssa(unsigned int surface_index);
-  std::vector<float> fetch_pssa(const std::vector<unsigned int> &surface_indices);
-  std::vector<float> fetch_pssa();
+  float retrieve_pssa(unsigned int surface_index);
+  std::vector<float> retrieve_pssa(const std::vector<unsigned int> &surface_indices);
+  std::vector<float> retrieve_pssa();
   float calculate_pssa(unsigned int surface_index);
   std::vector<float> calculate_pssa(const std::vector<unsigned int> &surface_indices);
   std::vector<float> calculate_pssa();

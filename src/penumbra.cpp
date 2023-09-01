@@ -135,42 +135,42 @@ void Penumbra::submit_pssa(const std::vector<unsigned int> &surface_indices) {
   for (auto const surface_index : surface_indices) {
     penumbra->check_surface(surface_index);
   }
-  penumbra->context.submit_pssa(surface_indices, penumbra->sun.get_view());
+  penumbra->context.submit_pssas(surface_indices, penumbra->sun.get_view());
 }
 
 void Penumbra::submit_pssa() {
   penumbra->context.submit_pssa(penumbra->sun.get_view());
 }
 
-float Penumbra::fetch_pssa(unsigned int surface_index) {
+float Penumbra::retrieve_pssa(unsigned int surface_index) {
   penumbra->check_surface(surface_index);
-  return penumbra->context.calculate_pssa(surface_index);
+  return penumbra->context.retrieve_pssa(surface_index);
 }
 
-std::vector<float> Penumbra::fetch_pssa(const std::vector<unsigned int> &surface_indices) {
+std::vector<float> Penumbra::retrieve_pssa(const std::vector<unsigned int> &surface_indices) {
   for (auto const surface_index : surface_indices) {
     penumbra->check_surface(surface_index);
   }
-  return penumbra->context.calculate_pssa(surface_indices);
+  return penumbra->context.retrieve_pssas(surface_indices);
 }
 
-std::vector<float> Penumbra::fetch_pssa() {
-  return penumbra->context.calculate_pssa();
+std::vector<float> Penumbra::retrieve_pssa() {
+  return penumbra->context.retrieve_pssa();
 }
 
 float Penumbra::calculate_pssa(unsigned int surface_index) {
   submit_pssa(surface_index);
-  return fetch_pssa(surface_index);
+  return retrieve_pssa(surface_index);
 }
 
 std::vector<float> Penumbra::calculate_pssa(const std::vector<unsigned int> &surface_indices) {
   submit_pssa(surface_indices);
-  return fetch_pssa(surface_indices);
+  return retrieve_pssa(surface_indices);
 }
 
 std::vector<float> Penumbra::calculate_pssa() {
   submit_pssa();
-  return fetch_pssa();
+  return retrieve_pssa();
 }
 
 std::unordered_map<unsigned int, float>

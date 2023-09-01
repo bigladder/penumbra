@@ -460,7 +460,7 @@ TEST(PenumbraTest, bad_surface_input_errors) {
 
   EXPECT_THROW(penumbra.render_scene(11), Penumbra::PenumbraException);
 
-  EXPECT_THROW(penumbra.fetch_pssa(bad_test_cube), Penumbra::PenumbraException);
+  EXPECT_THROW(penumbra.retrieve_pssa(bad_test_cube), Penumbra::PenumbraException);
 }
 
 int main(int argc, char **argv) {
