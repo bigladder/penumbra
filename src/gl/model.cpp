@@ -22,11 +22,8 @@ namespace Pumbra {
 SurfaceBuffer::SurfaceBuffer(GLuint begin, GLuint count, GLint index)
     : begin(begin), count(count), index(index) {}
 
-GLModel::~GLModel() { clearModel(); }
-
 void GLModel::clearModel() {
-  if (objectsSet)
-  {
+  if (objectsSet) {
     glDeleteVertexArraysX(1, &vao);
     glDeleteBuffers(1, &vbo);
   }
@@ -44,11 +41,12 @@ void GLModel::setVertices(const std::vector<float> &vertices) {
   // Set up array buffer to store vertex information
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(sizeof(float) * vertices.size()), &vertices[0],
+               GL_STATIC_DRAW);
 
   // Set drawing pointers for current vertex buffer
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, nullptr);
 
   objectsSet = true;
 }
@@ -58,14 +56,17 @@ void GLModel::setSurfaceBuffers(const std::vector<SurfaceBuffer> &m_surfaceBuffe
 }
 
 void GLModel::drawSurface(SurfaceBuffer surfaceBuffer) {
-  glDrawArrays(GL_TRIANGLES, surfaceBuffer.begin, surfaceBuffer.count);
+  glDrawArrays(GL_TRIANGLES, static_cast<GLint>(surfaceBuffer.begin),
+               static_cast<GLsizei>(surfaceBuffer.count));
 }
 
-void GLModel::drawAll() { glDrawArrays(GL_TRIANGLES, 0, numPoints); }
+void GLModel::drawAll() const {
+  glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(numPoints));
+}
 
-void GLModel::drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) {
+void GLModel::drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) const {
 
-  if (hiddenSurfaces.size() == 0) { // draw all if no hidden surfaces
+  if (hiddenSurfaces.empty()) { // draw all if no hidden surfaces
     drawAll();
     return;
   }
@@ -77,7 +78,7 @@ void GLModel::drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) {
 
   // Begin (if first hidden surface isn't first surface)
   if (hiddenSurfaces[0].begin != 0u) {
-    glDrawArrays(GL_TRIANGLES, 0, hiddenSurfaces[0].begin);
+    glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(hiddenSurfaces[0].begin));
   }
 
   GLuint nextBegin = hiddenSurfaces[0].begin + hiddenSurfaces[0].count;
@@ -93,11 +94,13 @@ void GLModel::drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) {
       nextBegin = hiddenSurfaces[i].begin + hiddenSurfaces[i].count;
       break;
     }
-    glDrawArrays(GL_TRIANGLES, nextBegin, hiddenSurfaces[i + 1].begin - 1);
+    glDrawArrays(GL_TRIANGLES, static_cast<GLsizei>(nextBegin),
+                 static_cast<GLsizei>(hiddenSurfaces[i + 1].begin - 1));
   }
 
   if (nextBegin < numPoints) {
-    glDrawArrays(GL_TRIANGLES, nextBegin, numPoints - nextBegin);
+    glDrawArrays(GL_TRIANGLES, static_cast<GLsizei>(nextBegin),
+                 static_cast<GLsizei>(numPoints - nextBegin));
   }
 }
 

@@ -8,8 +8,8 @@
 #endif
 
 // Penumbra
+#include <penumbra/logging.h>
 #include "context.h"
-#include "../error.h"
 
 namespace Pumbra {
 
@@ -48,19 +48,27 @@ const char *Context::calculationVertexShaderSource =
   }
 )src";
 
-static void glErrorCallback(int, const char *description) {
-  showMessage(MSG_INFO, description);
+thread_local static Courierr::Courierr *glfw_logger{nullptr};
+
+static void glfw_error_callback(int, const char *description) {
+  if (glfw_logger) {
+    glfw_logger->info(fmt::format("GLFW message: {}", description));
+  }
 }
 
-Context::Context(unsigned size)
-    : size(size), modelSet(false), isWireFrame(false), isCameraMode(false), viewScale(1.f),
-      cameraRotAngleX(0.f), cameraRotAngleY(0.f), lbutton_down(true), isRenderMode(false) {
+Context::Context(GLint size_in, Courierr::Courierr *logger_in)
+    : size(size_in), modelSet(false), isWireFrame(false), isCameraMode(false), viewScale(1.f),
+      cameraRotAngleX(0.f), cameraRotAngleY(0.f), lbutton_down(true), isRenderMode(false),
+      logger(logger_in) {
 
-  glfwSetErrorCallback(glErrorCallback);
+  glfw_logger = logger;
+  glfwSetErrorCallback(glfw_error_callback);
 
   if (!glfwInit()) {
-    showMessage(MSG_ERR, "Unable to initialize GLFW.");
-    showMessage(MSG_ERR, "Either there is no GPU, libraries are missing, or some other error happened.");
+    throw PenumbraException(
+        "Unable to initialize GLFW. Either there is no GPU, libraries are missing, or "
+        "some other error happened.",
+        *logger);
   }
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -72,7 +80,7 @@ Context::Context(unsigned size)
   fedisableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
 #endif
-  window = glfwCreateWindow(1, 1, "Penumbra", NULL, NULL);
+  window = glfwCreateWindow(1, 1, "Penumbra", nullptr, nullptr);
 #ifndef NDEBUG
 #ifdef __unix__
   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
@@ -80,37 +88,39 @@ Context::Context(unsigned size)
 #endif
   glfwMakeContextCurrent(window);
   if (!window) {
-    showMessage(
-        MSG_ERR,
-        "Unable to create OpenGL context. OpenGL 2.1+ is required to perform GPU accelerated shading calculations.");
+    throw PenumbraException(
+        "Unable to create OpenGL context. OpenGL 2.1+ is required to perform GPU "
+        "accelerated shading calculations.",
+        *logger);
   }
 
   // OpenGL extension loader
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    showMessage(MSG_ERR, "Failed to load OpenGL extensions.");
+    throw PenumbraException("Failed to load required OpenGL extensions.", *logger);
   }
 
   if (!glfwExtensionSupported("GL_ARB_vertex_array_object") &&
       !glfwExtensionSupported("GL_APPLE_vertex_array_object")) {
-    showMessage(MSG_ERR, "The current version of OpenGL does not support vertex array objects.");
+    throw PenumbraException("The current version of OpenGL does not support vertex array objects.",
+                            *logger);
   }
   if (!glfwExtensionSupported("GL_EXT_framebuffer_object")) {
-    showMessage(MSG_ERR, "The current version of OpenGL does not support framebuffer objects.");
+    throw PenumbraException("The current version of OpenGL does not support framebuffer objects.",
+                            *logger);
   }
 
-  // std::string glVersion = (char*)glGetString(GL_VERSION);
-  // showMessage(MSG_INFO, "OpenGL version = " + glVersion);
   GLint max_view_size[2];
   glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &max_view_size[0]);
-  GLuint max_res = std::min(GL_MAX_RENDERBUFFER_SIZE_EXT, max_view_size[0]);
+  GLint max_res = std::min(GL_MAX_RENDERBUFFER_SIZE_EXT, max_view_size[0]);
   if (size >= max_res) {
-    showMessage(MSG_WARN,
-                "The selected resolution is larger than the maximum allowable by your hardware. "
-                "The size will be reset to be equal to the maximum allowable."); // TODO: Format
-    this->size = max_res;
+    logger->warning(
+        fmt::format("The selected resolution, {}, is larger than the maximum allowable by your "
+                    "hardware, {}. The size will be reset to be equal to the maximum allowable.",
+                    size, max_res));
+    size = max_res;
   }
 
-  glViewport(0, 0, this->size, this->size);
+  glViewport(0, 0, size, size);
 
   // Input callbacks for orbit mode
   glfwSetWindowUserPointer(window, this);
@@ -159,7 +169,7 @@ Context::Context(unsigned size)
       glfwWPtr(w)->cameraRotAngleX = static_cast<float>(
           -(yPos - glfwWPtr(w)->prevPosY) * rotationSpeed); // Y motion should produce x rotation
       glfwWPtr(w)->cameraRotAngleY = static_cast<float>(
-          (xPos - glfwWPtr(w)->prevPosX) * rotationSpeed); // X motion should produce -y rotation
+          (xPos - glfwWPtr(w)->prevPosX) * rotationSpeed);  // X motion should produce -y rotation
 
       glfwWPtr(w)->prevPosX = xPos;
       glfwWPtr(w)->prevPosY = yPos;
@@ -168,6 +178,8 @@ Context::Context(unsigned size)
       glfwWPtr(w)->setCameraMVP();
     }
   };
+
+#undef glfwWPtr
 
   glfwSetKeyCallback(window, key_callback);
   glfwSetScrollCallback(window, scroll_callback);
@@ -181,13 +193,13 @@ Context::Context(unsigned size)
   // Shader programs
 
   // Program for off-screen calculation
-  calcProgram = std::unique_ptr<GLProgram>(new GLProgram(calculationVertexShaderSource, nullptr));
+  calcProgram = std::make_unique<GLProgram>(calculationVertexShaderSource, nullptr, logger);
 
   glBindAttribLocation(calcProgram->getInt(), 0, "vPos");
 
   // Program for on-screen rendering (mostly for debugging)
-  renderProgram = std::unique_ptr<GLProgram>(
-      new GLProgram(renderVertexShaderSource, renderFragmentShaderSource));
+  renderProgram =
+      std::make_unique<GLProgram>(renderVertexShaderSource, renderFragmentShaderSource, logger);
   glBindAttribLocation(renderProgram->getInt(), 0, "vPos");
   vColLocation = glGetUniformLocation(renderProgram->getInt(), "vCol");
 
@@ -205,7 +217,8 @@ Context::~Context() {
   glDeleteRenderbuffersEXT(1, &rbo);
   glDeleteProgram(calcProgram->getInt());
   glDeleteProgram(renderProgram->getInt());
-  glfwDestroyWindow(window);
+  model.clearModel();
+  glfwTerminate();
 }
 void Context::toggleWireFrame() {
   isWireFrame = !isWireFrame;
@@ -229,7 +242,7 @@ void Context::toggleCameraMode() {
 }
 
 std::string Context::vendorName() {
-    return reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+  return reinterpret_cast<const char *>(glGetString(GL_VENDOR));
 }
 
 void Context::clearModel() {
@@ -238,7 +251,8 @@ void Context::clearModel() {
   modelSet = false;
 }
 
-void Context::setModel(const std::vector<float> &vertices, const std::vector<SurfaceBuffer> &surfaceBuffers) {
+void Context::setModel(const std::vector<float> &vertices,
+                       const std::vector<SurfaceBuffer> &surfaceBuffers) {
   if (modelSet) {
     clearModel();
   }
@@ -258,7 +272,7 @@ void Context::setModel(const std::vector<float> &vertices, const std::vector<Sur
   float bRight = -MAX_FLOAT, bTop = -MAX_FLOAT, bBack = -MAX_FLOAT;
 
   // calculate bounding box
-  for (int i = 0; i < (int)vertices.size(); i += model.vertexSize) {
+  for (int i = 0; i < (int)vertices.size(); i += GLModel::vertexSize) {
     float x = vertices[i];
     float y = vertices[i + 1];
     float z = vertices[i + 2];
@@ -287,7 +301,7 @@ void Context::setModel(const std::vector<float> &vertices, const std::vector<Sur
 float Context::setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer, bool clipFar) {
 
   if (!modelSet) {
-    showMessage(MSG_ERR, "Model has not been set. Cannot set OpenGL scene.");
+    throw PenumbraException("Model has not been set. Cannot set OpenGL scene.", *logger);
   }
 
   mat4x4_dup(view, sunView);
@@ -301,10 +315,12 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer, bool
   far_ = MAX_FLOAT;
 
   // If surface buffer has not been set use entire model instead.
-  GLuint beg = surfaceBuffer ? surfaceBuffer->begin * model.vertexSize : 0;
-  GLuint end = surfaceBuffer ? surfaceBuffer->begin * model.vertexSize + surfaceBuffer->count * model.vertexSize : static_cast<GLuint>(model.vertexArray.size());
+  GLuint beg = surfaceBuffer ? surfaceBuffer->begin * GLModel::vertexSize : 0;
+  GLuint end = surfaceBuffer ? surfaceBuffer->begin * GLModel::vertexSize +
+                                   surfaceBuffer->count * GLModel::vertexSize
+                             : static_cast<GLuint>(model.vertexArray.size());
 
-  for (GLuint i = beg; i < end; i += model.vertexSize) {
+  for (GLuint i = beg; i < end; i += GLModel::vertexSize) {
     vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
     vec4 trans;
     mat4x4_mul_vec4(trans, view, point);
@@ -317,9 +333,9 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer, bool
   }
 
   // Use model box to determine near clipping plane (and far if looking interior)
-  for (std::size_t i = 0; i < 8; i++) {
+  for (auto const coordinate : modelBox) {
     vec4 trans;
-    mat4x4_mul_vec4(trans, view, modelBox[i]);
+    mat4x4_mul_vec4(trans, view, coordinate);
     near_ = std::max(trans[2], near_);
     if (!clipFar) {
       far_ = std::min(trans[2], far_);
@@ -328,29 +344,28 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer, bool
 
   // account for camera position
   near_ -= 0.999f; // For some reason, -1. is too tight when sun is perpendicular to the surface.
-  far_ -= 1.001f; // For some reason, -1. is too tight when sun is perpendicular to the surface.
+  far_ -= 1.001f;  // For some reason, -1. is too tight when sun is perpendicular to the surface.
 
   // Grow horizontal extents of view by one pixel on each side
-  float deltaX = (right - left) / size;
+  float deltaX = (right - left) / static_cast<float>(size);
   left -= deltaX;
   right += deltaX;
 
   // Grow vertical extents of view by one pixel on each side
-  float deltaY = (top - bottom) / size;
+  float deltaY = (top - bottom) / static_cast<float>(size);
   bottom -= deltaY;
   top += deltaY;
 
   // calculate pixel area (A[i]*cos(theta) for each pixel of the surface)
   // multiplies by the number of pixels to get projected sunlit surface area
 
-  auto const pixelArea = (right - left) * (top - bottom) / (size * size);
+  auto const pixelArea = (right - left) * (top - bottom) / static_cast<float>(size * size);
 
-  if (pixelArea > 0.0)
-  {
-      mat4x4_ortho(projection, left, right, bottom, top, -near_, -far_);
-      mat4x4_mul(mvp, projection, view);
+  if (pixelArea > 0.0) {
+    mat4x4_ortho(projection, left, right, bottom, top, -near_, -far_);
+    mat4x4_mul(mvp, projection, view);
 
-      setMVP();
+    setMVP();
   }
 
   // TODO: Consider what to do with the camera if pixelArea happens to be zero
@@ -361,7 +376,7 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer, bool
 void Context::calcCameraView() {
   // Do something here to give the appearance of rotating the scene.
   mat4x4
-  tempMat; // Transpose changes the affects of consecutive rotations from local to global space.
+      tempMat; // Transpose changes the affects of consecutive rotations from local to global space.
   mat4x4_transpose(tempMat, cameraView);
   mat4x4_rotate_X(cameraView, tempMat, cameraRotAngleX);
   mat4x4_rotate_Y(tempMat, cameraView, cameraRotAngleY);
@@ -378,8 +393,8 @@ void Context::setCameraMVP() {
   float cLeft = left;
   float cTop = top;
   float cBottom = bottom;
-  float cNear = near_;
-  float cFar = far_;
+  float cNear = 100.; // Set near and far to something now and make it tighter later.
+  float cFar = -100.; // To tighten, look at the sphere of possible rotations.
 
   deltaW = (cRight - cLeft) / 2.f;
   deltaH = (cTop - cBottom) / 2.f;
@@ -391,9 +406,6 @@ void Context::setCameraMVP() {
     cLeft -= (deltaH - deltaW);
     cRight += (deltaW - deltaH);
   }
-
-  cNear = 100.; // Set near and far to something now and make it tighter later.
-  cFar = -100.; // To tighten, look at the sphere of possible rotations.
 
   mat4x4 cProjection;
   mat4x4 cMVP;
@@ -451,14 +463,14 @@ void Context::showRendering(const unsigned surfaceIndex, mat4x4 sunView) {
     isRenderMode = true;
   }
 
-  auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
+  auto const &surfaceBuffer = model.surfaceBuffers[surfaceIndex];
   setScene(sunView, &surfaceBuffer);
 
   while (!glfwWindowShouldClose(window)) {
     glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
     drawModel();
     glUniform3f(vColLocation, 1.f, 1.f, 1.f);
-    model.drawSurface(surfaceBuffer);
+    GLModel::drawSurface(surfaceBuffer);
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -468,8 +480,7 @@ void Context::showRendering(const unsigned surfaceIndex, mat4x4 sunView) {
 }
 
 void Context::showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIndices,
-                                    const unsigned interiorSurfaceIndex,
-                                    mat4x4 sunView) {
+                                    const unsigned interiorSurfaceIndex, mat4x4 sunView) {
   glfwSetWindowSize(window, size, size);
   glfwShowWindow(window);
 
@@ -478,8 +489,9 @@ void Context::showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIn
     isRenderMode = true;
   }
 
-  auto const & interiorSurface = model.surfaceBuffers[interiorSurfaceIndex];
+  auto const &interiorSurface = model.surfaceBuffers[interiorSurfaceIndex];
   std::vector<SurfaceBuffer> hiddenSurfaces;
+  hiddenSurfaces.reserve(hiddenSurfaceIndices.size());
   for (auto const hiddenSurf : hiddenSurfaceIndices) {
     hiddenSurfaces.push_back(model.surfaceBuffers[hiddenSurf]);
   }
@@ -490,7 +502,7 @@ void Context::showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIn
     glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
     drawExcept(hiddenSurfaces);
     glUniform3f(vColLocation, 1.f, 1.f, 1.f);
-    model.drawSurface(interiorSurface);
+    GLModel::drawSurface(interiorSurface);
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -500,60 +512,33 @@ void Context::showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIn
 }
 
 void Context::submitPSSA(const unsigned surfaceIndex, mat4x4 sunView) {
-  auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
+  auto const &surfaceBuffer = model.surfaceBuffers[surfaceIndex];
   auto const pixelArea = setScene(sunView, &surfaceBuffer);
   drawModel();
   glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
-  model.drawSurface(surfaceBuffer);
+  GLModel::drawSurface(surfaceBuffer);
   glEndQuery(GL_SAMPLES_PASSED);
   pixelAreas.at(surfaceBuffer.index) = pixelArea;
 }
 
-void Context::bufferedQuery(const unsigned surfaceIndex) {
-  int i = 0;
-  for (; i < bufferSize; ++i) {
-    if (indexBuffer[i] == static_cast<int>(surfaceIndex)) break;
-  }
-  if (i == bufferSize) return;
-
-  glGetQueryObjectiv(queries[i], GL_QUERY_RESULT, &(pixelCounts.at(indexBuffer[i])));
-  indexBuffer[i] = -1;
-}
-
-void Context::bufferedQuery(const SurfaceBuffer &surfaceBuffer) {
-  if (indexBuffer[currentBufferIndex] > -1) {
-    glGetQueryObjectiv(queries[currentBufferIndex], GL_QUERY_RESULT, &(pixelCounts.at(indexBuffer[currentBufferIndex])));
-  }
-
-  glBeginQuery(GL_SAMPLES_PASSED, queries[currentBufferIndex]);
-  model.drawSurface(surfaceBuffer);
-  glEndQuery(GL_SAMPLES_PASSED);
-  pixelCounts.at(surfaceBuffer.index) = -1;
-  indexBuffer[currentBufferIndex] = surfaceBuffer.index;
-  currentBufferIndex++;
-  if (currentBufferIndex % bufferSize == 0) {
-    currentBufferIndex = 0;
-  }
-}
-
 void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
   for (auto const surfaceIndex : surfaceIndices) {
-    auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
+    auto const &surfaceBuffer = model.surfaceBuffers[surfaceIndex];
     auto const pixelArea = setScene(sunView, &surfaceBuffer);
     drawModel();
     glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
-    model.drawSurface(surfaceBuffer);
+    GLModel::drawSurface(surfaceBuffer);
     glEndQuery(GL_SAMPLES_PASSED);
     pixelAreas.at(surfaceBuffer.index) = pixelArea;
   }
 }
 
 void Context::submitPSSA(mat4x4 sunView) {
-  for (auto const & surfaceBuffer : model.surfaceBuffers) {
+  for (auto const &surfaceBuffer : model.surfaceBuffers) {
     auto const pixelArea = setScene(sunView, &surfaceBuffer);
     drawModel();
     glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
-    model.drawSurface(surfaceBuffer);
+    GLModel::drawSurface(surfaceBuffer);
     glEndQuery(GL_SAMPLES_PASSED);
     // bufferedQuery(surfaceBuffer);
     pixelAreas.at(surfaceBuffer.index) = pixelArea;
@@ -562,7 +547,7 @@ void Context::submitPSSA(mat4x4 sunView) {
 
 float Context::calculatePSSA(const unsigned surfaceIndex) {
 
-  if (isRenderMode) { // if currently render mode, switch to off screen mode
+  if (isRenderMode) { // if currently render mode, switch to off-screen mode
     initOffScreenMode();
     isRenderMode = false;
   }
@@ -576,12 +561,12 @@ float Context::calculatePSSA(const unsigned surfaceIndex) {
   // retrieve result
   glGetQueryObjectiv(queries[surfaceIndex], GL_QUERY_RESULT, &(pixelCounts.at(surfaceIndex)));
 
-  return pixelCounts[surfaceIndex] * pixelAreas[surfaceIndex];
+  return static_cast<float>(pixelCounts[surfaceIndex]) * pixelAreas[surfaceIndex];
 }
 
 std::vector<float> Context::calculatePSSA(const std::vector<unsigned> &surfaceIndices) {
 
-  if (isRenderMode) { // if currently render mode, switch to off screen mode
+  if (isRenderMode) { // if currently render mode, switch to off-screen mode
     initOffScreenMode();
     isRenderMode = false;
   }
@@ -589,9 +574,9 @@ std::vector<float> Context::calculatePSSA(const std::vector<unsigned> &surfaceIn
   // retrieve result
   std::vector<float> results;
   results.reserve(surfaceIndices.size());
-  for (auto const & surfaceIndex : surfaceIndices) {
+  for (auto const &surfaceIndex : surfaceIndices) {
     glGetQueryObjectiv(queries[surfaceIndex], GL_QUERY_RESULT, &(pixelCounts.at(surfaceIndex)));
-    results.emplace_back(pixelCounts[surfaceIndex] * pixelAreas[surfaceIndex]);
+    results.emplace_back(static_cast<float>(pixelCounts[surfaceIndex]) * pixelAreas[surfaceIndex]);
   }
 
   return results;
@@ -599,7 +584,7 @@ std::vector<float> Context::calculatePSSA(const std::vector<unsigned> &surfaceIn
 
 std::vector<float> Context::calculatePSSA() {
 
-  if (isRenderMode) { // if currently render mode, switch to off screen mode
+  if (isRenderMode) { // if currently render mode, switch to off-screen mode
     initOffScreenMode();
     isRenderMode = false;
   }
@@ -607,36 +592,42 @@ std::vector<float> Context::calculatePSSA() {
   // retrieve result
   std::vector<float> results;
   results.reserve(model.surfaceBuffers.size());
-  for (auto const & surfaceBuffer : model.surfaceBuffers) {
-    glGetQueryObjectiv(queries[surfaceBuffer.index], GL_QUERY_RESULT, &(pixelCounts.at(surfaceBuffer.index)));
-    results.emplace_back(pixelCounts[surfaceBuffer.index] * pixelAreas[surfaceBuffer.index]);
+  for (auto const &surfaceBuffer : model.surfaceBuffers) {
+    glGetQueryObjectiv(queries[surfaceBuffer.index], GL_QUERY_RESULT,
+                       &(pixelCounts.at(surfaceBuffer.index)));
+    results.emplace_back(static_cast<float>(pixelCounts[surfaceBuffer.index]) *
+                         pixelAreas[surfaceBuffer.index]);
   }
 
   return results;
 }
 
-std::map<unsigned, float>
+std::unordered_map<unsigned, float>
 Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndices,
-                                const std::vector<unsigned> &interiorSurfaceIndices, mat4x4 sunView) {
+                                const std::vector<unsigned> &interiorSurfaceIndices,
+                                mat4x4 sunView) {
 
-  if (isRenderMode) { // if currently render mode, switch to off screen mode
+  if (isRenderMode) { // if currently render mode, switch to off-screen mode
     initOffScreenMode();
     isRenderMode = false;
   }
 
   std::vector<GLuint> pssasQueries(interiorSurfaceIndices.size());
-  std::map<unsigned, float> pssas;
+  std::unordered_map<unsigned, float> pssas;
 
   glGenQueries(static_cast<GLsizei>(pssasQueries.size()), pssasQueries.data());
 
-  auto const pixelArea = setScene( sunView, &model.surfaceBuffers[hiddenSurfaceIndices.at(0)], false);
+  auto const pixelArea =
+      setScene(sunView, &model.surfaceBuffers[hiddenSurfaceIndices.at(0)], false);
 
   std::vector<SurfaceBuffer> hiddenSurfaces;
+  hiddenSurfaces.reserve(hiddenSurfaceIndices.size());
   for (auto const hiddenSurf : hiddenSurfaceIndices) {
     hiddenSurfaces.push_back(model.surfaceBuffers[hiddenSurf]);
   }
   std::vector<SurfaceBuffer> interiorSurfaces;
-  for (auto &intSurf : interiorSurfaceIndices) {
+  interiorSurfaces.reserve(interiorSurfaceIndices.size());
+  for (auto const intSurf : interiorSurfaceIndices) {
     interiorSurfaces.push_back(model.surfaceBuffers[intSurf]);
   }
 
@@ -644,7 +635,7 @@ Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndice
 
   for (size_t i = 0; i < interiorSurfaces.size(); ++i) {
     glBeginQuery(GL_SAMPLES_PASSED, pssasQueries[i]);
-    model.drawSurface(interiorSurfaces[i]);
+    GLModel::drawSurface(interiorSurfaces[i]);
     glEndQuery(GL_SAMPLES_PASSED);
   }
 
@@ -653,7 +644,7 @@ Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndice
     GLint pixelCount;
     glGetQueryObjectiv(pssasQueries[i], GL_QUERY_RESULT, &pixelCount);
 
-    pssas[interiorSurfaces[i].index] = pixelCount * pixelArea;
+    pssas[interiorSurfaces[i].index] = static_cast<float>(pixelCount) * pixelArea;
   }
 
   glDeleteQueries(static_cast<GLsizei>(pssasQueries.size()), pssasQueries.data());
@@ -697,7 +688,7 @@ void Context::initOffScreenMode() {
       reason = "Reason unknown.";
     }
     }
-    showMessage(MSG_ERR, "Unable to create framebuffer. " + reason);
+    throw PenumbraException(fmt::format("Unable to create framebuffer. {}", reason), *logger);
   }
 
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
@@ -713,4 +704,4 @@ void Context::initRenderMode() {
   glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 
-}
+} // namespace Pumbra

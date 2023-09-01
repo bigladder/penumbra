@@ -4,8 +4,12 @@
 #ifndef SUN_H_
 #define SUN_H_
 
+// Standard
 #include <cmath>
 #include <linmath.h>
+
+// Vendor
+#include <courierr/courierr.h>
 
 namespace Pumbra {
 
@@ -14,7 +18,6 @@ typedef float (*mat4x4_ptr)[4];
 
 class Sun {
 public:
-  Sun(float azm, float alt);
   Sun();
 
   // Member functions
@@ -22,8 +25,8 @@ public:
   mat4x4_ptr getView();
   void setView(float azm, float alt);
   // void setView(mat4x4 view);
-  float getAzimuth();
-  float getAltitude();
+  [[nodiscard]] float getAzimuth() const;
+  [[nodiscard]] float getAltitude() const;
 
 private:
   void setView();
@@ -32,9 +35,8 @@ private:
 
   // Data Members
 private:
-  mat4x4 view;
+  mat4x4 view = {};
   float azimuth, altitude;
-  bool posSet;
 };
 
 } // namespace Pumbra

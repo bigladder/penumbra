@@ -6,6 +6,7 @@
 
 // Vendor
 #include <tesselator.h>
+#include <courierr/courierr.h>
 
 // Standard
 #include <vector>
@@ -17,17 +18,21 @@ struct TessData {
   TessData(const float *array, unsigned numVerts);
   std::vector<float> vertices;
   unsigned numVerts;
-  static const int polySize = 3;   // making triangles
-  static const int vertexSize = 3; // i.e., 3D
+  static const int polySize{3};   // making triangles
+  static const int vertexSize{3}; // i.e., 3D
 };
 
 class SurfacePrivate {
 public:
-  SurfacePrivate();
-  SurfacePrivate(const Polygon &polygon);
+  SurfacePrivate() = default;
+  explicit SurfacePrivate(Polygon polygon);
+  TessData tessellate();
   Polygon polygon;
   std::vector<Polygon> holes;
-  TessData tessellate();
+  std::shared_ptr<Courierr::Courierr> logger;
+  std::string name;
+
+private:
   std::shared_ptr<float> vertPtr;
 };
 

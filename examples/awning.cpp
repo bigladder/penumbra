@@ -7,40 +7,32 @@
 // Penumbra
 #include <penumbra/penumbra.h>
 
-void errorCallback(const int messageType, const std::string &message, void * /*contextPtr*/
-) {
-  if (messageType == Pumbra::MSG_INFO) {
-    std::cout << "  NOTE: " << message << std::endl;
-  } else if (messageType == Pumbra::MSG_WARN) {
-    std::cout << "  WARNING: " << message << std::endl;
-  } else if (messageType == Pumbra::MSG_ERR) {
-    std::cout << "  ERROR: " << message << std::endl;
-    exit(EXIT_FAILURE);
+class AwningLogger : public Pumbra::PenumbraLogger {
+  void info(const std::string_view message) override {
+    write_message("Info", message);
   }
-}
+};
 
-int main(void) {
-  Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
+int main() {
 
-  Pumbra::Polygon windowVerts = {0.25f, 0.f, 0.25f, 0.75f, 0.f, 0.25f,
-                                 0.75f, 0.f, 0.5f,  0.25f, 0.f, 0.5f};
+  Pumbra::Surface wall({0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f}, "Wall");
 
-  Pumbra::Polygon awningVerts = {0.25f, 0.f,   0.5f, 0.75f, 0.f,   0.5f,
-                                 0.75f, -0.5f, 0.5f, 0.25f, -0.5f, 0.5f};
+  Pumbra::Polygon window_vertices = {0.25f, 0.f, 0.25f, 0.75f, 0.f, 0.25f,
+                                     0.75f, 0.f, 0.5f,  0.25f, 0.f, 0.5f};
+  Pumbra::Surface window(window_vertices, "Window");
+  wall.addHole(window_vertices);
 
-  Pumbra::Surface wall(wallVerts);
-  wall.addHole(windowVerts);
-
-  Pumbra::Surface window(windowVerts);
-  Pumbra::Surface awning(awningVerts);
+  Pumbra::Surface awning(
+      {0.25f, 0.f, 0.5f, 0.75f, 0.f, 0.5f, 0.75f, -0.5f, 0.5f, 0.25f, -0.5f, 0.5f}, "Awning");
 
   Pumbra::Penumbra::isValidContext();
 
-  Pumbra::Penumbra pumbra(errorCallback);
+  std::shared_ptr<Pumbra::PenumbraLogger> logger = std::make_shared<Pumbra::PenumbraLogger>();
+  Pumbra::Penumbra pumbra(512u, logger);
 
   unsigned wallId = pumbra.addSurface(wall);
   unsigned windowId = pumbra.addSurface(window);
-  /*unsigned awningId = */ pumbra.addSurface(awning);
+  [[maybe_unused]] auto awningId = pumbra.addSurface(awning);
 
   pumbra.setModel();
   pumbra.setSunPosition(2.50f, 0.3f);
@@ -48,30 +40,28 @@ int main(void) {
   pumbra.renderScene(wallId);
   float wallPSSA = pumbra.calculatePSSA(wallId);
 
-  std::cout << "Wall PSSA: " << wallPSSA << std::endl;
+  logger->info(fmt::format("Wall PSSA: {}", wallPSSA));
 
   pumbra.renderScene(windowId);
   float windowPSSA = pumbra.calculatePSSA(windowId);
 
-  std::cout << "Window PSSA: " << windowPSSA << std::endl;
+  logger->info(fmt::format("Window PSSA: {}", windowPSSA));
 
   pumbra.clearModel();
 
-  Pumbra::Polygon finVerts = {0.75f, -0.25f, 0.5f,  0.75f, -0.25f, 0.25f,
-                              0.75f, 0.0f,   0.25f, 0.75f, 0.0f,   0.5f};
-
-  Pumbra::Surface fin(finVerts);
+  Pumbra::Surface fin(
+      {0.75f, -0.25f, 0.5f, 0.75f, -0.25f, 0.25f, 0.75f, 0.0f, 0.25f, 0.75f, 0.0f, 0.5f}, "Fin");
 
   windowId = pumbra.addSurface(window);
-  /*awningId = */ pumbra.addSurface(awning);
-  /*unsigned finID = */ pumbra.addSurface(fin);
+  /* awningId = */ pumbra.addSurface(awning);
+  [[maybe_unused]] auto finID = pumbra.addSurface(fin);
 
   pumbra.setModel();
 
   pumbra.renderScene(windowId);
   windowPSSA = pumbra.calculatePSSA(windowId);
 
-  std::cout << "Window PSSA with fin: " << windowPSSA << std::endl;
+  logger->info(fmt::format("Window PSSA with fin: {}", windowPSSA));
 
   return 0;
 }

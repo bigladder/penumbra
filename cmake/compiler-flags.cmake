@@ -11,7 +11,9 @@ target_compile_options(penumbra_common_interface INTERFACE
     /GR
     /nologo
     /W4
-    /WX
+    $<$<BOOL:${${PROJECT_NAME}_WARNINGS_AS_ERRORS}>:
+      /WX     # Turn warnings into errors
+    >
     $<$<CONFIG:Release>:
       /GS-    # Disable buffer overrun checks for performance in release mode
     >
@@ -25,7 +27,9 @@ target_compile_options(penumbra_common_interface INTERFACE
     >
     -Wall       # Turn on warnings
     -Wextra     # Turn on warnings
-    -Werror     # Turn warnings into errors
+    $<$<BOOL:${${PROJECT_NAME}_WARNINGS_AS_ERRORS}>:
+      -Werror     # Turn warnings into errors
+    >
     $<$<CONFIG:Release>:
       -fno-stack-protector  # Produces debugging information specifically for gdb
     >
@@ -36,9 +40,6 @@ target_compile_options(penumbra_common_interface INTERFACE
       >
     >
     # -finline-limit=2000 # More aggressive inlining   This is causing unit test failures on Ubuntu 14.04
-    $<$<BOOL:UNIX>:
-      -fPIC
-    >
   >
 )
 

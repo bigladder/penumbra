@@ -7,6 +7,9 @@
 // Standard
 #include <memory>
 
+// vendor
+#include <courierr/courierr.h>
+
 // Penumbra
 #include <penumbra/penumbra.h>
 #include <penumbra/surface.h>
@@ -18,8 +21,8 @@ namespace Pumbra {
 class PenumbraPrivate {
 
 public:
-  PenumbraPrivate(unsigned size = 512);
-  ~PenumbraPrivate();
+  PenumbraPrivate(int size, const std::shared_ptr<Courierr::Courierr> &logger);
+  ~PenumbraPrivate() = default;
 
 public:
   void addSurface(const Surface &surface);
@@ -27,7 +30,8 @@ public:
   Sun sun;
   std::vector<float> model;
   std::vector<SurfacePrivate> surfaces;
-  bool checkSurface(const unsigned index);
+  std::shared_ptr<Courierr::Courierr> logger;
+  [[nodiscard]] bool checkSurface(unsigned index) const;
 };
 
 } // namespace Pumbra
