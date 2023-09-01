@@ -11,9 +11,8 @@
 // Vendor
 #include <courierr/courierr.h>
 
-namespace Pumbra {
+namespace Penumbra {
 
-// typedef std::array<std::array<float, 4>, 4> mat4x4_std;
 typedef float (*mat4x4_ptr)[4];
 
 class Sun {
@@ -22,16 +21,16 @@ public:
 
   // Member functions
 public:
-  mat4x4_ptr getView();
-  void setView(float azm, float alt);
-  // void setView(mat4x4 view);
-  [[nodiscard]] float getAzimuth() const;
-  [[nodiscard]] float getAltitude() const;
+  mat4x4_ptr get_view();
+  void set_view(float azimuth, float altitude);
+  // void set_view(mat4x4 view);
+  [[nodiscard]] float get_azimuth() const;
+  [[nodiscard]] float get_altitude() const;
 
 private:
-  void setView();
-  void setAzimuth(float azm);
-  void setAltitude(float alt);
+  void set_view();
+  void set_azimuth(float azimuth);
+  void set_altitude(float altitude);
 
   // Data Members
 private:
@@ -39,6 +38,6 @@ private:
   float azimuth, altitude;
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 
 #endif // SUN_H_

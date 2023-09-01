@@ -11,7 +11,7 @@
 // Standard
 #include <vector>
 
-namespace Pumbra {
+namespace Penumbra {
 
 class SurfaceBuffer {
 public:
@@ -23,23 +23,23 @@ public:
 
 class GLModel {
 public:
-  GLModel() : objectsSet(false){};
+  GLModel() = default;
   ~GLModel() = default;
-  void setVertices(const std::vector<float> &vertices);
-  void setSurfaceBuffers(const std::vector<SurfaceBuffer> &surfaceBuffers);
-  static void drawSurface(SurfaceBuffer surfaceBuffer);
-  void drawAll() const;
-  void drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces) const;
-  void clearModel();
-  std::vector<float> vertexArray;
-  std::vector<SurfaceBuffer> surfaceBuffers;
-  unsigned numPoints{0};
-  static const int vertexSize{3}; // i.e., 3D
+  void set_vertices(const std::vector<float> &vertices);
+  void set_surface_buffers(const std::vector<SurfaceBuffer> &surface_buffers);
+  static void draw_surface(SurfaceBuffer surface_buffer);
+  void draw_all() const;
+  void draw_except(std::vector<SurfaceBuffer> hidden_surfaces) const;
+  void clear_model();
+  std::vector<float> vertex_array;
+  std::vector<SurfaceBuffer> surface_buffers;
+  unsigned number_of_points{0};
+  static const int vertex_size{3}; // i.e., 3D
 private:
-  GLuint vbo{}, vao{};
-  bool objectsSet;
+  GLuint vertex_buffer_object{}, vertex_array_object{};
+  bool objects_set{false};
 };
 
-} // namespace Pumbra
+} // namespace Penumbra
 
 #endif // MODEL_H_

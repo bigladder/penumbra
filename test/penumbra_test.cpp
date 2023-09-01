@@ -15,7 +15,7 @@ constexpr float m_pi_4_f = static_cast<float>(M_PI_4);
 
 float calculate_surface_exposure(float azimuth, float altitude) {
 
-  // Due to the one sided nature of shaded surfaces, we will revert
+  // Due to the one-sided nature of shaded surfaces, we will revert
   // negative values to zero, as this indicates that the opposite side
   // of the surface is shaded. This shading should be disregarded.
   auto incident_azimuth = cos(azimuth);
@@ -29,258 +29,341 @@ float calculate_surface_exposure(float azimuth, float altitude) {
   return incident_azimuth * incident_altitude;
 }
 
-const std::string invalid_context_str = "A valid context could not be created. Test skipped.";
+const std::string invalid_context_string = "A valid context could not be created. Test skipped.";
 
 TEST(PenumbraTest, check_azimuth) {
 
-  if (!Pumbra::Penumbra::isValidContext()) {
-    GTEST_SKIP() << invalid_context_str << std::endl;
+  if (!Penumbra::Penumbra::is_valid_context()) {
+    GTEST_SKIP() << invalid_context_string << std::endl;
   }
 
-  Pumbra::Penumbra pumbra;
+  Penumbra::Penumbra penumbra;
 
   // Loop azimuth (with zero altitude).
-  for (float azm = 0.0f; azm <= 2 * m_pi_f; azm += m_pi_4_f) {
-    pumbra.setSunPosition(azm, 0.0f);
-    float check_azimuth = pumbra.getSunAzimuth();
-    EXPECT_FLOAT_EQ(azm, check_azimuth);
+  for (float azimuth = 0.0f; azimuth <= 2 * m_pi_f; azimuth += m_pi_4_f) {
+    penumbra.set_sun_position(azimuth, 0.0f);
+    float check_azimuth = penumbra.get_sun_azimuth();
+    EXPECT_FLOAT_EQ(azimuth, check_azimuth);
   }
 }
 
 TEST(PenumbraTest, check_altitude) {
-  if (!Pumbra::Penumbra::isValidContext()) {
-    GTEST_SKIP() << invalid_context_str << std::endl;
+  if (!Penumbra::Penumbra::is_valid_context()) {
+    GTEST_SKIP() << invalid_context_string << std::endl;
   }
-  Pumbra::Penumbra pumbra;
+  Penumbra::Penumbra penumbra;
 
   // Loop altitude around the axis (with zero azimuth).
-  for (float alt = 0.0f; alt <= 2 * m_pi_f; alt += m_pi_4_f) {
-    pumbra.setSunPosition(0.0f, alt);
-    float check_altitude = pumbra.getSunAltitude();
-    EXPECT_FLOAT_EQ(alt, check_altitude);
+  for (float altitude = 0.0f; altitude <= 2 * m_pi_f; altitude += m_pi_4_f) {
+    penumbra.set_sun_position(0.0f, altitude);
+    float check_altitude = penumbra.get_sun_altitude();
+    EXPECT_FLOAT_EQ(altitude, check_altitude);
   }
 }
 
 TEST(PenumbraTest, azimuth) {
-  if (!Pumbra::Penumbra::isValidContext()) {
-    GTEST_SKIP() << invalid_context_str << std::endl;
+  if (!Penumbra::Penumbra::is_valid_context()) {
+    GTEST_SKIP() << invalid_context_string << std::endl;
   }
-  Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
-  Pumbra::Surface wall(wallVerts);
-  Pumbra::Penumbra pumbra;
-  unsigned wallId = pumbra.addSurface(wall);
-  pumbra.setModel();
+  Penumbra::Surface wall({0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f}, "Wall");
+  Penumbra::Penumbra penumbra;
+  unsigned wall_id = penumbra.add_surface(wall);
+  penumbra.set_model();
   // Loop azimuth around the surface (with zero altitude).
-  for (float azm = 0.0f; azm <= 2 * m_pi_f; azm += m_pi_4_f) {
-    pumbra.setSunPosition(azm, 0.0f);
-    float wallPSSA = pumbra.calculatePSSA(wallId);
-    EXPECT_NEAR(wallPSSA, std::abs(cos(azm)), 0.01) << "azm evaluates to " << azm;
-    // pumbra.renderScene(wallId);
+  for (float azimuth = 0.0f; azimuth <= 2 * m_pi_f; azimuth += m_pi_4_f) {
+    penumbra.set_sun_position(azimuth, 0.0f);
+    float wall_pssa = penumbra.calculate_pssa(wall_id);
+    EXPECT_NEAR(wall_pssa, std::abs(cos(azimuth)), 0.01) << "azimuth evaluates to " << azimuth;
+    // penumbra.render_scene(wall_id);
   }
 }
 
 TEST(PenumbraTest, interior) {
-  if (!Pumbra::Penumbra::isValidContext()) {
-    GTEST_SKIP() << invalid_context_str << std::endl;
+  if (!Penumbra::Penumbra::is_valid_context()) {
+    GTEST_SKIP() << invalid_context_string << std::endl;
   }
   float const r_W = 2., r_D = 1., r_H = 1.; // Overall dimensions
   float const w_W = 1., w_H = .5;           // Window dimensions
 
-  Pumbra::Polygon wallFrontVerts = {
-      -r_W / 2.f, r_D / 2.f, -r_H / 2.f, r_W / 2.f,  r_D / 2.f, -r_H / 2.f,
-      r_W / 2.f,  r_D / 2.f, r_H / 2.f,  -r_W / 2.f, r_D / 2.f, r_H / 2.f,
-  };
-
-  Pumbra::Polygon wallFrontWindowVerts = {
+  Penumbra::Polygon window_polygon = {
       -w_W / 2.f, r_D / 2.f, -w_H / 2.f, w_W / 2.f,  r_D / 2.f, -w_H / 2.f,
       w_W / 2.f,  r_D / 2.f, w_H / 2.f,  -w_W / 2.f, r_D / 2.f, w_H / 2.f,
   };
 
-  Pumbra::Polygon wallBackVerts = {
-      r_W / 2.f,  -r_D / 2.f, -r_H / 2.f, -r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
-      -r_W / 2.f, -r_D / 2.f, r_H / 2.f,  r_W / 2.f,  -r_D / 2.f, r_H / 2.f,
-  };
+  Penumbra::Surface front_wall({
+      -r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+      -r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+  });
+  front_wall.add_hole(window_polygon);
 
-  /*	Pumbra::Polygon wallBackVerts =	//Can use this to check changing norm of back wall.
-  {
-            -r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
-            r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
-            r_W / 2.f, -r_D / 2.f, r_H / 2.f,
-            -r_W / 2.f, -r_D / 2.f, r_H / 2.f,
-          };
-  */
-  Pumbra::Polygon roofVerts = {
-      -r_W / 2.f, r_D / 2.f,  r_H / 2.f, r_W / 2.f,  r_D / 2.f,  r_H / 2.f,
-      r_W / 2.f,  -r_D / 2.f, r_H / 2.f, -r_W / 2.f, -r_D / 2.f, r_H / 2.f,
-  };
+  Penumbra::Surface window(window_polygon);
+  Penumbra::Surface back_wall({
+      r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+      r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+  });
+  Penumbra::Surface roof({
+      -r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+      r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+      r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+  });
+  Penumbra::Surface floor({
+      -r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+  });
+  Penumbra::Surface left_wall({
+      -r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      -r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+  });
+  Penumbra::Surface right_wall({
+      r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+      r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+      r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+  });
 
-  Pumbra::Polygon floorVerts = {
-      -r_W / 2.f, r_D / 2.f,  -r_H / 2.f, r_W / 2.f,  r_D / 2.f,  -r_H / 2.f,
-      r_W / 2.f,  -r_D / 2.f, -r_H / 2.f, -r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
-  };
+  Penumbra::Penumbra penumbra;
 
-  Pumbra::Polygon sideWallLeftVerts = {
-      -r_W / 2.f, r_D / 2.f,  -r_H / 2.f, -r_W / 2.f, r_D / 2.f,  r_H / 2.f,
-      -r_W / 2.f, -r_D / 2.f, r_H / 2.f,  -r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
-  };
+  unsigned front_wall_id = penumbra.add_surface(front_wall);
+  unsigned window_id = penumbra.add_surface(window);
+  unsigned back_wall_id = penumbra.add_surface(back_wall);
+  [[maybe_unused]] unsigned roof_id = penumbra.add_surface(roof);
+  unsigned floor_id = penumbra.add_surface(floor);
+  unsigned left_wall_id = penumbra.add_surface(left_wall);
+  unsigned right_wall_id = penumbra.add_surface(right_wall);
 
-  Pumbra::Polygon sideWallRightVerts = {
-      r_W / 2.f, r_D / 2.f,  -r_H / 2.f, r_W / 2.f, r_D / 2.f,  r_H / 2.f,
-      r_W / 2.f, -r_D / 2.f, r_H / 2.f,  r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
-  };
+  penumbra.set_model();
+  penumbra.set_sun_position(0.0f, 0.f);
+  EXPECT_NEAR(penumbra.calculate_pssa(front_wall_id), r_W * r_H - w_W * w_H, 0.01);
+  // penumbra.render_scene(front_wall_id);
 
-  Pumbra::Surface wallFront(wallFrontVerts);
-  wallFront.addHole(wallFrontWindowVerts);
+  EXPECT_NEAR(penumbra.calculate_interior_pssas({window_id}, {back_wall_id})[back_wall_id],
+              w_W * w_H, 0.01);
+  // penumbra.render_interior_scene({window_id},{back_wall_id});
 
-  Pumbra::Surface window(wallFrontWindowVerts);
-  Pumbra::Surface wallBack(wallBackVerts);
-  Pumbra::Surface roof(roofVerts);
-  Pumbra::Surface floor(floorVerts);
-  Pumbra::Surface sideWallLeft(sideWallLeftVerts);
-  Pumbra::Surface sideWallRight(sideWallRightVerts);
+  penumbra.set_sun_position(3.1415f, 0.f);
+  EXPECT_NEAR(penumbra.calculate_pssa(front_wall_id), 0.f,
+              0.01); // front_wall should be blocked by back wall.
+  // penumbra.render_scene(front_wall_id);
 
-  Pumbra::Penumbra pumbra2;
-
-  unsigned wallFrontId = pumbra2.addSurface(wallFront);
-  unsigned windowId = pumbra2.addSurface(window);
-  unsigned wallBackId = pumbra2.addSurface(wallBack);
-  /* unsigned roofId = */ pumbra2.addSurface(roof);
-  unsigned floorId = pumbra2.addSurface(floor);
-  unsigned sideWallLeftId = pumbra2.addSurface(sideWallLeft);
-  unsigned sideWallRightId = pumbra2.addSurface(sideWallRight);
-
-  pumbra2.setModel();
-  pumbra2.setSunPosition(0.0f, 0.f);
-  float wallPSSA2 = pumbra2.calculatePSSA(wallFrontId);
-  EXPECT_NEAR(wallPSSA2, r_W * r_H - w_W * w_H, 0.01);
-  // pumbra2.renderScene(wallFrontId);
-
-  float backWallInteriorPSSA = pumbra2.calculateInteriorPSSAs({windowId}, {wallBackId})[wallBackId];
-  EXPECT_NEAR(backWallInteriorPSSA, w_W * w_H, 0.01);
-  // pumbra2.renderInteriorScene({windowId},{wallBackId});
-
-  pumbra2.setSunPosition(3.1415f, 0.f);
-  float wallPSSA3 = pumbra2.calculatePSSA(wallFrontId);
-  EXPECT_NEAR(wallPSSA3, 0.f, 0.01); // WallFront should be blocked by back wall.
-  // pumbra2.renderScene(wallFrontId);
-
-  pumbra2.setSunPosition(0.5f, 0.5f);
-  std::unordered_map<unsigned, float> intPSSAs = pumbra2.calculateInteriorPSSAs(
-      {windowId}, {wallBackId, floorId, sideWallLeftId, sideWallRightId});
-  backWallInteriorPSSA = intPSSAs[wallBackId];
-  float floorInteriorPSSA = intPSSAs[floorId];
-  float leftWallInteriorPSSA = intPSSAs[sideWallLeftId];
-  float rightWallInteriorPSSA = intPSSAs[sideWallRightId];
-  EXPECT_GT(backWallInteriorPSSA, 0.f);
-  EXPECT_GT(floorInteriorPSSA, 0.f);
-  EXPECT_GT(leftWallInteriorPSSA, 0.f);
-  EXPECT_EQ(rightWallInteriorPSSA, 0.f);
-  // pumbra2.renderInteriorScene({windowId},{wallBackId, floorId, sideWallLeftId, sideWallRightId});
+  penumbra.set_sun_position(0.5f, 0.5f);
+  std::unordered_map<unsigned, float> interior_pssas = penumbra.calculate_interior_pssas(
+      {window_id}, {back_wall_id, floor_id, left_wall_id, right_wall_id});
+  EXPECT_GT(interior_pssas[back_wall_id], 0.f);
+  EXPECT_GT(interior_pssas[floor_id], 0.f);
+  EXPECT_GT(interior_pssas[left_wall_id], 0.f);
+  EXPECT_EQ(interior_pssas[right_wall_id], 0.f);
+  // penumbra.render_interior_scene({window_id},{back_wall_id, floor_id, left_wall_id,
+  // right_wall_id});
 }
 
-TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
-  if (!Pumbra::Penumbra::isValidContext()) {
-    GTEST_SKIP() << invalid_context_str << std::endl;
+TEST(PenumbraTest, calculate_pssa_multiple_surfaces) {
+  if (!Penumbra::Penumbra::is_valid_context()) {
+    GTEST_SKIP() << invalid_context_string << std::endl;
   }
   // create a cube
   float const r_W = 1.f, r_D = 1.f, r_H = 1.f; // Overall dimensions
 
-  Pumbra::Polygon wallFrontVerts = {
-      -r_W / 2.f, r_D / 2.f, -r_H / 2.f, r_W / 2.f,  r_D / 2.f, -r_H / 2.f,
-      r_W / 2.f,  r_D / 2.f, r_H / 2.f,  -r_W / 2.f, r_D / 2.f, r_H / 2.f,
-  };
+  // TODO: put in fixture
+  Penumbra::Surface front_wall({
+      -r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+      -r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+  });
+  Penumbra::Surface back_wall({
+      r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+      r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+  });
+  Penumbra::Surface roof({
+      -r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+      r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+      r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+  });
+  Penumbra::Surface floor({
+      -r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+  });
+  Penumbra::Surface left_wall({
+      -r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      -r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+      -r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+  });
+  Penumbra::Surface right_wall({
+      r_W / 2.f,
+      r_D / 2.f,
+      -r_H / 2.f,
+      r_W / 2.f,
+      r_D / 2.f,
+      r_H / 2.f,
+      r_W / 2.f,
+      -r_D / 2.f,
+      r_H / 2.f,
+      r_W / 2.f,
+      -r_D / 2.f,
+      -r_H / 2.f,
+  });
+  Penumbra::Penumbra penumbra;
 
-  Pumbra::Polygon wallBackVerts = {
-      r_W / 2.f,  -r_D / 2.f, -r_H / 2.f, -r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
-      -r_W / 2.f, -r_D / 2.f, r_H / 2.f,  r_W / 2.f,  -r_D / 2.f, r_H / 2.f,
-  };
+  const unsigned int front_wall_id = penumbra.add_surface(front_wall);
+  const unsigned int back_wall_id = penumbra.add_surface(back_wall);
+  const unsigned int roof_id = penumbra.add_surface(roof);
+  const unsigned int floor_id = penumbra.add_surface(floor);
+  const unsigned int left_wall_id = penumbra.add_surface(left_wall);
+  const unsigned int right_wall_id = penumbra.add_surface(right_wall);
 
-  Pumbra::Polygon roofVerts = {
-      -r_W / 2.f, r_D / 2.f,  r_H / 2.f, r_W / 2.f,  r_D / 2.f,  r_H / 2.f,
-      r_W / 2.f,  -r_D / 2.f, r_H / 2.f, -r_W / 2.f, -r_D / 2.f, r_H / 2.f,
-  };
+  const std::vector<unsigned> test_cube{front_wall_id, back_wall_id, roof_id,
+                                        floor_id,      left_wall_id, right_wall_id};
 
-  Pumbra::Polygon floorVerts = {
-      -r_W / 2.f, r_D / 2.f,  -r_H / 2.f, r_W / 2.f,  r_D / 2.f,  -r_H / 2.f,
-      r_W / 2.f,  -r_D / 2.f, -r_H / 2.f, -r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
-  };
+  penumbra.set_model();
 
-  Pumbra::Polygon sideWallLeftVerts = {
-      -r_W / 2.f, r_D / 2.f,  -r_H / 2.f, -r_W / 2.f, r_D / 2.f,  r_H / 2.f,
-      -r_W / 2.f, -r_D / 2.f, r_H / 2.f,  -r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
-  };
-
-  Pumbra::Polygon sideWallRightVerts = {
-      r_W / 2.f, r_D / 2.f,  -r_H / 2.f, r_W / 2.f, r_D / 2.f,  r_H / 2.f,
-      r_W / 2.f, -r_D / 2.f, r_H / 2.f,  r_W / 2.f, -r_D / 2.f, -r_H / 2.f,
-  };
-
-  Pumbra::Surface wallFront(wallFrontVerts);
-  Pumbra::Surface wallBack(wallBackVerts);
-  Pumbra::Surface roof(roofVerts);
-  Pumbra::Surface floor(floorVerts);
-  Pumbra::Surface sideWallLeft(sideWallLeftVerts);
-  Pumbra::Surface sideWallRight(sideWallRightVerts);
-
-  Pumbra::Penumbra pumbra;
-
-  const unsigned wallFrontId = pumbra.addSurface(wallFront);
-  const unsigned wallBackId = pumbra.addSurface(wallBack);
-  const unsigned roofId = pumbra.addSurface(roof);
-  const unsigned floorId = pumbra.addSurface(floor);
-  const unsigned sideWallLeftId = pumbra.addSurface(sideWallLeft);
-  const unsigned sideWallRightId = pumbra.addSurface(sideWallRight);
-
-  const std::vector<unsigned> test_cube{wallFrontId, wallBackId,     roofId,
-                                        floorId,     sideWallLeftId, sideWallRightId};
-
-  pumbra.setModel();
-
-  pumbra.setSunPosition(0.0f, 0.0f);
-  std::vector<float> results = pumbra.calculatePSSA(test_cube);
+  penumbra.set_sun_position(0.0f, 0.0f);
+  std::vector<float> results = penumbra.calculate_pssa(test_cube);
 
   float m_pi_3_4 = m_pi_4_f + m_pi_2_f;
 
   const std::vector<std::pair<float, float>> angular_test_data{
-      {0.0f, 0.0f},      // wallFront full shade
-      {m_pi_4_f, 0.0f},  // wallFront half shade, sideWallRightId half shade
-      {m_pi_2_f, 0.0f},  // sideWallRight full shade  !!
-      {m_pi_3_4, 0.0f},  // wallBack half shade, sideWallRight half shade
-      {-m_pi_2_f, 0.0f}, // sideWallLeft full shade  !!
-      {m_pi_f, 0.0f},    // wallBack full shade
+      {0.0f, 0.0f},      // front_wall full shade
+      {m_pi_4_f, 0.0f},  // front_wall half shade, right_wall_id half shade
+      {m_pi_2_f, 0.0f},  // right_wall full shade  !!
+      {m_pi_3_4, 0.0f},  // back_wall half shade, right_wall half shade
+      {-m_pi_2_f, 0.0f}, // left_wall full shade  !!
+      {m_pi_f, 0.0f},    // back_wall full shade
       {0.0f, m_pi_2_f},  // roof full shade  !!
       {0.0f, -m_pi_2_f}, // floor full shade !!
   };
 
-  for (auto const &sunPosition : angular_test_data) {
-    pumbra.setSunPosition(sunPosition.first, sunPosition.second);
-    results = pumbra.calculatePSSA();
+  for (auto const &sun_position : angular_test_data) {
+    penumbra.set_sun_position(sun_position.first, sun_position.second);
+    results = penumbra.calculate_pssa();
     float azimuth, altitude;
     for (auto side : test_cube) {
       switch (side) {
-      case 0: // wallFrontId
-        azimuth = sunPosition.first;
-        altitude = sunPosition.second;
+      case 0: // front_wall_id
+        azimuth = sun_position.first;
+        altitude = sun_position.second;
         break;
-      case 1: // wallBackId
-        azimuth = sunPosition.first + m_pi_f;
-        altitude = sunPosition.second;
+      case 1: // back_wall_id
+        azimuth = sun_position.first + m_pi_f;
+        altitude = sun_position.second;
         break;
-      case 2: // roofId
-        azimuth = sunPosition.first;
-        altitude = sunPosition.second - m_pi_2_f;
+      case 2: // roof_id
+        azimuth = sun_position.first;
+        altitude = sun_position.second - m_pi_2_f;
         break;
-      case 3: // floorId
-        azimuth = sunPosition.first;
-        altitude = sunPosition.second + m_pi_2_f;
+      case 3: // floor_id
+        azimuth = sun_position.first;
+        altitude = sun_position.second + m_pi_2_f;
         break;
-      case 4: // sideWallLeftId
-        azimuth = sunPosition.first + m_pi_2_f;
-        altitude = sunPosition.second;
+      case 4: // left_wall_id
+        azimuth = sun_position.first + m_pi_2_f;
+        altitude = sun_position.second;
         break;
-      case 5: // sideWallRightId
-        azimuth = sunPosition.first - m_pi_2_f;
-        altitude = sunPosition.second;
+      case 5: // right_wall_id
+        azimuth = sun_position.first - m_pi_2_f;
+        altitude = sun_position.second;
         break;
       default:
         FAIL() << "Side not found.";
@@ -288,7 +371,7 @@ TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
 
       float expectedResults = calculate_surface_exposure(azimuth, altitude);
 
-      // pumbra.renderScene(side);
+      // penumbra.render_scene(side);
 
       EXPECT_NEAR(results[side], expectedResults, 0.01);
     }
@@ -296,30 +379,30 @@ TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
 }
 
 TEST(PenumbraTest, vendor_name) {
-  if (!Pumbra::Penumbra::isValidContext()) {
-    GTEST_SKIP() << invalid_context_str << std::endl;
+  if (!Penumbra::Penumbra::is_valid_context()) {
+    GTEST_SKIP() << invalid_context_string << std::endl;
   }
 
-  Pumbra::Penumbra pumbra;
-  Pumbra::VendorName vname = pumbra.getVendorName();
+  Penumbra::Penumbra penumbra;
+  Penumbra::VendorType vendor_type = penumbra.get_vendor_name();
 
-  switch (vname) {
-  case Pumbra::VendorName::unknown:
+  switch (vendor_type) {
+  case Penumbra::VendorType::unknown:
     SUCCEED();
     break;
-  case Pumbra::VendorName::nvidia:
+  case Penumbra::VendorType::nvidia:
     SUCCEED();
     break;
-  case Pumbra::VendorName::amd:
+  case Penumbra::VendorType::amd:
     SUCCEED();
     break;
-  case Pumbra::VendorName::intel:
+  case Penumbra::VendorType::intel:
     SUCCEED();
     break;
-  case Pumbra::VendorName::vmware:
+  case Penumbra::VendorType::vmware:
     SUCCEED();
     break;
-  case Pumbra::VendorName::mesa:
+  case Penumbra::VendorType::mesa:
     SUCCEED();
     break;
   default:
@@ -328,72 +411,56 @@ TEST(PenumbraTest, vendor_name) {
 }
 
 TEST(PenumbraTest, side_count_check) {
-  if (!Pumbra::Penumbra::isValidContext()) {
-    GTEST_SKIP() << invalid_context_str << std::endl;
+  if (!Penumbra::Penumbra::is_valid_context()) {
+    GTEST_SKIP() << invalid_context_string << std::endl;
   }
 
-  Pumbra::Polygon wallVerts = {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f};
-  Pumbra::Surface wall(wallVerts);
-  Pumbra::Penumbra pumbra;
+  Penumbra::Surface wall({0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f});
+  Penumbra::Penumbra penumbra;
 
-  pumbra.addSurface(wall);
-  pumbra.setModel();
+  penumbra.add_surface(wall);
+  penumbra.set_model();
 
-  EXPECT_EQ(pumbra.getNumSurfaces(), 1u);
+  EXPECT_EQ(penumbra.get_number_of_surfaces(), 1u);
 
-  pumbra.clearModel();
+  penumbra.clear_model();
 
-  Pumbra::Polygon wallFrontVerts = {-.5f, .5f, -.5f, .5f, .5f, -.5f, .5f, .5f, .5f, -.5f, .5f, .5f};
+  Penumbra::Surface front_wall({-.5f, .5f, -.5f, .5f, .5f, -.5f, .5f, .5f, .5f, -.5f, .5f, .5f});
+  Penumbra::Surface back_wall({.5f, -.5f, -.5f, -.5f, -.5f, -.5f, -.5f, -.5f, .5f, .5f, -.5f, .5f});
+  Penumbra::Surface roof({-.5f, .5f, .5f, .5f, .5f, .5f, .5f, -.5f, .5f, -.5f, -.5f, .5f});
 
-  Pumbra::Polygon wallBackVerts = {.5f,  -.5f, -.5f, -.5f, -.5f, -.5f,
-                                   -.5f, -.5f, .5f,  .5f,  -.5f, .5f};
+  penumbra.add_surface(front_wall);
+  penumbra.add_surface(back_wall);
+  penumbra.add_surface(roof);
 
-  Pumbra::Polygon roofVerts = {-.5f, .5f, .5f, .5f, .5f, .5f, .5f, -.5f, .5f, -.5f, -.5f, .5f};
+  penumbra.set_model();
 
-  Pumbra::Surface wallFront(wallFrontVerts);
-  Pumbra::Surface wallBack(wallBackVerts);
-  Pumbra::Surface roof(roofVerts);
-
-  pumbra.addSurface(wallFront);
-  pumbra.addSurface(wallBack);
-  pumbra.addSurface(roof);
-
-  pumbra.setModel();
-
-  EXPECT_EQ(pumbra.getNumSurfaces(), 3u);
+  EXPECT_EQ(penumbra.get_number_of_surfaces(), 3u);
 }
 
 TEST(PenumbraTest, bad_surface_input_errors) {
-  if (!Pumbra::Penumbra::isValidContext()) {
-    GTEST_SKIP() << invalid_context_str << std::endl;
+  if (!Penumbra::Penumbra::is_valid_context()) {
+    GTEST_SKIP() << invalid_context_string << std::endl;
   }
 
   const std::vector<unsigned> bad_test_cube{5, 6, 7, 8, 9, 10};
+  Penumbra::Surface front_wall({-.5f, .5f, -.5f, .5f, .5f, -.5f, .5f, .5f, .5f, -.5f, .5f, .5f});
+  Penumbra::Surface back_wall({.5f, -.5f, -.5f, -.5f, -.5f, -.5f, -.5f, -.5f, .5f, .5f, -.5f, .5f});
+  Penumbra::Surface roof({-.5f, .5f, .5f, .5f, .5f, .5f, .5f, -.5f, .5f, -.5f, -.5f, .5f});
 
-  Pumbra::Polygon wallFrontVerts = {-.5f, .5f, -.5f, .5f, .5f, -.5f, .5f, .5f, .5f, -.5f, .5f, .5f};
+  Penumbra::Penumbra penumbra;
 
-  Pumbra::Polygon wallBackVerts = {.5f,  -.5f, -.5f, -.5f, -.5f, -.5f,
-                                   -.5f, -.5f, .5f,  .5f,  -.5f, .5f};
+  penumbra.add_surface(front_wall);
+  penumbra.add_surface(back_wall);
+  penumbra.add_surface(roof);
 
-  Pumbra::Polygon roofVerts = {-.5f, .5f, .5f, .5f, .5f, .5f, .5f, -.5f, .5f, -.5f, -.5f, .5f};
+  penumbra.set_model();
 
-  Pumbra::Surface wallFront(wallFrontVerts);
-  Pumbra::Surface wallBack(wallBackVerts);
-  Pumbra::Surface roof(roofVerts);
+  EXPECT_THROW(penumbra.calculate_pssa(bad_test_cube), Penumbra::PenumbraException);
 
-  Pumbra::Penumbra pumbra;
+  EXPECT_THROW(penumbra.render_scene(11), Penumbra::PenumbraException);
 
-  pumbra.addSurface(wallFront);
-  pumbra.addSurface(wallBack);
-  pumbra.addSurface(roof);
-
-  pumbra.setModel();
-
-  EXPECT_THROW(pumbra.calculatePSSA(bad_test_cube), Pumbra::PenumbraException);
-
-  EXPECT_THROW(pumbra.renderScene(11), Pumbra::PenumbraException);
-
-  EXPECT_THROW(pumbra.fetchPSSA(bad_test_cube), Pumbra::PenumbraException);
+  EXPECT_THROW(penumbra.fetch_pssa(bad_test_cube), Penumbra::PenumbraException);
 }
 
 int main(int argc, char **argv) {
