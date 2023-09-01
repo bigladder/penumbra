@@ -27,8 +27,11 @@ void PenumbraImplementation::add_surface(const Surface &surface) {
   surfaces.push_back(*surface.surface);
 }
 
-bool PenumbraImplementation::check_surface(const unsigned index) const {
-  return index < surfaces.size();
+void PenumbraImplementation::check_surface(const unsigned int surface_index,
+                                           const std::string_view &surface_context) const {
+  if (surface_index >= surfaces.size()) {
+    throw SurfaceException(surface_index, surface_context, *(logger));
+  }
 }
 
 } // namespace Penumbra

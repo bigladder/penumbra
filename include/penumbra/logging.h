@@ -40,6 +40,17 @@ public:
   explicit PenumbraException(const std::string &message, Courierr::Courierr &logger)
       : CourierrException(message, logger) {}
 };
+
+class SurfaceException : public PenumbraException {
+public:
+  explicit SurfaceException(const unsigned int surface_index,
+                            const std::string_view &surface_context, Courierr::Courierr &logger)
+      : PenumbraException(fmt::format(error_message_format, surface_context, surface_index),
+                          logger) {}
+
+private:
+  static constexpr std::string_view error_message_format = "{} index, {}, does not exist.";
+};
 } // namespace Penumbra
 
 #endif // define PENUMBRA_LOGGING_H_

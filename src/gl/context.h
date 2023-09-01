@@ -73,12 +73,12 @@ private:
   double previous_x_position, previous_y_position;
   float camera_x_rotation_angle{0.f}, camera_y_rotation_angle{0.f};
   bool left_mouse_button_pressed{true};
-  bool is_render_mode{false};
   std::vector<GLuint> queries;
   std::vector<float> pixel_areas;
   std::vector<GLint> pixel_counts;
   Courierr::Courierr *logger;
 
+  void submit_pssa(const SurfaceBuffer &surface_buffer, mat4x4 sun_view);
   void draw_model();
   void draw_except(const std::vector<SurfaceBuffer> &hidden_surfaces);
   void set_mvp();
