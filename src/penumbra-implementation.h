@@ -13,8 +13,9 @@
 // Penumbra
 #include <penumbra/penumbra.h>
 #include <penumbra/surface.h>
-#include <surface-implementation.h>
-#include <gl/context.h>
+#include "surface-implementation.h"
+#include "sun.h"
+#include "gl/context.h"
 
 namespace Penumbra {
 

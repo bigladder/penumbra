@@ -2,8 +2,8 @@
  * See the LICENSE file for additional terms and conditions. */
 
 // Penumbra
-#include <gl/program.h>
-#include <gl/shader.h>
+#include "program.h"
+#include "shader.h"
 
 namespace Penumbra {
 

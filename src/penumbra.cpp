@@ -13,7 +13,7 @@
 
 // Penumbra
 #include <penumbra/penumbra.h>
-#include <penumbra-implementation.h>
+#include "penumbra-implementation.h"
 
 namespace Penumbra {
 

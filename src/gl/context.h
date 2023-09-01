@@ -16,12 +16,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <courierr/courierr.h>
+#include <linmath.h> // Part of GLFW
 
 // Penumbra
-#include <sun.h>
-#include <gl/model.h>
-#include <gl/shader.h>
-#include <gl/program.h>
+#include "gl/model.h"
+#include "gl/shader.h"
+#include "gl/program.h"
 
 #define MAX_FLOAT std::numeric_limits<float>::max()
 

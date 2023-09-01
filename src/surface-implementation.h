@@ -4,13 +4,13 @@
 #ifndef SURFACE_IMPLEMENTATION_H_
 #define SURFACE_IMPLEMENTATION_H_
 
-// Vendor
-#include <tesselator.h>
-#include <courierr/courierr.h>
-
 // Standard
 #include <vector>
 #include <array>
+
+// Vendor
+#include <tesselator.h>
+#include <courierr/courierr.h>
 
 namespace Penumbra {
 

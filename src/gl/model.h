@@ -4,12 +4,12 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
+// Standard
+#include <vector>
+
 // Vendor
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-// Standard
-#include <vector>
 
 namespace Penumbra {
 
