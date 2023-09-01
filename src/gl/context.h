@@ -32,21 +32,21 @@ class Context {
 public:
   Context(GLint size, Courierr::Courierr *logger);
   ~Context();
-  void show_rendering(unsigned surface_index, mat4x4 sun_view);
+  void show_rendering(unsigned int surface_index, mat4x4 sun_view);
   void set_model(const std::vector<float> &vertices,
                  const std::vector<SurfaceBuffer> &surface_buffers);
   float set_scene(mat4x4 sun_view, const SurfaceBuffer *surface_buffer = nullptr,
                   bool clip_far = true);
-  void submit_pssa(unsigned surface_index, mat4x4 sun_view);
-  void submit_pssa(const std::vector<unsigned> &surface_indices, mat4x4 sun_view);
+  void submit_pssa(unsigned int surface_index, mat4x4 sun_view);
+  void submit_pssa(const std::vector<unsigned int> &surface_indices, mat4x4 sun_view);
   void submit_pssa(mat4x4 sun_view);
-  float calculate_pssa(unsigned surface_index);
-  std::vector<float> calculate_pssa(const std::vector<unsigned> &surface_indices);
+  float calculate_pssa(unsigned int surface_index);
+  std::vector<float> calculate_pssa(const std::vector<unsigned int> &surface_indices);
   std::vector<float> calculate_pssa();
-  std::unordered_map<unsigned, float>
-  calculate_interior_pssas(const std::vector<unsigned> &hidden_surfaces,
-                           const std::vector<unsigned> &interior_surfaces, mat4x4 sun_view);
-  void show_interior_rendering(const std::vector<unsigned> &hidden_surface_indices,
+  std::unordered_map<unsigned int, float>
+  calculate_interior_pssas(const std::vector<unsigned int> &hidden_surfaces,
+                           const std::vector<unsigned int> &interior_surfaces, mat4x4 sun_view);
+  void show_interior_rendering(const std::vector<unsigned int> &hidden_surface_indices,
                                const unsigned int interior_surface_index, mat4x4 sun_view);
   void clear_model();
   static std::string get_vendor_name();

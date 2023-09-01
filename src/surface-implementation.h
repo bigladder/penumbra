@@ -15,9 +15,9 @@
 namespace Penumbra {
 
 struct TessData {
-  TessData(const float *array, unsigned number_of_vertices);
+  TessData(const float *array, unsigned int number_of_vertices);
   std::vector<float> vertices;
-  unsigned number_of_vertices;
+  unsigned int number_of_vertices;
   static const int polygon_size{3}; // making triangles
   static const int vertex_size{3};  // i.e., 3D
 };

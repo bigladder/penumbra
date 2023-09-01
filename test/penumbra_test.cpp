@@ -67,7 +67,7 @@ TEST(PenumbraTest, azimuth) {
   }
   Penumbra::Surface wall({0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f}, "Wall");
   Penumbra::Penumbra penumbra;
-  unsigned wall_id = penumbra.add_surface(wall);
+  unsigned int wall_id = penumbra.add_surface(wall);
   penumbra.set_model();
   // Loop azimuth around the surface (with zero altitude).
   for (float azimuth = 0.0f; azimuth <= 2 * m_pi_f; azimuth += m_pi_4_f) {
@@ -180,13 +180,13 @@ TEST(PenumbraTest, interior) {
 
   Penumbra::Penumbra penumbra;
 
-  unsigned front_wall_id = penumbra.add_surface(front_wall);
-  unsigned window_id = penumbra.add_surface(window);
-  unsigned back_wall_id = penumbra.add_surface(back_wall);
-  [[maybe_unused]] unsigned roof_id = penumbra.add_surface(roof);
-  unsigned floor_id = penumbra.add_surface(floor);
-  unsigned left_wall_id = penumbra.add_surface(left_wall);
-  unsigned right_wall_id = penumbra.add_surface(right_wall);
+  unsigned int front_wall_id = penumbra.add_surface(front_wall);
+  unsigned int window_id = penumbra.add_surface(window);
+  unsigned int back_wall_id = penumbra.add_surface(back_wall);
+  [[maybe_unused]] unsigned int roof_id = penumbra.add_surface(roof);
+  unsigned int floor_id = penumbra.add_surface(floor);
+  unsigned int left_wall_id = penumbra.add_surface(left_wall);
+  unsigned int right_wall_id = penumbra.add_surface(right_wall);
 
   penumbra.set_model();
   penumbra.set_sun_position(0.0f, 0.f);
@@ -203,7 +203,7 @@ TEST(PenumbraTest, interior) {
   // penumbra.render_scene(front_wall_id);
 
   penumbra.set_sun_position(0.5f, 0.5f);
-  std::unordered_map<unsigned, float> interior_pssas = penumbra.calculate_interior_pssas(
+  std::unordered_map<unsigned int, float> interior_pssas = penumbra.calculate_interior_pssas(
       {window_id}, {back_wall_id, floor_id, left_wall_id, right_wall_id});
   EXPECT_GT(interior_pssas[back_wall_id], 0.f);
   EXPECT_GT(interior_pssas[floor_id], 0.f);
@@ -314,8 +314,8 @@ TEST(PenumbraTest, calculate_pssa_multiple_surfaces) {
   const unsigned int left_wall_id = penumbra.add_surface(left_wall);
   const unsigned int right_wall_id = penumbra.add_surface(right_wall);
 
-  const std::vector<unsigned> test_cube{front_wall_id, back_wall_id, roof_id,
-                                        floor_id,      left_wall_id, right_wall_id};
+  const std::vector<unsigned int> test_cube{front_wall_id, back_wall_id, roof_id,
+                                            floor_id,      left_wall_id, right_wall_id};
 
   penumbra.set_model();
 
@@ -443,7 +443,7 @@ TEST(PenumbraTest, bad_surface_input_errors) {
     GTEST_SKIP() << invalid_context_string << std::endl;
   }
 
-  const std::vector<unsigned> bad_test_cube{5, 6, 7, 8, 9, 10};
+  const std::vector<unsigned int> bad_test_cube{5, 6, 7, 8, 9, 10};
   Penumbra::Surface front_wall({-.5f, .5f, -.5f, .5f, .5f, -.5f, .5f, .5f, .5f, -.5f, .5f, .5f});
   Penumbra::Surface back_wall({.5f, -.5f, -.5f, -.5f, -.5f, -.5f, -.5f, -.5f, .5f, .5f, -.5f, .5f});
   Penumbra::Surface roof({-.5f, .5f, .5f, .5f, .5f, .5f, .5f, -.5f, .5f, -.5f, -.5f, .5f});

@@ -455,7 +455,7 @@ void Context::draw_except(const std::vector<SurfaceBuffer> &hidden_surfaces) {
 #endif
 }
 
-void Context::show_rendering(const unsigned surface_index, mat4x4 sun_view) {
+void Context::show_rendering(const unsigned int surface_index, mat4x4 sun_view) {
   glfwSetWindowSize(window, size, size);
   glfwShowWindow(window);
 
@@ -479,7 +479,7 @@ void Context::show_rendering(const unsigned surface_index, mat4x4 sun_view) {
   initialize_off_screen_mode();
 }
 
-void Context::show_interior_rendering(const std::vector<unsigned> &hidden_surface_indices,
+void Context::show_interior_rendering(const std::vector<unsigned int> &hidden_surface_indices,
                                       const unsigned interior_surface_index, mat4x4 sun_view) {
   glfwSetWindowSize(window, size, size);
   glfwShowWindow(window);
@@ -519,11 +519,11 @@ void Context::submit_pssa(const SurfaceBuffer &surface_buffer, mat4x4 sun_view) 
   pixel_areas.at(surface_buffer.index) = pixel_area;
 }
 
-void Context::submit_pssa(const unsigned surface_index, mat4x4 sun_view) {
+void Context::submit_pssa(const unsigned int surface_index, mat4x4 sun_view) {
   submit_pssa(model.surface_buffers[surface_index], sun_view);
 }
 
-void Context::submit_pssa(const std::vector<unsigned> &surface_indices, mat4x4 sun_view) {
+void Context::submit_pssa(const std::vector<unsigned int> &surface_indices, mat4x4 sun_view) {
   for (auto const surface_index : surface_indices) {
     submit_pssa(surface_index, sun_view);
   }
@@ -535,13 +535,13 @@ void Context::submit_pssa(mat4x4 sun_view) {
   }
 }
 
-float Context::calculate_pssa(const unsigned surface_index) {
+float Context::calculate_pssa(const unsigned int surface_index) {
   // retrieve result
   glGetQueryObjectiv(queries[surface_index], GL_QUERY_RESULT, &(pixel_counts.at(surface_index)));
   return static_cast<float>(pixel_counts[surface_index]) * pixel_areas[surface_index];
 }
 
-std::vector<float> Context::calculate_pssa(const std::vector<unsigned> &surface_indices) {
+std::vector<float> Context::calculate_pssa(const std::vector<unsigned int> &surface_indices) {
 
   // retrieve result
   std::vector<float> results;

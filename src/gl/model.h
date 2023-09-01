@@ -33,7 +33,7 @@ public:
   void clear_model();
   std::vector<float> vertex_array;
   std::vector<SurfaceBuffer> surface_buffers;
-  unsigned number_of_points{0};
+  unsigned int number_of_points{0u};
   static const int vertex_size{3}; // i.e., 3D
 private:
   GLuint vertex_buffer_object{}, vertex_array_object{};

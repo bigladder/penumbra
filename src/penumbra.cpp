@@ -74,12 +74,12 @@ VendorType Penumbra::get_vendor_name() {
   return vendor_type;
 }
 
-unsigned Penumbra::add_surface(const Surface &surface) {
+unsigned int Penumbra::add_surface(const Surface &surface) {
   penumbra->add_surface(surface);
   return static_cast<unsigned int>(penumbra->surfaces.size()) - 1u;
 }
 
-unsigned Penumbra::get_number_of_surfaces() {
+unsigned int Penumbra::get_number_of_surfaces() {
   return static_cast<unsigned int>(penumbra->surfaces.size());
 }
 
@@ -88,13 +88,13 @@ void Penumbra::set_model() {
 
     // Tessellate each surface into triangles
     std::vector<SurfaceBuffer> surface_buffers;
-    unsigned next_starting_index = 0;
-    unsigned surface_index = 0;
+    unsigned int next_starting_index{0u};
+    unsigned int surface_index{0u};
     for (auto &surface : penumbra->surfaces) {
       TessData tess = surface.tessellate();
       surface_buffers.emplace_back(next_starting_index / TessData::vertex_size,
                                    tess.number_of_vertices / TessData::vertex_size, surface_index);
-      for (unsigned i = 0; i < tess.number_of_vertices; ++i) {
+      for (unsigned int i = 0; i < tess.number_of_vertices; ++i) {
         penumbra->model.push_back(tess.vertices[i]);
       }
       next_starting_index += tess.number_of_vertices;
@@ -126,12 +126,12 @@ float Penumbra::get_sun_altitude() {
   return penumbra->sun.get_altitude();
 }
 
-void Penumbra::submit_pssa(unsigned surface_index) {
+void Penumbra::submit_pssa(unsigned int surface_index) {
   penumbra->check_surface(surface_index);
   penumbra->context.submit_pssa(surface_index, penumbra->sun.get_view());
 }
 
-void Penumbra::submit_pssa(const std::vector<unsigned> &surface_indices) {
+void Penumbra::submit_pssa(const std::vector<unsigned int> &surface_indices) {
   for (auto const surface_index : surface_indices) {
     penumbra->check_surface(surface_index);
   }
@@ -142,12 +142,12 @@ void Penumbra::submit_pssa() {
   penumbra->context.submit_pssa(penumbra->sun.get_view());
 }
 
-float Penumbra::fetch_pssa(unsigned surface_index) {
+float Penumbra::fetch_pssa(unsigned int surface_index) {
   penumbra->check_surface(surface_index);
   return penumbra->context.calculate_pssa(surface_index);
 }
 
-std::vector<float> Penumbra::fetch_pssa(const std::vector<unsigned> &surface_indices) {
+std::vector<float> Penumbra::fetch_pssa(const std::vector<unsigned int> &surface_indices) {
   for (auto const surface_index : surface_indices) {
     penumbra->check_surface(surface_index);
   }
@@ -158,12 +158,12 @@ std::vector<float> Penumbra::fetch_pssa() {
   return penumbra->context.calculate_pssa();
 }
 
-float Penumbra::calculate_pssa(unsigned surface_index) {
+float Penumbra::calculate_pssa(unsigned int surface_index) {
   submit_pssa(surface_index);
   return fetch_pssa(surface_index);
 }
 
-std::vector<float> Penumbra::calculate_pssa(const std::vector<unsigned> &surface_indices) {
+std::vector<float> Penumbra::calculate_pssa(const std::vector<unsigned int> &surface_indices) {
   submit_pssa(surface_indices);
   return fetch_pssa(surface_indices);
 }
@@ -173,10 +173,10 @@ std::vector<float> Penumbra::calculate_pssa() {
   return fetch_pssa();
 }
 
-std::unordered_map<unsigned, float>
-Penumbra::calculate_interior_pssas(const std::vector<unsigned> &transparent_surface_indices,
-                                   const std::vector<unsigned> &interior_surface_indices) {
-  std::unordered_map<unsigned, float> pssas;
+std::unordered_map<unsigned int, float>
+Penumbra::calculate_interior_pssas(const std::vector<unsigned int> &transparent_surface_indices,
+                                   const std::vector<unsigned int> &interior_surface_indices) {
+  std::unordered_map<unsigned int, float> pssas;
   if (!transparent_surface_indices.empty()) {
     for (auto const transparent_surface_index : transparent_surface_indices) {
       penumbra->check_surface(transparent_surface_index, "Transparent surface");
@@ -195,13 +195,13 @@ Penumbra::calculate_interior_pssas(const std::vector<unsigned> &transparent_surf
   return pssas;
 }
 
-void Penumbra::render_scene(unsigned surface_index) {
+void Penumbra::render_scene(unsigned int surface_index) {
   penumbra->check_surface(surface_index);
   penumbra->context.show_rendering(surface_index, penumbra->sun.get_view());
 }
 
-void Penumbra::render_interior_scene(std::vector<unsigned> transparent_surface_indices,
-                                     std::vector<unsigned> interior_surface_indices) {
+void Penumbra::render_interior_scene(const std::vector<unsigned int> &transparent_surface_indices,
+                                     const std::vector<unsigned int> &interior_surface_indices) {
   if (!transparent_surface_indices.empty()) {
     for (auto const transparent_surface_index : transparent_surface_indices) {
       penumbra->check_surface(transparent_surface_index, "Transparent surface");
