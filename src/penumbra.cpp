@@ -54,7 +54,7 @@ bool Penumbra::is_valid_context() {
 
 VendorType Penumbra::get_vendor_name() {
   VendorType vendor_type;
-  auto vendor_name = Context::vendorName();
+  auto vendor_name = Context::get_vendor_name();
   if (vendor_name == "NVIDIA") {
     vendor_type = VendorType::nvidia;
   } else if (vendor_name == "AMD" || vendor_name == "ATI" ||
@@ -253,8 +253,8 @@ void Penumbra::render_interior_scene(std::vector<unsigned> transparent_surface_i
       }
       for (auto &interior_surface_index : interior_surface_indices) {
         if (penumbra->check_surface(interior_surface_index)) {
-          penumbra->context.showInteriorRendering(transparent_surface_indices,
-                                                  interior_surface_index, penumbra->sun.get_view());
+          penumbra->context.show_interior_rendering(
+              transparent_surface_indices, interior_surface_index, penumbra->sun.get_view());
         } else {
           throw PenumbraException(
               fmt::format("Interior surface index, {}, does not exist. Cannot render scene.",

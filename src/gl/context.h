@@ -46,10 +46,10 @@ public:
   std::unordered_map<unsigned, float>
   calculate_interior_pssas(const std::vector<unsigned> &hidden_surfaces,
                            const std::vector<unsigned> &interior_surfaces, mat4x4 sun_view);
-  void showInteriorRendering(const std::vector<unsigned> &hidden_surface_indices,
-                             unsigned interior_surface_index, mat4x4 sun_view);
+  void show_interior_rendering(const std::vector<unsigned> &hidden_surface_indices,
+                               const unsigned int interior_surface_index, mat4x4 sun_view);
   void clear_model();
-  static std::string vendorName();
+  static std::string get_vendor_name();
 
 private:
   GLFWwindow *window;
