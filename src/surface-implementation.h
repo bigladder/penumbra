@@ -4,20 +4,20 @@
 #ifndef SURFACE_IMPLEMENTATION_H_
 #define SURFACE_IMPLEMENTATION_H_
 
-// Vendor
-#include <tesselator.h>
-#include <courierr/courierr.h>
-
 // Standard
 #include <vector>
 #include <array>
 
+// Vendor
+#include <tesselator.h>
+#include <courierr/courierr.h>
+
 namespace Penumbra {
 
 struct TessData {
-  TessData(const float *array, unsigned number_of_vertices);
+  TessData(const float *array, unsigned int number_of_vertices);
   std::vector<float> vertices;
-  unsigned number_of_vertices;
+  unsigned int number_of_vertices;
   static const int polygon_size{3}; // making triangles
   static const int vertex_size{3};  // i.e., 3D
 };

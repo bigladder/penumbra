@@ -5,7 +5,7 @@
 #include <algorithm>
 
 // Penumbra
-#include <gl/model.h>
+#include "model.h"
 
 #ifdef __APPLE__
 #define glGenVertexArraysX glGenVertexArraysAPPLE

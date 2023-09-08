@@ -31,8 +31,8 @@ int main() {
   std::shared_ptr<AwningLogger> logger = std::make_shared<AwningLogger>();
   Penumbra::Penumbra penumbra(512u, logger);
 
-  unsigned wall_id = penumbra.add_surface(wall);
-  unsigned window_id = penumbra.add_surface(window);
+  unsigned int wall_id = penumbra.add_surface(wall);
+  unsigned int window_id = penumbra.add_surface(window);
   [[maybe_unused]] auto awning_id = penumbra.add_surface(awning);
 
   penumbra.set_model();

@@ -7,7 +7,7 @@
 
 // Penumbra
 #include <penumbra/surface.h>
-#include <surface-implementation.h>
+#include "surface-implementation.h"
 
 namespace Penumbra {
 

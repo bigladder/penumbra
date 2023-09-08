@@ -13,8 +13,9 @@
 // Penumbra
 #include <penumbra/penumbra.h>
 #include <penumbra/surface.h>
-#include <surface-implementation.h>
-#include <gl/context.h>
+#include "surface-implementation.h"
+#include "sun.h"
+#include "gl/context.h"
 
 namespace Penumbra {
 
@@ -31,7 +32,7 @@ public:
   std::vector<float> model;
   std::vector<SurfaceImplementation> surfaces;
   std::shared_ptr<Courierr::Courierr> logger;
-  [[nodiscard]] bool check_surface(unsigned index) const;
+  void check_surface(unsigned int index, const std::string_view &surface_context = "Surface") const;
 };
 
 } // namespace Penumbra

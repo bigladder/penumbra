@@ -32,7 +32,7 @@ public:
 
 public:
   static bool is_valid_context();
-  unsigned add_surface(const Surface &surface);
+  unsigned int add_surface(const Surface &surface);
   void set_model();
   void clear_model();
   void set_sun_position(float azimuth, // in radians, clockwise, north = 0
@@ -40,23 +40,23 @@ public:
   );
   float get_sun_azimuth();
   float get_sun_altitude();
-  void submit_pssa(unsigned surface_index);
-  void submit_pssa(const std::vector<unsigned> &surface_indices);
+  void submit_pssa(unsigned int surface_index);
+  void submit_pssa(const std::vector<unsigned int> &surface_indices);
   void submit_pssa();
-  unsigned get_number_of_surfaces();
-  float fetch_pssa(unsigned surface_index);
-  std::vector<float> fetch_pssa(const std::vector<unsigned> &surface_indices);
-  std::vector<float> fetch_pssa();
-  float calculate_pssa(unsigned surface_index);
-  std::vector<float> calculate_pssa(const std::vector<unsigned> &surface_indices);
+  unsigned int get_number_of_surfaces();
+  float retrieve_pssa(unsigned int surface_index);
+  std::vector<float> retrieve_pssa(const std::vector<unsigned int> &surface_indices);
+  std::vector<float> retrieve_pssa();
+  float calculate_pssa(unsigned int surface_index);
+  std::vector<float> calculate_pssa(const std::vector<unsigned int> &surface_indices);
   std::vector<float> calculate_pssa();
-  std::unordered_map<unsigned, float>
-  calculate_interior_pssas(const std::vector<unsigned> &transparent_surface_indices,
-                           const std::vector<unsigned> &interior_surface_indices);
-  void render_scene(unsigned surface_index); // Primarily for debug purposes
+  std::unordered_map<unsigned int, float>
+  calculate_interior_pssas(const std::vector<unsigned int> &transparent_surface_indices,
+                           const std::vector<unsigned int> &interior_surface_indices);
+  void render_scene(unsigned int surface_index); // Primarily for debug purposes
   void render_interior_scene(
-      std::vector<unsigned> transparent_surface_indices,
-      std::vector<unsigned> interior_surface_indices); // Primarily for debug purposes
+      const std::vector<unsigned int> &transparent_surface_indices,
+      const std::vector<unsigned int> &interior_surface_indices); // Primarily for debug purposes
   VendorType get_vendor_name();
   std::shared_ptr<Courierr::Courierr> get_logger();
 

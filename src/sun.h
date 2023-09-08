@@ -6,9 +6,9 @@
 
 // Standard
 #include <cmath>
-#include <linmath.h>
 
 // Vendor
+#include <linmath.h> // Part of GLFW
 #include <courierr/courierr.h>
 
 namespace Penumbra {
@@ -23,7 +23,6 @@ public:
 public:
   mat4x4_ptr get_view();
   void set_view(float azimuth, float altitude);
-  // void set_view(mat4x4 view);
   [[nodiscard]] float get_azimuth() const;
   [[nodiscard]] float get_altitude() const;
 

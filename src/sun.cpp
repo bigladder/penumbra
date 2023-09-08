@@ -2,7 +2,7 @@
  * See the LICENSE file for additional terms and conditions. */
 
 // Penumbra
-#include <sun.h>
+#include "sun.h"
 
 namespace Penumbra {
 
