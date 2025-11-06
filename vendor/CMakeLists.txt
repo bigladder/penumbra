@@ -39,9 +39,9 @@ add_library(tess2 ${libtess2_sources})
 target_include_directories(tess2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Include)
 target_include_directories(tess2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source)
 
-if (NOT TARGET courierr)
-  add_subdirectory(courierr)
-  mark_as_advanced(courierr_BUILD_TESTING courierr_COVERAGE courierr_STATIC_LIB)
+if (NOT TARGET courier)
+  add_subdirectory(courier)
+  mark_as_advanced(courier_BUILD_TESTING courier_COVERAGE courier_STATIC_LIB)
 endif ()
 
 # googletest library
