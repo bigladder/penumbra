@@ -63,6 +63,13 @@ jobs:
             static_lib: ON
             coverage: OFF
             examples: ON
+          - os: macos-latest
+            cc: clang
+            cxx: clang++
+            config: Release
+            static_lib: ON
+            coverage: OFF
+            examples: ON
           - os: ubuntu
             os_ver: "20.04"
             cc: gcc-10
@@ -92,6 +99,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev
       - name: Configure CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}" -D${{ env.REPOSITORY_NAME }}_BUILD_EXAMPLES="${{ matrix.examples }}"
+      - name: Verify Clang version
+        if: runner.os == 'macOS'
+        run: clang --version
       - name: Build
         run: cmake --build build --config ${{ matrix.config }}
       - name: Setup Mesa3D
