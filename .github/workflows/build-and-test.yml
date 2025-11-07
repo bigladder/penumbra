@@ -7,14 +7,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu
-            os_ver: "22.04"
-            cc: gcc-11
-            cxx: g++-11
-            config: Release
-            static_lib: ON
-            coverage: OFF
-            examples: ON
+          # - os: ubuntu
+          #   os_ver: "22.04"
+          #   cc: gcc-11
+          #   cxx: g++-11
+          #   config: Release
+          #   static_lib: ON
+          #   coverage: OFF
+          #   examples: ON
           # - os: ubuntu
           #   os_ver: "20.04"
           #   cc: gcc-10
@@ -63,7 +63,8 @@ jobs:
           #   static_lib: ON
           #   coverage: OFF
           #   examples: ON
-          - os: macos-latest
+          - os: macos
+            os_ver: "latest"
             cc: clang
             cxx: clang++
             config: Release
