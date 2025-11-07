@@ -7,7 +7,7 @@
 // Penumbra
 #include <penumbra/logging.h>
 #include "shader.h"
-#include <format>
+#include <fmt/format.h>
 
 namespace Penumbra {
 GLShader::GLShader(GLenum type, const char *source, Courier::Courier *logger_in)
@@ -26,8 +26,8 @@ GLShader::GLShader(GLenum type, const char *source, Courier::Courier *logger_in)
       glDeleteShader(shader);
       shader = 0;
       std::string shader_type_string = (type == GL_FRAGMENT_SHADER) ? "fragment" : "vertex";
-      logger->send_info(std::format("OpenGL {} shader: {}", shader_type_string, info_log));
-      logger->send_error(std::format("Unable to compile {} shader.", shader_type_string));
+      logger->send_info(fmt::format("OpenGL {} shader: {}", shader_type_string, info_log));
+      logger->send_error(fmt::format("Unable to compile {} shader.", shader_type_string));
     }
   }
 }

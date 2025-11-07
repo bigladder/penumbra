@@ -15,7 +15,7 @@
 #include <penumbra/penumbra.h>
 #include "penumbra-implementation.h"
 
-#include <format>
+#include <fmt/format.h>
 
 namespace Penumbra {
 
@@ -70,7 +70,7 @@ VendorType Penumbra::get_vendor_name() {
     vendor_type = VendorType::mesa;
   } else {
     penumbra->logger->send_error(
-        std::format("Failed to find GPU or vendor name ({}) is not in list.", vendor_name));
+        fmt::format("Failed to find GPU or vendor name ({}) is not in list.", vendor_name));
   }
   return vendor_type;
 }

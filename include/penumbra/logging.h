@@ -5,7 +5,7 @@
 #define PENUMBRA_LOGGING_H_
 
 #include <courier/courier.h>
-#include <format>
+#include <fmt/format.h>
 
 namespace Penumbra {
 
@@ -30,7 +30,7 @@ public:
 protected:
 
 void write_message(const std::string_view message_type, const std::string_view message) {
-    std::cout << std::format("  [{}] {}", message_type, message) << std::endl;
+    std::cout << fmt::format("  [{}] {}", message_type, message) << std::endl;
   }
 };
 

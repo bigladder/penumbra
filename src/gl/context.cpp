@@ -10,7 +10,7 @@
 // Penumbra
 #include <penumbra/logging.h>
 #include "context.h"
-#include <format>
+#include <fmt/format.h>
 
 namespace Penumbra {
 
@@ -53,7 +53,7 @@ thread_local static Courier::Courier *glfw_logger{nullptr};
 
 static void glfw_error_callback(int, const char *description) {
   if (glfw_logger) {
-    glfw_logger->send_info(std::format("GLFW message: {}", description));
+    glfw_logger->send_info(fmt::format("GLFW message: {}", description));
   }
 }
 
@@ -108,7 +108,7 @@ Context::Context(GLint size_in, Courier::Courier *logger_in) : size(size_in), lo
   GLint max_res = std::min(GL_MAX_RENDERBUFFER_SIZE_EXT, max_view_size[0]);
   if (size >= max_res) {
     logger->send_warning(
-        std::format("The selected resolution, {}, is larger than the maximum allowable by your "
+        fmt::format("The selected resolution, {}, is larger than the maximum allowable by your "
                     "hardware, {}. The size will be reset to be equal to the maximum allowable.",
                     size, max_res));
     size = max_res;
@@ -635,7 +635,7 @@ void Context::initialize_off_screen_mode() {
       reason = "Reason unknown.";
     }
     }
-    logger->send_error(std::format("Unable to create framebuffer. {}", reason));
+    logger->send_error(fmt::format("Unable to create framebuffer. {}", reason));
   }
 
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
