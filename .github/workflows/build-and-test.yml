@@ -48,7 +48,7 @@ jobs:
           #   coverage: OFF
           #   examples: ON
           - os: macos
-            os_ver: "12"
+            os_ver: "13"
             cc: clang
             cxx: clang++
             config: Debug
