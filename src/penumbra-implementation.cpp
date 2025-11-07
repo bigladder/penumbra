@@ -12,17 +12,18 @@
 
 // Penumbra
 #include "penumbra-implementation.h"
+#include <format>
 
 namespace Penumbra {
 
 PenumbraImplementation::PenumbraImplementation(int size,
-                                               const std::shared_ptr<Courierr::Courierr> &logger_in)
+                                               const std::shared_ptr<Courier::Courier> &logger_in)
     : context(size, logger_in.get()), logger(logger_in) {}
 
 void PenumbraImplementation::add_surface(const Surface &surface) {
   surface.surface->logger = logger;
   if (surface.surface->name.empty()) {
-    surface.surface->name = fmt::format("Surface {}", surfaces.size());
+    surface.surface->name = std::format("Surface {}", surfaces.size());
   }
   surfaces.push_back(*surface.surface);
 }
@@ -30,7 +31,8 @@ void PenumbraImplementation::add_surface(const Surface &surface) {
 void PenumbraImplementation::check_surface(const unsigned int surface_index,
                                            const std::string_view &surface_context) const {
   if (surface_index >= surfaces.size()) {
-    throw SurfaceException(surface_index, surface_context, *(logger));
+    auto index_error = std::format("{} index, {}, does not exist.", surface_context, surface_index);
+    logger->send_error(index_error);
   }
 }
 

@@ -7,9 +7,10 @@
 // Penumbra
 #include <penumbra/logging.h>
 #include "shader.h"
+#include <format>
 
 namespace Penumbra {
-GLShader::GLShader(GLenum type, const char *source, Courierr::Courierr *logger_in)
+GLShader::GLShader(GLenum type, const char *source, Courier::Courier *logger_in)
     : logger(logger_in) {
   GLint shader_ok;
   GLsizei log_length;
@@ -25,9 +26,8 @@ GLShader::GLShader(GLenum type, const char *source, Courierr::Courierr *logger_i
       glDeleteShader(shader);
       shader = 0;
       std::string shader_type_string = (type == GL_FRAGMENT_SHADER) ? "fragment" : "vertex";
-      logger->info(fmt::format("OpenGL {} shader: {}", shader_type_string, info_log));
-      throw PenumbraException(fmt::format("Unable to compile {} shader.", shader_type_string),
-                              *logger);
+      logger->send_info(std::format("OpenGL {} shader: {}", shader_type_string, info_log));
+      logger->send_error(std::format("Unable to compile {} shader.", shader_type_string));
     }
   }
 }

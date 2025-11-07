@@ -8,7 +8,7 @@
 namespace Penumbra {
 
 GLProgram::GLProgram(const char *vertex_source, const char *fragment_source,
-                     Courierr::Courierr *logger) {
+                     Courier::Courier *logger) {
   program = glCreateProgram();
   GLShader vertex(GL_VERTEX_SHADER, vertex_source, logger);
   glAttachShader(program, vertex.get());

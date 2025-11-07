@@ -456,11 +456,11 @@ TEST(PenumbraTest, bad_surface_input_errors) {
 
   penumbra.set_model();
 
-  EXPECT_THROW(penumbra.calculate_pssa(bad_test_cube), Penumbra::PenumbraException);
+  EXPECT_THROW(penumbra.calculate_pssa(bad_test_cube), std::runtime_error);
 
-  EXPECT_THROW(penumbra.render_scene(11), Penumbra::PenumbraException);
+  EXPECT_THROW(penumbra.render_scene(11), std::runtime_error);
 
-  EXPECT_THROW(penumbra.retrieve_pssa(bad_test_cube), Penumbra::PenumbraException);
+  EXPECT_THROW(penumbra.retrieve_pssa(bad_test_cube), std::runtime_error);
 }
 
 int main(int argc, char **argv) {

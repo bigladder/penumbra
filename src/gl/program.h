@@ -7,13 +7,13 @@
 // Vendor
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <courierr/courierr.h>
+#include <courier/courier.h>
 
 namespace Penumbra {
 
 class GLProgram {
 public:
-  GLProgram(const char *vertex_source, const char *fragment_source, Courierr::Courierr *logger);
+  GLProgram(const char *vertex_source, const char *fragment_source, Courier::Courier *logger);
   ~GLProgram();
   [[nodiscard]] GLuint get() const;
 

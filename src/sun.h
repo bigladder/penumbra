@@ -9,7 +9,7 @@
 
 // Vendor
 #include <linmath.h> // Part of GLFW
-#include <courierr/courierr.h>
+#include <courier/courier.h>
 
 namespace Penumbra {
 
