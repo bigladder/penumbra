@@ -67,7 +67,7 @@ jobs:
             os_ver: "latest"
             cc: clang
             cxx: clang++
-            config: Release
+            config: Debug
             static_lib: ON
             coverage: OFF
             examples: ON
