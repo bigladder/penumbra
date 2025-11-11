@@ -11,7 +11,7 @@ endif()
 
 add_executable(awning WIN32 MACOSX_BUNDLE awning.cpp ${ICON})
 target_link_libraries(awning PRIVATE ${PROJECT_NAME} penumbra_common_interface)
-target_compile_features(awning PRIVATE cxx_std_20)
+target_compile_features(awning PRIVATE cxx_std_17)
 target_compile_definitions(awning PRIVATE $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>)
 
 set(EXE_BINARIES awning)
