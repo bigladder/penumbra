@@ -32,7 +32,7 @@ jobs:
         run: cmake -E make_directory ${{github.workspace}}/build
       - name: Install Linux Libraries
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev libwayland-dev
+        run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev libwayland-dev wayland-protocols extra-cmake-modules libxkbcommon-dev
       - name: Verify compiler version
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
