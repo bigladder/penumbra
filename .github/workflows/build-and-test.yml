@@ -35,8 +35,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev
       - name: Verify compiler version
         if: contains(runner.os, 'macos')
-        run: CLANG_VERSION=$(clang --version | head -n 1)
+        run: |
+             CLANG_VERSION=$(clang --version | head -n 1)
              echo "SAVED_CLANG_VERSION=$CLANG_VERSION" >> $GITHUB_ENV
+             echo "The Clang version used is ${{ env.SAVED_CLANG_VERSION }}"
       - name: Configure CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}" -D${{ env.REPOSITORY_NAME }}_BUILD_EXAMPLES="${{ matrix.examples }}"
       - name: Build with CPP=${{ env.SAVED_CLANG_VERSION }}
