@@ -32,16 +32,22 @@ jobs:
         run: cmake -E make_directory ${{github.workspace}}/build
       - name: Install Linux Libraries
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev
+        run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev libwayland-dev
       - name: Verify compiler version
-        if: contains(runner.os, 'macos')
         run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+             GCC_VERSION=$(g++ --version | head -n 1)
+             echo "COMPILER_VERSION=$CLANG_VERSION" >> $GITHUB_ENV
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+             echo "COMPILER_VERSION=cl.exe" >> $GITHUB_ENV
+          elif [ "$RUNNER_OS" == "macOS" ]; then
              CLANG_VERSION=$(clang --version | head -n 1)
-             echo "SAVED_CLANG_VERSION=$CLANG_VERSION" >> $GITHUB_ENV
-             echo "The Clang version used is ${{ env.SAVED_CLANG_VERSION }}"
+             echo "COMPILER_VERSION=$CLANG_VERSION" >> $GITHUB_ENV
+             echo "The Clang version used is ${{ env.COMPILER_VERSION }}"
+          fi
       - name: Configure CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}" -D${{ env.REPOSITORY_NAME }}_BUILD_EXAMPLES="${{ matrix.examples }}"
-      - name: Build with CPP=${{ env.SAVED_CLANG_VERSION }}
+      - name: Build with CPP=${{ env.COMPILER_VERSION }}
         run: cmake --build build --config ${{ matrix.config }}
       - name: Setup Mesa3D
         uses: bigladder/github-actions/setup-mesa3d@main
