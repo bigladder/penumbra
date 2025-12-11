@@ -6,88 +6,23 @@ jobs:
   build-and-test:
     strategy:
       matrix:
+        os: [ubuntu-latest, ubuntu-24.04, ubuntu-22.04,
+             windows-latest, windows-2025, windows-2022,
+             macos-latest, macos-26, macos-15, macos-14, macos-15-intel]
         include:
-          - os: ubuntu
-            os_ver: "22.04"
-            cc: gcc-11
-            cxx: g++-11
+          - coverage: OFF
             config: Release
             static_lib: ON
-            coverage: OFF
-            examples: ON
-          # - os: ubuntu
-          #   os_ver: "20.04"
-          #   cc: gcc-10
-          #   cxx: g++-10
-          #   config: Release
-          #   static_lib: ON
-          #   coverage: OFF
-          #   examples: ON
-          - os: windows
-            os_ver: "2022"
-            cc: cl
-            cxx: cl
-            config: Release
+          - coverage: ON
+            config: DEBUG
             static_lib: ON
-            coverage: OFF
-            examples: ON
-          # - os: windows
-          #   os_ver: "2022"
-          #   cc: cl
-          #   cxx: cl
-          #   config: Debug
-          #   static_lib: ON
-          #   coverage: OFF
-          #   examples: ON
-          # - os: macos
-          #   os_ver: "12"
-          #   cc: clang
-          #   cxx: clang++
-          #   config: Release
-          #   static_lib: ON
-          #   coverage: OFF
-          #   examples: ON
-          - os: macos
-            os_ver: "13"
-            cc: clang
-            cxx: clang++
-            config: Debug
-            static_lib: ON
-            coverage: OFF
-            examples: ON
-          # - os: macos
-          #   os_ver: "11"
-          #   cc: clang
-          #   cxx: clang++
-          #   config: Release
-          #   static_lib: ON
-          #   coverage: OFF
-          #   examples: ON
-          - os: macos
-            os_ver: "latest"
-            cc: clang
-            cxx: clang++
-            config: Debug
-            static_lib: ON
-            coverage: OFF
-            examples: ON
-          # - os: ubuntu
-          #   os_ver: "20.04"
-          #   cc: gcc-10
-          #   cxx: g++-10
-          #   config: Debug
-          #   static_lib: OFF
-          #   coverage: ON
-          #   examples: OFF
+            os: ubuntu-latest
       fail-fast: false
     defaults:
       run:
         shell: bash
-    env:
-      CC: ${{ matrix.cc }}
-      CXX: ${{ matrix.cxx }}
-    runs-on: ${{ matrix.os }}-${{ matrix.os_ver }}
-    name: ${{ matrix.os }}-${{ matrix.os_ver }} ${{ matrix.cxx }} ${{ matrix.config }} coverage=${{ matrix.coverage }}
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} ${{ matrix.config }} coverage=${{ matrix.coverage }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
