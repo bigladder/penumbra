@@ -17,6 +17,10 @@ jobs:
             config: Release
             static_lib: ON
             os: ubuntu-latest
+          - coverage: OFF
+            config: Debug
+            static_lib: ON
+            os: macos-15
           # - coverage: ON
           #   config: DEBUG
           #   static_lib: ON
