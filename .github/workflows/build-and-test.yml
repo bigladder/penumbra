@@ -13,14 +13,10 @@ jobs:
           - coverage: OFF
             config: Release
             static_lib: ON
-          - coverage: OFF
-            config: Release
+          - coverage: ON
+            config: DEBUG
             static_lib: ON
             os: ubuntu-latest
-          # - coverage: ON
-          #   config: DEBUG
-          #   static_lib: ON
-          #   os: ubuntu-latest
       fail-fast: false
     defaults:
       run:
