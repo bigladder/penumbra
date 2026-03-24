@@ -15,7 +15,7 @@ jobs:
             static_lib: ON
           - coverage: ON
             config: DEBUG
-            static_lib: ON
+            static_lib: OFF
             os: ubuntu-latest
       fail-fast: false
     defaults:
