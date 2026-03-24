@@ -11,7 +11,6 @@ add_executable(${PROJECT_NAME}_tests ${test_sources})
 target_include_directories(${PROJECT_NAME}_tests PRIVATE
   ${gtest_SOURCE_DIR}/include
 )
-target_link_libraries(gtest PRIVATE penumbra_common_interface)
 target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME} gtest penumbra_common_interface)
 target_compile_features(${PROJECT_NAME}_tests PRIVATE cxx_std_17)
 
