@@ -3,7 +3,9 @@
 
 macro(add_submodule submodule_name)
     # Clone a submodule and add its subdirectory to the build (if the corresponding target hasn't already been added)
-    set(options) # None
+    set(options
+        NO_CMAKELISTS  # Skip adding a subdirectory if the submodule doesn't have a CMakeLists.txt file
+)
     set(one_value_args
             TARGET_NAME           # Specify if target name is different from the submodule name
             PARENT_SUBMODULE_PATH # Specify if you want to leverage a submodule outside of this project's vendor directory
@@ -39,7 +41,7 @@ macro(add_submodule submodule_name)
     endif ()
 
     # Add subdirectory
-    if (NOT TARGET ${target_name} AND (EXISTS "${submodule_path}"))
+    if (NOT TARGET ${target_name} AND (EXISTS "${submodule_path}") AND NOT add_${submodule_name}_args_NO_CMAKELISTS)
         add_subdirectory(${submodule_path})
     endif ()
 

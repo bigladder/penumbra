@@ -11,6 +11,7 @@ endif()
 
 add_submodule(courier MARK_AS_ADVANCED courier_BUILD_TESTING courier_COVERAGE courier_STATIC_LIB)
 add_submodule(glfw)
+add_submodule(libtess2 NO_CMAKELISTS TARGET_NAME tess2)
 
 # GLAD
 add_subdirectory(glad)
