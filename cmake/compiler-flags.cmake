@@ -18,8 +18,8 @@ target_compile_options(penumbra_common_interface INTERFACE
       /GS-    # Disable buffer overrun checks for performance in release mode
     >
   >
-  # GCC And Clang
-  $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
+  # GCC And Clang (excluding clang-cl, which sets MSVC=true)
+  $<$<AND:$<CXX_COMPILER_ID:GNU,Clang,AppleClang>,$<NOT:$<BOOL:${MSVC}>>>:
     -pthread
     -pipe       # Faster compiler processing
     $<$<COMPILE_LANG_AND_ID:CXX,GNU>: # Adds flag only to C++
