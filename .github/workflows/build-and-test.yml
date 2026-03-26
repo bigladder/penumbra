@@ -9,8 +9,14 @@ jobs:
         os: [ubuntu-24.04, ubuntu-22.04,
              windows-latest, windows-2025, windows-2022,
              macos-latest, macos-26, macos-15, macos-14, macos-15-intel]
+        compiler: ['']
         include:
           - coverage: OFF
+            config: Release
+            static_lib: ON
+          - compiler: clang-cl
+            os: windows-latest
+            coverage: OFF
             config: Release
             static_lib: ON
           - coverage: ON
@@ -43,13 +49,18 @@ jobs:
              GCC_VERSION=$(g++ --version | head -n 1)
              echo "COMPILER_VERSION=$GCC_VERSION" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "Windows" ]; then
-             echo "COMPILER_VERSION=cl.exe" >> $GITHUB_ENV
+             if [ "${{ matrix.compiler }}" == "clang-cl" ]; then
+               CLANG_CL_VERSION=$(clang-cl --version | head -n 1)
+               echo "COMPILER_VERSION=$CLANG_CL_VERSION" >> $GITHUB_ENV
+             else
+               echo "COMPILER_VERSION=cl.exe" >> $GITHUB_ENV
+             fi
           elif [ "$RUNNER_OS" == "macOS" ]; then
              CLANG_VERSION=$(clang --version | head -n 1)
              echo "COMPILER_VERSION=$CLANG_VERSION" >> $GITHUB_ENV
           fi
       - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}" -D${{ env.REPOSITORY_NAME }}_BUILD_EXAMPLES="${{ matrix.examples }}"
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}" -D${{ env.REPOSITORY_NAME }}_BUILD_EXAMPLES="${{ matrix.examples }}"${{ matrix.compiler == 'clang-cl' && ' -T ClangCL' || '' }}
       - name: "Build with compiler: ${{ env.COMPILER_VERSION }}"
         run: cmake --build build --config ${{ matrix.config }}
       - name: Setup Mesa3D
