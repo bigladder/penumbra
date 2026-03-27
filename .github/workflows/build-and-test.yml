@@ -2,6 +2,9 @@ name: Build and Test
 
 on: push
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true
+
 jobs:
   build-and-test:
     strategy:
@@ -43,22 +46,6 @@ jobs:
       - name: Install Linux Libraries
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev libwayland-dev wayland-protocols extra-cmake-modules libxkbcommon-dev
-      - name: Get compiler version
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-             GCC_VERSION=$(g++ --version | head -n 1)
-             echo "COMPILER_VERSION=$GCC_VERSION" >> $GITHUB_ENV
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-             if [ "${{ matrix.compiler }}" == "clang-cl" ]; then
-               CLANG_CL_VERSION=$(clang-cl --version | head -n 1)
-               echo "COMPILER_VERSION=$CLANG_CL_VERSION" >> $GITHUB_ENV
-             else
-               echo "COMPILER_VERSION=cl.exe" >> $GITHUB_ENV
-             fi
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-             CLANG_VERSION=$(clang --version | head -n 1)
-             echo "COMPILER_VERSION=$CLANG_VERSION" >> $GITHUB_ENV
-          fi
       - name: Configure CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}" -D${{ env.REPOSITORY_NAME }}_BUILD_EXAMPLES="${{ matrix.examples }}"${{ matrix.compiler == 'clang-cl' && ' -T ClangCL' || '' }}
       - name: "Build with compiler: ${{ env.COMPILER_VERSION }}"
