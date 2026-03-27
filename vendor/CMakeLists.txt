@@ -37,11 +37,6 @@ mark_as_advanced(
   BUILD_SHARED_LIBS
 )
 
-target_include_directories(glfw PUBLIC
- $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/vendor/glfw/include>
- $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/vendor/glfw/deps>
-)
-
 # tess2 library
 file(GLOB libtess2_sources "${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source/[a-zA-Z]*.c")
 add_library(tess2 ${libtess2_sources})
