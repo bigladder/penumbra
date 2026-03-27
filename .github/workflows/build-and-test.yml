@@ -65,4 +65,4 @@ jobs:
         working-directory: build
       - name: Upload Code Coverage Report
         if: matrix.coverage == 'ON'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
