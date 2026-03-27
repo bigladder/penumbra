@@ -10,7 +10,6 @@ if (${PROJECT_NAME}_BUILD_TESTING)
 endif()
 
 add_submodule(courier MARK_AS_ADVANCED courier_BUILD_TESTING courier_COVERAGE courier_STATIC_LIB)
-add_submodule(glfw)
 add_submodule(libtess2 NO_CMAKELISTS TARGET_NAME tess2)
 
 # GLAD
@@ -36,6 +35,8 @@ mark_as_advanced(
   GLFW_VULKAN_STATIC
   BUILD_SHARED_LIBS
 )
+
+add_submodule(glfw)
 
 # tess2 library
 file(GLOB libtess2_sources "${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source/[a-zA-Z]*.c")

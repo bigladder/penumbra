@@ -24,6 +24,7 @@ target_include_directories(${PROJECT_NAME}
   ${PROJECT_SOURCE_DIR}/include
   PRIVATE
   ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_SOURCE_DIR}/vendor/glfw/deps
 )
 
 include(GenerateExportHeader)
