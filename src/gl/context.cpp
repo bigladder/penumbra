@@ -10,6 +10,7 @@
 // Penumbra
 #include <penumbra/logging.h>
 #include "context.h"
+#include <fmt/format.h>
 
 namespace Penumbra {
 
@@ -48,24 +49,23 @@ const char *Context::calculation_vertex_shader_source =
   }
 )src";
 
-thread_local static Courierr::Courierr *glfw_logger{nullptr};
+thread_local static Courier::Courier *glfw_logger{nullptr};
 
 static void glfw_error_callback(int, const char *description) {
   if (glfw_logger) {
-    glfw_logger->info(fmt::format("GLFW message: {}", description));
+    glfw_logger->send_info(fmt::format("GLFW message: {}", description));
   }
 }
 
-Context::Context(GLint size_in, Courierr::Courierr *logger_in) : size(size_in), logger(logger_in) {
+Context::Context(GLint size_in, Courier::Courier *logger_in) : size(size_in), logger(logger_in) {
 
   glfw_logger = logger;
   glfwSetErrorCallback(glfw_error_callback);
 
   if (!glfwInit()) {
-    throw PenumbraException(
+    logger->send_error(
         "Unable to initialize GLFW. Either there is no GPU, libraries are missing, or "
-        "some other error happened.",
-        *logger);
+        "some other error happened.");
   }
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -85,32 +85,29 @@ Context::Context(GLint size_in, Courierr::Courierr *logger_in) : size(size_in), 
 #endif
   glfwMakeContextCurrent(window);
   if (!window) {
-    throw PenumbraException(
+    logger->send_error(
         "Unable to create OpenGL context. OpenGL 2.1+ is required to perform GPU "
-        "accelerated shading calculations.",
-        *logger);
+        "accelerated shading calculations.");
   }
 
   // OpenGL extension loader
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    throw PenumbraException("Failed to load required OpenGL extensions.", *logger);
+    logger->send_error("Failed to load required OpenGL extensions.");
   }
 
   if (!glfwExtensionSupported("GL_ARB_vertex_array_object") &&
       !glfwExtensionSupported("GL_APPLE_vertex_array_object")) {
-    throw PenumbraException("The current version of OpenGL does not support vertex array objects.",
-                            *logger);
+    logger->send_error("The current version of OpenGL does not support vertex array objects.");
   }
   if (!glfwExtensionSupported("GL_EXT_framebuffer_object")) {
-    throw PenumbraException("The current version of OpenGL does not support framebuffer objects.",
-                            *logger);
+    logger->send_error("The current version of OpenGL does not support framebuffer objects.");
   }
 
   GLint max_view_size[2];
   glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &max_view_size[0]);
   GLint max_res = std::min(GL_MAX_RENDERBUFFER_SIZE_EXT, max_view_size[0]);
   if (size >= max_res) {
-    logger->warning(
+    logger->send_warning(
         fmt::format("The selected resolution, {}, is larger than the maximum allowable by your "
                     "hardware, {}. The size will be reset to be equal to the maximum allowable.",
                     size, max_res));
@@ -300,7 +297,7 @@ void Context::set_model(const std::vector<float> &vertices,
 float Context::set_scene(mat4x4 sun_view, const SurfaceBuffer *surface_buffer, bool clip_far) {
 
   if (!model_is_set) {
-    throw PenumbraException("Model has not been set. Cannot set OpenGL scene.", *logger);
+    logger->send_error("Model has not been set. Cannot set OpenGL scene.");
   }
 
   mat4x4_dup(view, sun_view);
@@ -638,7 +635,7 @@ void Context::initialize_off_screen_mode() {
       reason = "Reason unknown.";
     }
     }
-    throw PenumbraException(fmt::format("Unable to create framebuffer. {}", reason), *logger);
+    logger->send_error(fmt::format("Unable to create framebuffer. {}", reason));
   }
 
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);

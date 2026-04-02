@@ -15,7 +15,7 @@
 // Vendor
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <courierr/courierr.h>
+#include <courier/courier.h>
 #include <linmath.h> // Part of GLFW
 
 // Penumbra
@@ -30,7 +30,7 @@ namespace Penumbra {
 class Context {
 
 public:
-  Context(GLint size, Courierr::Courierr *logger);
+  Context(GLint size, Courier::Courier *logger);
   ~Context();
   void show_rendering(unsigned int surface_index, mat4x4 sun_view);
   void set_model(const std::vector<float> &vertices,
@@ -78,7 +78,7 @@ private:
   std::vector<GLuint> queries;
   std::vector<float> pixel_areas;
   std::vector<GLint> pixel_counts;
-  Courierr::Courierr *logger;
+  Courier::Courier *logger;
 
   void submit_pssa(const SurfaceBuffer &surface_buffer, mat4x4 sun_view);
   void draw_model();

@@ -15,12 +15,14 @@
 #include <penumbra/penumbra.h>
 #include "penumbra-implementation.h"
 
+#include <fmt/format.h>
+
 namespace Penumbra {
 
-Penumbra::Penumbra(unsigned int size, const std::shared_ptr<Courierr::Courierr> &logger)
+Penumbra::Penumbra(unsigned int size, const std::shared_ptr<Courier::Courier> &logger)
     : penumbra(std::make_unique<PenumbraImplementation>(static_cast<int>(size), logger)) {}
 
-Penumbra::Penumbra(const std::shared_ptr<Courierr::Courierr> &logger)
+Penumbra::Penumbra(const std::shared_ptr<Courier::Courier> &logger)
     : penumbra(std::make_unique<PenumbraImplementation>(512, logger)) {}
 
 Penumbra::~Penumbra() = default;
@@ -67,9 +69,8 @@ VendorType Penumbra::get_vendor_name() {
   } else if (vendor_name == "Mesa" || vendor_name == "Mesa/X.org") {
     vendor_type = VendorType::mesa;
   } else {
-    throw PenumbraException(
-        fmt::format("Failed to find GPU or vendor name ({}) is not in list.", vendor_name),
-        *(penumbra->logger));
+    penumbra->logger->send_error(
+        fmt::format("Failed to find GPU or vendor name ({}) is not in list.", vendor_name));
   }
   return vendor_type;
 }
@@ -102,7 +103,7 @@ void Penumbra::set_model() {
     }
     penumbra->context.set_model(penumbra->model, surface_buffers);
   } else {
-    penumbra->logger->warning("No surfaces added to Penumbra before calling set_model().");
+    penumbra->logger->send_warning("No surfaces added to Penumbra before calling set_model().");
   }
 }
 
@@ -188,9 +189,8 @@ Penumbra::calculate_interior_pssas(const std::vector<unsigned int> &transparent_
         transparent_surface_indices, interior_surface_indices, penumbra->sun.get_view());
 
   } else {
-    throw PenumbraException(
-        "Cannot calculate interior PSSAs without defining at least one transparent surface index.",
-        *(penumbra->logger));
+    penumbra->logger->send_error(
+        "Cannot calculate interior PSSAs without defining at least one transparent surface index.");
   }
   return pssas;
 }
@@ -212,12 +212,11 @@ void Penumbra::render_interior_scene(const std::vector<unsigned int> &transparen
                                                 penumbra->sun.get_view());
     }
   } else {
-    throw PenumbraException("Cannot render interior scene without defining at least one "
-                            "transparent surface index.",
-                            *(penumbra->logger));
+    penumbra->logger->send_error("Cannot render interior scene without defining at least one "
+                            "transparent surface index.");
   }
 }
-std::shared_ptr<Courierr::Courierr> Penumbra::get_logger() {
+std::shared_ptr<Courier::Courier> Penumbra::get_logger() {
   return penumbra->logger;
 }
 

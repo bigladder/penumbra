@@ -23,10 +23,10 @@ class PenumbraImplementation;
 
 class Penumbra {
 public:
-  explicit Penumbra(unsigned int size = 512u, const std::shared_ptr<Courierr::Courierr> &logger =
+  explicit Penumbra(unsigned int size = 512u, const std::shared_ptr<Courier::Courier> &logger =
                                                   std::make_shared<PenumbraLogger>());
 
-  explicit Penumbra(const std::shared_ptr<Courierr::Courierr> &logger);
+  explicit Penumbra(const std::shared_ptr<Courier::Courier> &logger);
 
   ~Penumbra();
 
@@ -58,7 +58,7 @@ public:
       const std::vector<unsigned int> &transparent_surface_indices,
       const std::vector<unsigned int> &interior_surface_indices); // Primarily for debug purposes
   VendorType get_vendor_name();
-  std::shared_ptr<Courierr::Courierr> get_logger();
+  std::shared_ptr<Courier::Courier> get_logger();
 
 private:
   std::unique_ptr<PenumbraImplementation> penumbra;

@@ -8,7 +8,7 @@
 #include <memory>
 
 // vendor
-#include <courierr/courierr.h>
+#include <courier/courier.h>
 
 // Penumbra
 #include <penumbra/penumbra.h>
@@ -22,7 +22,7 @@ namespace Penumbra {
 class PenumbraImplementation {
 
 public:
-  PenumbraImplementation(int size, const std::shared_ptr<Courierr::Courierr> &logger);
+  PenumbraImplementation(int size, const std::shared_ptr<Courier::Courier> &logger);
   ~PenumbraImplementation() = default;
 
 public:
@@ -31,7 +31,7 @@ public:
   Sun sun;
   std::vector<float> model;
   std::vector<SurfaceImplementation> surfaces;
-  std::shared_ptr<Courierr::Courierr> logger;
+  std::shared_ptr<Courier::Courier> logger;
   void check_surface(unsigned int index, const std::string_view &surface_context = "Surface") const;
 };
 

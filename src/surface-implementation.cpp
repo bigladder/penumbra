@@ -6,6 +6,7 @@
 #include <array>
 
 // Penumbra
+#include <fmt/format.h>
 #include <penumbra/surface.h>
 #include <penumbra/logging.h>
 #include "surface-implementation.h"
@@ -23,8 +24,7 @@ TessData SurfaceImplementation::tessellate() {
   TESStesselator *tess = tessNewTess(nullptr);
 
   if (!tess) {
-    throw PenumbraException(fmt::format("Unable to create tessellator for surface, \"{}\".", name),
-                            *logger);
+    logger->send_error(fmt::format("Unable to create tessellator for surface, \"{}\".", name));
   }
 
   // Add primary polygon
@@ -39,7 +39,7 @@ TessData SurfaceImplementation::tessellate() {
 
   if (!tessTesselate(tess, TESS_WINDING_ODD, TESS_POLYGONS, TessData::polygon_size,
                      TessData::vertex_size, nullptr)) {
-    throw PenumbraException(fmt::format("Unable to tessellate surface, \"{}\".", name), *logger);
+    logger->send_error(fmt::format("Unable to tessellate surface, \"{}\".", name));
   }
 
   // For now convert to glDrawArrays() style of vertices, sometime may change to glDrawElements

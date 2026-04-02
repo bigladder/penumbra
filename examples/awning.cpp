@@ -3,13 +3,14 @@
 
 // Standard
 #include <iostream>
+#include <fmt/format.h>
 
 // Penumbra
 #include <penumbra/penumbra.h>
 
 class AwningLogger : public Penumbra::PenumbraLogger {
 public:
-  void info(const std::string_view message) override {
+  void receive_info(const std::string& message) override {
     write_message("Info", message);
   }
 };
@@ -40,11 +41,11 @@ int main() {
   // penumbra.set_sun_position(3.14f, 0.0f);
   penumbra.render_scene(wall_id);
 
-  logger->info(fmt::format("Wall PSSA: {}", penumbra.calculate_pssa(wall_id)));
+  logger->send_info(fmt::format("Wall PSSA: {}", penumbra.calculate_pssa(wall_id)));
 
   penumbra.render_scene(window_id);
 
-  logger->info(fmt::format("Window PSSA: {}", penumbra.calculate_pssa(window_id)));
+  logger->send_info(fmt::format("Window PSSA: {}", penumbra.calculate_pssa(window_id)));
 
   penumbra.clear_model();
 
@@ -59,7 +60,7 @@ int main() {
 
   penumbra.render_scene(window_id);
 
-  logger->info(fmt::format("Window PSSA with fin: {}", penumbra.calculate_pssa(window_id)));
+  logger->send_info(fmt::format("Window PSSA with fin: {}", penumbra.calculate_pssa(window_id)));
 
   return 0;
 }

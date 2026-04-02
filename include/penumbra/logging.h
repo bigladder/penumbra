@@ -4,53 +4,53 @@
 #ifndef PENUMBRA_LOGGING_H_
 #define PENUMBRA_LOGGING_H_
 
-#include <courierr/courierr.h>
+#include <courier/courier.h>
+#include <fmt/format.h>
 
 namespace Penumbra {
 
-class PenumbraLogger : public Courierr::Courierr {
+class PenumbraLogger : public Courier::Courier {
 public:
-  void error(const std::string_view message) override {
+  void receive_error(const std::string& message) override {
     write_message("ERROR", message);
   }
 
-  void warning(const std::string_view message) override {
+  void receive_warning(const std::string& message) override {
     write_message("WARNING", message);
   }
 
-  void info(const std::string_view message) override {
+  void receive_info(const std::string& message) override {
     write_message("NOTE", message);
   }
 
-  void debug(const std::string_view message) override {
+  void receive_debug(const std::string& message) override {
     write_message("DEBUG", message);
   }
 
 protected:
-  void write_message(const std::string_view message_type, const std::string_view message) {
-    std::string context_string =
-        message_context ? fmt::format(" ({})", *(reinterpret_cast<std::string *>(message_context)))
-                        : "";
-    std::cout << fmt::format("  [{}]{} {}", message_type, context_string, message) << std::endl;
+
+void write_message(const std::string_view message_type, const std::string_view message) {
+    std::cout << fmt::format("  [{}] {}", message_type, message) << std::endl;
   }
 };
 
-class PenumbraException : public Courierr::CourierrException {
-public:
-  explicit PenumbraException(const std::string &message, Courierr::Courierr &logger)
-      : CourierrException(message, logger) {}
-};
 
-class SurfaceException : public PenumbraException {
-public:
-  explicit SurfaceException(const unsigned int surface_index,
-                            const std::string_view &surface_context, Courierr::Courierr &logger)
-      : PenumbraException(fmt::format(error_message_format, surface_context, surface_index),
-                          logger) {}
+// class PenumbraException : public Courier::CourierException {
+// public:
+//   explicit PenumbraException(const std::string &message, Courier::Courier &logger)
+//       : CourierException(message, logger) {}
+// };
 
-private:
-  static constexpr std::string_view error_message_format = "{} index, {}, does not exist.";
-};
+// class SurfaceException : public PenumbraException {
+// public:
+//   explicit SurfaceException(const unsigned int surface_index,
+//                             const std::string_view &surface_context, Courier::Courier &logger)
+//       : PenumbraException(std::format(error_message_format, surface_context, surface_index),
+//                           logger) {}
+
+// private:
+//   static constexpr std::string_view error_message_format = "{} index, {}, does not exist.";
+// };
 } // namespace Penumbra
 
 #endif // define PENUMBRA_LOGGING_H_

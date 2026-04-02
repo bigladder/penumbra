@@ -7,19 +7,19 @@
 // Vendor
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <courierr/courierr.h>
+#include <courier/courier.h>
 
 namespace Penumbra {
 
 class GLShader {
 public:
-  GLShader(GLenum type, const char *source, Courierr::Courierr *logger);
+  GLShader(GLenum type, const char *source, Courier::Courier *logger);
   ~GLShader() = default;
   [[nodiscard]] GLuint get() const;
 
 private:
   GLuint shader;
-  Courierr::Courierr *logger;
+  Courier::Courier *logger;
 };
 
 } // namespace Penumbra

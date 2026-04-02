@@ -10,7 +10,7 @@
 
 // Vendor
 #include <tesselator.h>
-#include <courierr/courierr.h>
+#include <courier/courier.h>
 
 namespace Penumbra {
 
@@ -29,7 +29,7 @@ public:
   TessData tessellate();
   Polygon polygon;
   std::vector<Polygon> holes;
-  std::shared_ptr<Courierr::Courierr> logger;
+  std::shared_ptr<Courier::Courier> logger;
   std::string name;
 };
 

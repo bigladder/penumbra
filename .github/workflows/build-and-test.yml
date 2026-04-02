@@ -6,107 +6,63 @@ jobs:
   build-and-test:
     strategy:
       matrix:
+        os: [ubuntu-24.04, ubuntu-22.04,
+             windows-latest, windows-2025, windows-2022,
+             macos-latest, macos-26, macos-15, macos-14, macos-15-intel]
+        compiler: ['']
         include:
-          - os: ubuntu
-            os_ver: "22.04"
-            cc: gcc-11
-            cxx: g++-11
+          - coverage: OFF
             config: Release
             static_lib: ON
+          - compiler: clang-cl
+            os: windows-latest
             coverage: OFF
-            examples: ON
-          - os: ubuntu
-            os_ver: "20.04"
-            cc: gcc-10
-            cxx: g++-10
             config: Release
             static_lib: ON
-            coverage: OFF
-            examples: ON
-          - os: windows
-            os_ver: "2022"
-            cc: cl
-            cxx: cl
-            config: Release
-            static_lib: ON
-            coverage: OFF
-            examples: ON
-          - os: windows
-            os_ver: "2022"
-            cc: cl
-            cxx: cl
-            config: Debug
-            static_lib: ON
-            coverage: OFF
-            examples: ON
-          - os: macos
-            os_ver: "12"
-            cc: clang
-            cxx: clang++
-            config: Release
-            static_lib: ON
-            coverage: OFF
-            examples: ON
-          - os: macos
-            os_ver: "12"
-            cc: clang
-            cxx: clang++
-            config: Debug
-            static_lib: ON
-            coverage: OFF
-            examples: ON
-          - os: macos
-            os_ver: "11"
-            cc: clang
-            cxx: clang++
-            config: Release
-            static_lib: ON
-            coverage: OFF
-            examples: ON
-          - os: ubuntu
-            os_ver: "20.04"
-            cc: gcc-10
-            cxx: g++-10
-            config: Debug
+          - coverage: ON
+            config: DEBUG
             static_lib: OFF
-            coverage: ON
-            examples: OFF
+            os: ubuntu-latest
+          - coverage: OFF
+            config: Release
+            static_lib: ON
+            os: ubuntu-latest
       fail-fast: false
     defaults:
       run:
         shell: bash
-    env:
-      CC: ${{ matrix.cc }}
-      CXX: ${{ matrix.cxx }}
-    runs-on: ${{ matrix.os }}-${{ matrix.os_ver }}
-    name: ${{ matrix.os }}-${{ matrix.os_ver }} ${{ matrix.cxx }} ${{ matrix.config }} coverage=${{ matrix.coverage }}
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} ${{ matrix.config }} coverage=${{ matrix.coverage }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       - name: Set Project Name
         run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
       - name: Create Build Directory
         run: cmake -E make_directory ${{github.workspace}}/build
       - name: Install Linux Libraries
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev
+        run: sudo apt-get update && sudo apt-get -y install xorg-dev libgl1-mesa-dev libwayland-dev wayland-protocols extra-cmake-modules libxkbcommon-dev xvfb
       - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}" -D${{ env.REPOSITORY_NAME }}_BUILD_EXAMPLES="${{ matrix.examples }}"
-      - name: Build
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE="${{ matrix.config }}" -D${{ env.REPOSITORY_NAME }}_STATIC_LIB="${{ matrix.static_lib }}" -D${{ env.REPOSITORY_NAME }}_COVERAGE="${{ matrix.coverage }}" -D${{ env.REPOSITORY_NAME }}_BUILD_EXAMPLES="${{ matrix.examples }}"${{ matrix.compiler == 'clang-cl' && ' -T ClangCL' || '' }}
+      - name: "Build with compiler: ${{ env.COMPILER_VERSION }}"
         run: cmake --build build --config ${{ matrix.config }}
       - name: Setup Mesa3D
         uses: bigladder/github-actions/setup-mesa3d@main
         with:
           install-directory: build\test\${{ matrix.config }}
       - name: Test
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: ctest -C ${{ matrix.config }} --output-on-failure
-          working-directory: build
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            xvfb-run ctest -C ${{ matrix.config }} --output-on-failure
+          else
+            ctest -C ${{ matrix.config }} --output-on-failure
+          fi
+        working-directory: build
       - name: Code Coverage Analysis
         if: matrix.coverage == 'ON'
         run: make gcov
         working-directory: build
       - name: Upload Code Coverage Report
         if: matrix.coverage == 'ON'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5

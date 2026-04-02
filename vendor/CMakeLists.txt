@@ -1,5 +1,16 @@
 include(initialize-submodules)
-initialize_submodules()
+
+if (${PROJECT_NAME}_BUILD_TESTING)
+  add_submodule(googletest
+          TARGET_NAME gtest
+          MARK_AS_ADVANCED BUILD_GTEST BUILD_GMOCK INSTALL_GTEST
+          CACHE_ON gtest_force_shared_crt BUILD_GTEST BUILD_GMOCK
+          CACHE_OFF INSTALL_GTEST
+  )
+endif()
+
+add_submodule(courier MARK_AS_ADVANCED courier_BUILD_TESTING courier_COVERAGE courier_STATIC_LIB)
+add_submodule(libtess2 NO_CMAKELISTS TARGET_NAME tess2)
 
 # GLAD
 add_subdirectory(glad)
@@ -25,24 +36,14 @@ mark_as_advanced(
   BUILD_SHARED_LIBS
 )
 
-add_subdirectory(glfw)
-target_include_directories(glfw PUBLIC
- ${PROJECT_SOURCE_DIR}/vendor/glfw/include
- ${PROJECT_SOURCE_DIR}/vendor/glfw/deps
-)
+add_submodule(glfw)
 
 # tess2 library
 file(GLOB libtess2_sources "${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source/[a-zA-Z]*.c")
-
 add_library(tess2 ${libtess2_sources})
 
 target_include_directories(tess2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Include)
 target_include_directories(tess2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source)
-
-if (NOT TARGET courierr)
-  add_subdirectory(courierr)
-  mark_as_advanced(courierr_BUILD_TESTING courierr_COVERAGE courierr_STATIC_LIB)
-endif ()
 
 # googletest library
 if (${PROJECT_NAME}_BUILD_TESTING AND NOT TARGET gtest)
