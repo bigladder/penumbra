@@ -4,6 +4,11 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+#include <cfenv>
+#if defined(_MSC_VER)
+#include <float.h>
+#endif
+
 #include "gtest/gtest.h"
 
 #include <penumbra/penumbra.h>
@@ -464,6 +469,72 @@ TEST(PenumbraTest, bad_surface_input_errors) {
   EXPECT_THROW(penumbra.render_scene(11), std::runtime_error);
 
   EXPECT_THROW(penumbra.retrieve_pssa(bad_test_cube), std::runtime_error);
+}
+
+// Enable divide-by-zero, invalid and overflow traps the way a host application (e.g., an
+// EnergyPlus debug build) might. Returns false if trapping isn't supported on this platform.
+static bool enable_floating_point_traps() {
+#if defined(__GLIBC__)
+  return feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW) != -1;
+#elif defined(__APPLE__) && defined(__aarch64__)
+  std::fenv_t environment;
+  std::fegetenv(&environment);
+  environment.__fpcr |= __fpcr_trap_divbyzero | __fpcr_trap_invalid | __fpcr_trap_overflow;
+  return std::fesetenv(&environment) == 0;
+#elif defined(__APPLE__) && defined(__x86_64__)
+  std::fenv_t environment;
+  std::fegetenv(&environment);
+  constexpr unsigned short traps = FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW;
+  environment.__control &= static_cast<unsigned short>(~traps);
+  environment.__mxcsr &= ~(static_cast<unsigned int>(traps) << 7);
+  return std::fesetenv(&environment) == 0;
+#elif defined(_MSC_VER)
+  unsigned int control_word;
+  _controlfp_s(&control_word, 0, 0);
+  return _controlfp_s(&control_word, control_word & ~(_EM_ZERODIVIDE | _EM_INVALID | _EM_OVERFLOW),
+                      _MCW_EM) == 0;
+#else
+  return false;
+#endif
+}
+
+TEST(PenumbraTest, floating_point_traps_enabled_by_host) {
+  std::fenv_t original_environment;
+  std::fegetenv(&original_environment);
+  if (!enable_floating_point_traps()) {
+    GTEST_SKIP() << "Enabling floating point traps is not supported on this platform.";
+  }
+  std::fenv_t trapping_environment;
+  std::fegetenv(&trapping_environment);
+
+  // Any FP exception raised by GLFW, the windowing system or the GL driver would crash here
+  // (SIGFPE on x86_64, SIGILL on arm64 macOS).
+  if (Penumbra::Penumbra::is_valid_context()) {
+    Penumbra::Surface wall({0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f}, "Wall");
+    {
+      Penumbra::Penumbra penumbra;
+      unsigned int wall_id = penumbra.add_surface(wall);
+      penumbra.set_model();
+      penumbra.set_sun_position(0.0f, 0.0f);
+      EXPECT_NEAR(penumbra.calculate_pssa(wall_id), 1.0f, 0.01);
+    }
+  }
+
+  // Penumbra must hand the host's environment (including its traps) back untouched.
+  std::fenv_t final_environment;
+  std::fegetenv(&final_environment);
+  std::fesetenv(&original_environment);
+#if defined(__APPLE__) && defined(__aarch64__)
+  EXPECT_EQ(final_environment.__fpcr, trapping_environment.__fpcr);
+#elif defined(__APPLE__) && defined(__x86_64__)
+  EXPECT_EQ(final_environment.__control, trapping_environment.__control);
+  EXPECT_EQ(final_environment.__mxcsr & 0xFF80u, trapping_environment.__mxcsr & 0xFF80u);
+#elif defined(__GLIBC__)
+  std::fesetenv(&final_environment);
+  EXPECT_EQ(fegetexcept(), FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+  std::fesetenv(&original_environment);
+#endif
+  (void)trapping_environment;
 }
 
 int main(int argc, char **argv) {
