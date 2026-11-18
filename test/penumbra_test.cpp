@@ -405,6 +405,9 @@ TEST(PenumbraTest, vendor_name) {
   case Penumbra::VendorType::mesa:
     SUCCEED();
     break;
+  case Penumbra::VendorType::apple:
+    SUCCEED();
+    break;
   default:
     FAIL() << "Vendor Name not found.";
   }
